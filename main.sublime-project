@@ -1,0 +1,24 @@
+{
+	"build_systems":
+	[
+		{
+			"cmd": "g++ -c src/*.cpp -m32 -O3 -Wall -I include -I C:/SFML-2.5.1/include && g++ *.o -o bin/main -L C:/SFML-2.5.1/lib -lsfml-audio -lsfml-network -lsfml-graphics -lsfml-window -lsfml-system -lopengl32 -lfreetype -lwinmm -lgdi32 -lopenal32 -lflac -lvorbisenc -lvorbisfile -lvorbis -logg -lmingw32 -lws2_32 -lwinpthread && start bin/main.exe",
+			"name": "Build",
+			"selector": "source.c++",
+			"shell": true,
+			"working_dir": "${project_path}",
+		}
+	],
+	/*"folders":
+	[
+		{
+			"path": "."
+		}
+	]*/
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+}
