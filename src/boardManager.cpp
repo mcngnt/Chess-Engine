@@ -67,10 +67,14 @@ BoardManager::BoardManager()
 	currentGameState.canWhiteQueenCastle = true;
 	currentGameState.canBlackKingCastle = true;
 	currentGameState.canBlackQueenCastle = true;
-	currentGameState.doublePushRank = 0;
+	currentGameState.doublePushFile = 0;
 	currentGameState.moveCount = 0;
 
 	loadFen(startingFen);
+	initZobrist();
+	computeZobrist();
+
+	currentGameState.zobristKey = zobristKey;
 	// currentBitboard = boardToBitBoard();
 }
 
@@ -399,11 +403,11 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						// En passant
 						// (currentGameState >> 10) & 7) - 1 == i+1)
 
-						if (numSquares[currentPID][NorthEastID] >= 1 && j == 3 && isSquareEnemy(i+1,j) && pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j-1) && currentGameState.doublePushRank - 1 == i+1)
+						if (numSquares[currentPID][NorthEastID] >= 1 && j == 3 && isSquareEnemy(i+1,j) && pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j-1) && currentGameState.doublePushFile - 1 == i+1)
 						{
 							moves.push_back(genMove(i,j,i+1,j-1, EPCapture));
 						}
-						if (numSquares[currentPID][NorthWestID] >= 1 && j == 3 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j-1) && currentGameState.doublePushRank - 1 == i-1)
+						if (numSquares[currentPID][NorthWestID] >= 1 && j == 3 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j-1) && currentGameState.doublePushFile - 1 == i-1)
 						{
 							moves.push_back(genMove(i,j,i-1,j-1, EPCapture));
 						}
@@ -458,11 +462,11 @@ std::vector<int> BoardManager::generatePseudoMoves()
 							}
 						}
 
-						if (numSquares[currentPID][SouthEastID] >= 1 && j == 4 && isSquareEnemy(i+1,j)&& pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j+1) && (currentGameState.doublePushRank - 1 == i+1))
+						if (numSquares[currentPID][SouthEastID] >= 1 && j == 4 && isSquareEnemy(i+1,j)&& pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j+1) && (currentGameState.doublePushFile - 1 == i+1))
 						{
 							moves.push_back(genMove(i,j,i+1,j+1, EPCapture));
 						}
-						if (numSquares[currentPID][SouthWestID] >= 1 && j == 4 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j+1) && (currentGameState.doublePushRank - 1 == i-1))
+						if (numSquares[currentPID][SouthWestID] >= 1 && j == 4 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j+1) && (currentGameState.doublePushFile - 1 == i-1))
 						{
 							moves.push_back(genMove(i,j,i-1,j+1, EPCapture));
 						}
@@ -489,7 +493,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						if (    (currentGameState.canWhiteQueenCastle && whiteToMove) ||  (currentGameState.canBlackQueenCastle && !whiteToMove))
 						{
 							bool isOK = true;
-							for (int p = 2; p < i; ++p )
+							for (int p = 2; p <= 3; ++p )
 							{
 								if (!isSquareEmpty(p, j) || controlled[j][p])
 								{
@@ -504,7 +508,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						if (   (currentGameState.canWhiteKingCastle && whiteToMove) ||  (currentGameState.canBlackKingCastle && !whiteToMove) )
 						{
 							bool isOK = true;
-							for (int p = i+1; p < 7; ++p )
+							for (int p = 5; p <= 6; ++p )
 							{
 								if (!isSquareEmpty(p, j) || controlled[j][p])
 								{
@@ -732,7 +736,7 @@ void BoardManager::loadFen(std::string fen)
 			switch (c)
 			{
 				case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : case '8' :
-					currentGameState.doublePushRank = (c - '0');
+					currentGameState.doublePushFile = (c - '0');
 					break;
 			}
 		}
@@ -847,7 +851,7 @@ std::string BoardManager::convertFen()
 
 	fen += ' ';
 
-	fen += '0' + currentGameState.doublePushRank;
+	fen += '0' + currentGameState.doublePushFile;
 
 	fen += ' ';
 
@@ -975,9 +979,6 @@ void BoardManager::makeMove(int move)
 	// boardHistory.push(nboard);
 	// // printf("%s\n", "aga");
 
-	// printf(" --> %d <-- \n", move);
-
-
 
 	int startPosi = startPos(move);
 	int endPosi = endPos(move);
@@ -988,7 +989,7 @@ void BoardManager::makeMove(int move)
 	newGameState.canWhiteQueenCastle = currentGameState.canWhiteQueenCastle;
 	newGameState.canWhiteKingCastle = currentGameState.canWhiteKingCastle;
 	newGameState.canBlackKingCastle = currentGameState.canBlackKingCastle;
-	newGameState.doublePushRank = 0;
+	newGameState.doublePushFile = 0;
 	newGameState.whiteKingPos = currentGameState.whiteKingPos;
 	newGameState.blackKingPos = currentGameState.blackKingPos;
 
@@ -1000,6 +1001,16 @@ void BoardManager::makeMove(int move)
 		return;
 	}
 
+
+	zobristKey ^= piecesZobrist[pieceType(get(startPosi))][whiteToMove][startPosi];
+	if (tag == Capture || tag == KnightPromCapture || tag == RookPromCapture || tag == BishopPromCapture || tag == QueenPromCapture)
+	{
+		zobristKey ^= piecesZobrist[pieceType(get(endPosi))][!whiteToMove][endPosi];
+	}
+	zobristKey ^= piecesZobrist[pieceType(get(startPosi))][whiteToMove][endPosi];
+
+
+
 	if (tag == Capture || tag == KnightPromCapture || tag == RookPromCapture || tag == BishopPromCapture || tag == QueenPromCapture)
 	{
 		newGameState.capturedPiece = get(endPosi);
@@ -1007,7 +1018,7 @@ void BoardManager::makeMove(int move)
 
 	if (tag == QuietMove || tag == Capture)
 	{
-		if ((pieceType(get(startPosi)) == Rook && startPos.x == 0) || (pieceType(get(endPosi)) == Rook && startPos.x == 0))
+		if ( (startPos.x == 0 && pieceType(get(startPosi)) == Rook) || (endPos.x == 0 && pieceType(get(endPosi)) == Rook)  )
 		{
 			if (whiteToMove)
 			{
@@ -1018,7 +1029,7 @@ void BoardManager::makeMove(int move)
 				newGameState.canBlackQueenCastle = false;
 			}
 		}
-		if ((pieceType(get(startPosi)) == Rook && startPos.x == 7) || (pieceType(get(endPosi)) == Rook && startPos.x == 7))
+		if (  (startPos.x == 7 && pieceType(get(startPosi)) == Rook) || (endPos.x == 7 && pieceType(get(endPosi)) == Rook)  )
 		{
 			if (whiteToMove)
 			{
@@ -1026,7 +1037,7 @@ void BoardManager::makeMove(int move)
 			}
 			else
 			{
-				newGameState.canWhiteKingCastle = false;
+				newGameState.canBlackKingCastle = false;
 			}
 		}
 		if (pieceType(get(startPosi)) == King)
@@ -1071,10 +1082,14 @@ void BoardManager::makeMove(int move)
 		if (isPieceWhite(get(startPosi)))
 		{
 			board[endPos.y][endPos.x] = White | piecePromoType;
+			zobristKey ^= piecesZobrist[Pawn][1][endPosi];
+			zobristKey ^= piecesZobrist[piecePromoType][1][endPosi];
 		}
 		else
 		{
 			board[endPos.y][endPos.x] = Black | piecePromoType;
+			zobristKey ^= piecesZobrist[Pawn][0][endPosi];
+			zobristKey ^= piecesZobrist[piecePromoType][0][endPosi];
 		}
 		board[startPos.y][startPos.x] = None;
 	}
@@ -1084,7 +1099,7 @@ void BoardManager::makeMove(int move)
 	{
 		board[endPos.y][endPos.x] = board[startPos.y][startPos.x];
 		board[startPos.y][startPos.x] = None;
-		newGameState.doublePushRank = startPos.x + 1;
+		newGameState.doublePushFile = startPos.x + 1;
 	}
 
 	if (tag == EPCapture)
@@ -1092,6 +1107,7 @@ void BoardManager::makeMove(int move)
 		board[endPos.y][endPos.x] = board[startPos.y][startPos.x];
 		board[startPos.y][startPos.x] = None;
 		board[startPos.y][endPos.x] = None;
+		zobristKey ^= piecesZobrist[Pawn][!whiteToMove][endPos.x + 8 * startPos.y];
 	}
 
 	if (tag == KingCastle || tag == QueenCastle)
@@ -1100,25 +1116,29 @@ void BoardManager::makeMove(int move)
 		board[startPos.y][startPos.x] = None;
 		if (whiteToMove)
 		{
-			newGameState.canWhiteQueenCastle = false;
 			newGameState.canWhiteKingCastle = false;
+			newGameState.canWhiteQueenCastle = false;
 			newGameState.whiteKingPos = endPosi;
 		}
 		else
 		{
-			newGameState.canBlackQueenCastle = false;
 			newGameState.canBlackKingCastle = false;
+			newGameState.canBlackQueenCastle = false;
 			newGameState.blackKingPos = endPosi;
 		}
 		if (tag == KingCastle)
 		{
-			board[startPos.y][startPos.x + 1] = board[startPos.y][7];
+			board[startPos.y][5] = board[startPos.y][7];
 			board[startPos.y][7] = None;
+			zobristKey ^= piecesZobrist[Rook][whiteToMove][7 + startPos.y * 8];
+			zobristKey ^= piecesZobrist[Rook][whiteToMove][5 + startPos.y * 8];
 		}
 		else
 		{
-			board[startPos.y][startPos.x - 1] = board[startPos.y][0];
+			board[startPos.y][4] = board[startPos.y][0];
 			board[startPos.y][0] = None;
+			zobristKey ^= piecesZobrist[Rook][whiteToMove][startPos.y * 8];
+			zobristKey ^= piecesZobrist[Rook][whiteToMove][4 + startPos.y * 8];
 		}
 	}
 
@@ -1153,48 +1173,37 @@ void BoardManager::makeMove(int move)
 		board[startPos.y][startPos.x] = None;
 	}
 
+	if (newGameState.canWhiteKingCastle != currentGameState.canWhiteKingCastle)
+	{
+		zobristKey ^= castlingRightZobrist[0];
+	}
+	if (newGameState.canWhiteQueenCastle != currentGameState.canWhiteQueenCastle)
+	{
+		zobristKey ^= castlingRightZobrist[1];
+	}
+	if (newGameState.canBlackKingCastle != currentGameState.canBlackKingCastle)
+	{
+		zobristKey ^= castlingRightZobrist[2];
+	}
+	if (newGameState.canBlackQueenCastle != currentGameState.canBlackQueenCastle)
+	{
+		zobristKey ^= castlingRightZobrist[3];
+	}
 
-	// for (int i = 0; i < 64; ++i)
-	// {
-	// 	printf("%d ", get(i));
-	// 	if (i % 8 == 0)
-	// 	{
-	// 		printf("\n");
-	// 	}
-	// }
+	zobristKey ^= doublePushFileZobrist[currentGameState.doublePushFile];
+	zobristKey ^= doublePushFileZobrist[newGameState.doublePushFile];
+	zobristKey ^= whiteToMoveZobrist;
+
+	newGameState.zobristKey = zobristKey;
+
 
 	// currentBitboard = boardToBitBoard();
 
 
 	whiteToMove = !whiteToMove;
 
-	// for (int i = 0; i < 64; ++i)
-	// {
-	// 	int piece = get(i);
-	// 	if (pieceType(piece) == King)
-	// 	{
-	// 		if (isPieceWhite(piece))
-	// 		{
-	// 			newGameState.whiteKingPos = i;
-	// 		}
-	// 		else
-	// 		{
-	// 			newGameState.blackKingPos = i;
-	// 		}
-	// 	}
-	// }
 
 	gameStateHistory.push(currentGameState);
-
-	// printf("Bruh %d %d %s\n", currentGameState.blackKingPos, newGameState.blackKingPos,standardNotation(move).c_str());
-
-	// currentGameState.canBlackQueenCastle = newGameState.canBlackQueenCastle;
-	// currentGameState.canWhiteQueenCastle = newGameState.canWhiteQueenCastle;
-	// currentGameState.canWhiteKingCastle = newGameState.canWhiteKingCastle;
-	// currentGameState.canBlackKingCastle = newGameState.canBlackKingCastle;
-	// currentGameState.doublePushRank = newGameState.doublePushRank;
-	// currentGameState.whiteKingPos = newGameState.whiteKingPos;
-	// currentGameState.blackKingPos = newGameState.blackKingPos;
 
 	currentGameState = newGameState;
 	
@@ -1292,6 +1301,7 @@ void BoardManager::unmakeMove(int move)
 	whiteToMove = !whiteToMove;
 
 	currentGameState = gameStateHistory.top();
+	zobristKey = currentGameState.zobristKey;
 	gameStateHistory.pop();
 
 
@@ -1333,4 +1343,79 @@ int BoardManager::get(int x, int y)
 	}
 }
 
+
+
+uint64_t BoardManager::computeZobrist()
+{
+	uint64_t newZobristKey = (uint64_t)0;
+
+	for (int i = 0; i < 64; ++i)
+	{
+		int piece = get(i);
+		if (piece > 0)
+		{
+			newZobristKey ^= piecesZobrist[pieceType(piece)][isPieceWhite(piece)][i];
+		}
+	}
+
+	newZobristKey ^= doublePushFileZobrist[currentGameState.doublePushFile];
+
+
+	if (!whiteToMove)
+	{
+		newZobristKey ^= whiteToMoveZobrist;
+	}
+
+
+	if (currentGameState.canWhiteKingCastle)
+	{
+		newZobristKey ^= castlingRightZobrist[0];
+	}
+	if (currentGameState.canWhiteQueenCastle)
+	{
+		newZobristKey ^= castlingRightZobrist[1];
+	}
+	if (currentGameState.canBlackKingCastle)
+	{
+		newZobristKey ^= castlingRightZobrist[2];
+	}
+	if (currentGameState.canBlackQueenCastle)
+	{
+		newZobristKey ^= castlingRightZobrist[3];
+	}
+
+	return newZobristKey;
+}
+
+void BoardManager::initZobrist()
+{
+
+	// std::random_device rd;
+
+    std::mt19937_64 gen(1926113);
+    std::uniform_int_distribution<uint64_t> dis(0, std::numeric_limits<uint64_t>::max());
+
+    for (int pType = 1; pType <= 6; ++pType)
+    {
+    	for (int color = 0 ; color <= 1; ++color)
+    	{
+    		for (int squareID = 0; squareID < 64; ++squareID)
+    		{
+    			piecesZobrist[pType][color][squareID] = dis(gen);
+    		}
+    	}
+    }
+
+    for (int i = 0 ; i < 9; ++i)
+    {
+    	doublePushFileZobrist[i] = dis(gen);
+    }
+    whiteToMoveZobrist = dis(gen);
+    for (int i = 0; i < 4; ++i)
+    {
+    	castlingRightZobrist[i] = dis(gen);
+    }
+
+    zobristKey = computeZobrist();
+}
 

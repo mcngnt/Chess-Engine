@@ -17,6 +17,10 @@ Engine::Engine(int whiteBotType_, int blackBotType_)
 
 
 	currentMoves = board.generateMoves();
+
+	printf("True  : %llu\n", board.computeZobrist());
+	printf("Board : %llu\n", board.zobristKey);
+	printf("---\n");
 }
 
 int Engine::aux(int depth)
@@ -111,6 +115,12 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2)
 			legalMove = discardTag(legalMove) | (newTag << 12);
 		}
 		board.makeMove(legalMove);
+
+		printf("True  : %llu\n", board.computeZobrist());
+		printf("Board : %llu\n", board.zobristKey);
+		printf("%d %d %d %d\n", board.currentGameState.canWhiteKingCastle, board.currentGameState.canWhiteQueenCastle, board.currentGameState.canBlackKingCastle, board.currentGameState.canBlackQueenCastle);
+		printf("---\n");
+
 		currentMoves = board.generateMoves();
 		movesHistory.push(legalMove);
 		update();
@@ -135,10 +145,18 @@ void Engine::update()
 		if (board.whiteToMove)
 		{
 			move = whiteBot.play(&board);
+			printf("True  : %llu\n", board.computeZobrist());
+			printf("Board : %llu\n", board.zobristKey);
+			printf("%d %d %d %d\n", board.currentGameState.canWhiteKingCastle, board.currentGameState.canWhiteQueenCastle, board.currentGameState.canBlackKingCastle, board.currentGameState.canBlackQueenCastle);
+			printf("---\n");
 		}
 		else
 		{
 			move = blackBot.play(&board);
+			printf("True  : %llu\n", board.computeZobrist());
+			printf("Board : %llu\n", board.zobristKey);
+			printf("%d %d %d %d\n", board.currentGameState.canWhiteKingCastle, board.currentGameState.canWhiteQueenCastle, board.currentGameState.canBlackKingCastle, board.currentGameState.canBlackQueenCastle);
+			printf("---\n");
 		}
 		if (move == -1)
 		{

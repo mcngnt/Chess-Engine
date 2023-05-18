@@ -1,6 +1,7 @@
 #include "boardManager.h"
+#include "transposition.h"
 
-#define botDepth 4
+#define maxBotDepth 50
 
 
 
@@ -26,6 +27,12 @@ struct MoveScore
     int score;
 };
 
+// struct MoveSeq
+// {
+//     int moveNB;
+//     int moves[maxBotDepth];
+// };
+
 
 
 class Bot
@@ -37,11 +44,11 @@ public:
 	int playRandom(BoardManager* board);
 	int playWell(BoardManager* board);
 
-	int search(BoardManager* board, int depth, int alpha, int beta);
+	int search(BoardManager* board, char depth, int alpha, int beta);
 	int evaluate(BoardManager* board);
 
 	int scoreMove(BoardManager* board, int move);
-	std::vector<int> orderMoves(BoardManager* board, std::vector<int> moves);
+	std::vector<int> orderMoves(BoardManager* board, std::vector<int> moves, char depth);
 
 	int accessHeatMap(int pType,int i, int j, bool whitePlaying);
 
@@ -49,7 +56,33 @@ public:
 
 	int nbMoves = 0;
 
-	int moveSeq[botDepth];
+	// int moveSeq[maxBotDepth];
+	// int bestMoveSeq[maxBotDepth];
+
+	// std::stack<int> moveStack;
+	// std::stack<int> pvMoves;
+
+	char currentDepth;
+
+	// int itDeepMoves[maxBotDepth];
+
+	float maxTime = 2000.0;
+
+	// int pvMoves[maxBotDepth];
+
+	int bestMove;
+	int currentBestMove;
+
+	std::chrono::high_resolution_clock::time_point startTime;
+
+	// bool isDeepOrdering = true;
+
+	// int moveToPlay;
+
+
+	bool reachedTime;
+
+	TranspositionTable transpositionTable;
 
 
 

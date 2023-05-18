@@ -43,10 +43,9 @@ int main()
     sf::Text text;
     text.setFont(font);
 
-    int whiteScore = 0;
 
 
-    Engine engine(Good, Random);
+    Engine engine(Random, Random);
 
     // engine.currentMoves = engine.board.generateMoves();
 
@@ -94,9 +93,6 @@ int main()
     sf::Vector2i pieceHeld(-1,-1);
     int pieceHeldType = 0;
     bool spaceTriggered = false;
-
-
-
 
 
 
@@ -153,9 +149,15 @@ int main()
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && !spaceTriggered)
                 {
                     engine.unmakeMove();
-                    spaceTriggered = true;
 
                 }
+                // if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+                // {
+                //     for (int i = 1; i <= 5;++i)
+                //     {
+                //         printf("%s\n", standardNotation(engine.whiteBot.pvMoves[i]).c_str());
+                //     }
+                // }
             // }
 
         }
@@ -164,21 +166,11 @@ int main()
         window.clear();
 
         spaceTriggered = false;
-
-        // printf("%d %d\n", engine.board.currentGameState.whiteKingPos, engine.board.currentGameState.blackKingPos);
-        // printf("%d %d\n", engine.board.currentGameState.canBlackKingCastle, engine.board.currentGameState.canBlackQueenCastle);
-
         
 
         // printf("%s\n", "Ouf 3");
 
-        engine.update();
-
-
-
-        // printf("%llu\n", engine.board.currentBitboard.blackPawn);
-        // printf("%d %d\n", engine.board.whiteKingPos, engine.board.blackKingPos);
-
+        // engine.update();
 
 
 
@@ -273,8 +265,8 @@ int main()
             text.setCharacterSize(80);
             centerText(&text);
             window.draw(text);
-            engine.checkmate = false;
-            engine.board.loadFen(engine.board.startingFen);
+            // engine.checkmate = false;
+            // engine.board.loadFen(engine.board.startingFen);
         }
 
         window.display();

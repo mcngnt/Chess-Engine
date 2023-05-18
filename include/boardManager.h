@@ -43,10 +43,11 @@ struct GameState
 	bool canWhiteQueenCastle;
 	bool canBlackKingCastle;
 	bool canBlackQueenCastle;
-	int doublePushRank;
+	int doublePushFile;
 	int moveCount;
 	int whiteKingPos;
 	int blackKingPos;
+	uint64_t zobristKey;
 };
 
 enum Pieces
@@ -107,16 +108,6 @@ enum Tag
 	QueenPromCapture = 15
 };
 
-// enum CastleID
-// {
-// 	KingWhiteLeft = 6,  
-// 	KingWhiteRight = 7,
-// 	KingBlackLeft  = 8,
-// 	KingBlackRight = 9  
-// };
-
-
-
 
 bool isPieceWhite(int piece);
 int pieceType(int piece);
@@ -146,6 +137,7 @@ public:
 	bool isSquareFriendly(int pid);
 	void unmakeMove(int move);
 	std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	// std::string startingFen = "7k/8/8/2p1p2p/2P1p2P/4P3/7K/8 b";
 	// std::string startingFen = "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1";
 	// std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
 	// std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/P1N2Q1p/1PPBBPPP/R3K2R b KQkq - ";
@@ -159,6 +151,18 @@ public:
 
 	// BitBoard boardToBitBoard();
 	// void loadBitBoard(BitBoard bitboard);
+
+	uint64_t piecesZobrist[8][2][64];
+	// Avec 0 : pas de prise en passant
+	uint64_t doublePushFileZobrist[9];
+	uint64_t whiteToMoveZobrist;
+	uint64_t castlingRightZobrist[4];
+
+
+	void initZobrist();
+	uint64_t computeZobrist();
+	
+	uint64_t zobristKey;
 
 
 	void controlledSquares();
