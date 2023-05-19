@@ -1,6 +1,6 @@
 #include <utils.h>
 
-#define tableSize 25000
+#define tableSize 35000
 
 enum NodeType
 {
@@ -27,6 +27,10 @@ public:
 	Transposition get(uint64_t key, char depth, int alpha, int beta);
 
 	void set(uint64_t key, char depth, int value, char nodeType, int bestMove);
+
+	void clear();
+
+	int count;
 	
 
 	Transposition table[tableSize];

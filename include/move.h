@@ -10,6 +10,24 @@
 
 #define tagMask 61440
 
+enum Tag
+{
+	QuietMove = 0,
+	DoublePawnPush = 1,
+	KingCastle = 2,
+	QueenCastle = 3,
+	Capture = 4,
+	EPCapture = 5,
+	KnightProm = 8,
+	BishopProm = 9,
+	RookProm = 10,
+	QueenProm = 11,
+	KnightPromCapture = 12,
+	BishopPromCapture = 13,
+	RookPromCapture = 14,
+	QueenPromCapture = 15
+};
+
 
 int pos2DToInt(sf::Vector2i pos);
 int pos2DToInt(int x, int y);
@@ -21,3 +39,4 @@ int endPos(int move);
 int startPos(int move);
 int tag(int move);
 std::string standardNotation(int move);
+bool isCapturingTag(int tag);

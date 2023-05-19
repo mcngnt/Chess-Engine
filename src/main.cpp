@@ -32,10 +32,16 @@ int main()
     sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
     window.setVerticalSyncEnabled(true);
 
-    sf::Color evenPieceCol(155,106,92);
-    sf::Color oddPieceCol(231,209,186);
+    sf::Color evenPieceCol(231,209,186);
+    sf::Color oddPieceCol(155,106,92);
     sf::Color hoverEvenCol(210, 91, 85);
     sf::Color hoverOddCol(244, 137, 127);
+
+    sf::Color fromEvenCol(244,213,79);
+    sf::Color fromOddCol(212,168,39);
+    sf::Color toEvenCol(215,190,124);
+    sf::Color toOddCol(164, 121, 61);
+
     sf::Color greenCol(20, 240, 50);
 
     sf::Font font;
@@ -45,7 +51,7 @@ int main()
 
 
 
-    Engine engine(Random, Random);
+    Engine engine(NotBot, Good);
 
     // engine.currentMoves = engine.board.generateMoves();
 
@@ -70,7 +76,9 @@ int main()
         piecesSpr[i].scale(2.0f, 2.0f);
     }
 
-    // int depth = 6;
+
+
+    // int depth = 4;
     // engine.test(depth);
 
 
@@ -85,7 +93,7 @@ int main()
     int tick = 0;
 
     int pieceSize = 95;
-    sf::Vector2f startPos(270, 170);
+    sf::Vector2f startPosDraw(270, 170);
 
 
     bool holdPiece = false;
@@ -94,14 +102,17 @@ int main()
     int pieceHeldType = 0;
     bool spaceTriggered = false;
 
+    bool doUpdate = true;
+
 
 
 
     while(window.isOpen())
     {
+        doUpdate = true;
     	sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
 
-        sf::Vector2i gridPos(int((mousePos.x - startPos.x)/pieceSize), int((mousePos.y - startPos.y)/pieceSize));
+        sf::Vector2i gridPos(int((mousePos.x - startPosDraw.x)/pieceSize), int((mousePos.y - startPosDraw.y)/pieceSize));
 
 
         sf::Event event;
@@ -131,6 +142,7 @@ int main()
                         holdPiece = false;
                         engine.tryMove(pieceHeld, gridPos);
                         pieceHeld = sf::Vector2i(-1,-1);
+                        doUpdate = false;
                     }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !spaceTriggered)
@@ -138,10 +150,10 @@ int main()
                     // engine.unmakeMove();
                     spaceTriggered = true;
 
-                    engine.update();
+                    // engine.update();
 
-                    std::string currentFen = engine.board.convertFen();
-                    printf("%s\n", currentFen.c_str());
+                    // std::string currentFen = engine.board.convertFen();
+                    // printf("%s\n", currentFen.c_str());
                     // engine.board.loadFen(currentFen);
 
                     // printf("Olala\n");
@@ -167,10 +179,10 @@ int main()
 
         spaceTriggered = false;
         
-
-        // printf("%s\n", "Ouf 3");
-
-        // engine.update();
+        if (doUpdate)
+        {
+            engine.update();
+        }
 
 
 
@@ -183,7 +195,7 @@ int main()
                 
                 int size = 95;
                 
-                sf::Vector2f pos = startPos + sf::Vector2f(j * pieceSize,i * pieceSize);
+                sf::Vector2f pos = startPosDraw + sf::Vector2f(j * pieceSize,i * pieceSize);
 
                 sf::RectangleShape rectangle(sf::Vector2f(size,size));
                 if ((i + j) % 2 == 0)
@@ -194,6 +206,37 @@ int main()
                 {
                     rectangle.setFillColor(oddPieceCol);
                 }
+
+
+                if (!engine.movesHistory.empty())
+                {
+                    int move = engine.movesHistory.top();
+                    sf::Vector2i start = posIntTo2D(startPos(move));
+                    sf::Vector2i end = posIntTo2D(endPos(move));
+                    if (j == start.x && i == start.y)
+                    {
+                        if ((i + j) % 2 == 0)
+                        {
+                            rectangle.setFillColor(fromEvenCol);
+                        }
+                        else
+                        {
+                            rectangle.setFillColor(fromOddCol);
+                        }
+                    }
+                    if (j == end.x && i == end.y)
+                    {
+                        if ((i + j) % 2 == 0)
+                        {
+                            rectangle.setFillColor(toEvenCol);
+                        }
+                        else
+                        {
+                            rectangle.setFillColor(toOddCol);
+                        }
+                    }
+                }
+                
 
                 if (holdPiece)
                 {
@@ -221,23 +264,19 @@ int main()
                 //     rectangle.setFillColor(greenCol);
                 // }
 
+               
+
                 rectangle.setPosition(pos);
                 window.draw(rectangle);
 
-                // Draw Pieces*
-                // printf("%s %d %d\n", "Ouf ", i, j);
 
                 int pnum = engine.get(j,i);
-                // printf("%d\n", pnum);
 
                 if (pnum > 0 && sf::Vector2i(j,i) != pieceHeld)
                 {
                     piecesSpr[pnum].setPosition(pos + sf::Vector2f(size/2, size/2));
                     window.draw(piecesSpr[pnum]);
                 }
-
-                // printf("%s %d %d\n", "Ouf2 ", i, j);
-
 
             }
         }

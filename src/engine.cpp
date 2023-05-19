@@ -16,7 +16,7 @@ Engine::Engine(int whiteBotType_, int blackBotType_)
 	}
 
 
-	currentMoves = board.generateMoves();
+	currentMoves = board.generateMoves(false);
 
 	printf("True  : %llu\n", board.computeZobrist());
 	printf("Board : %llu\n", board.zobristKey);
@@ -32,7 +32,7 @@ int Engine::aux(int depth)
 
 	// printf("%d\n", board.get(3,1));
 
-	std::vector<int> moves = board.generateMoves();
+	std::vector<int> moves = board.generateMoves(false);
 	int nb = 0;
 	for(int move : moves)
 	{
@@ -46,7 +46,7 @@ int Engine::aux(int depth)
 
 void Engine::test(int depth)
 {
-	std::vector<int> moves = board.generateMoves();
+	std::vector<int> moves = board.generateMoves(false);
 
 	int nb = 0;
 	
@@ -121,9 +121,9 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2)
 		printf("%d %d %d %d\n", board.currentGameState.canWhiteKingCastle, board.currentGameState.canWhiteQueenCastle, board.currentGameState.canBlackKingCastle, board.currentGameState.canBlackQueenCastle);
 		printf("---\n");
 
-		currentMoves = board.generateMoves();
+		currentMoves = board.generateMoves(false);
 		movesHistory.push(legalMove);
-		update();
+		// update();
 		return legalMove;
 	}
 	return 0;
@@ -162,7 +162,7 @@ void Engine::update()
 		{
 			checkmate = true;
 		}
-		currentMoves = board.generateMoves();
+		currentMoves = board.generateMoves(false);
 		movesHistory.push(move);
 	}
 }
@@ -173,7 +173,7 @@ void Engine::unmakeMove()
 	{
 		board.unmakeMove(movesHistory.top());
 		movesHistory.pop();
-		currentMoves = board.generateMoves();
+		currentMoves = board.generateMoves(false);
 		// update();
 	}
 	checkmate = false;

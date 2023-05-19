@@ -2,7 +2,7 @@
 
 TranspositionTable::TranspositionTable()
 {
-
+	clear();
 }
 
 Transposition TranspositionTable::get(uint64_t key, char depth, int alpha, int beta)
@@ -44,4 +44,15 @@ void TranspositionTable::set(uint64_t key, char depth, int value, char nodeType,
 
 	table[key % tableSize] = t;
 
+	count += 1;
+
+}
+
+void TranspositionTable::clear()
+{
+	for (int i = 0 ; i < tableSize; ++i)
+	{
+		table[i].isValid = false;
+	}
+	count = 0;
 }

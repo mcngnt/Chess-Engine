@@ -65,3 +65,15 @@ std::string standardNotation(int move)
 {
 	return standardPos(startPos(move)) + standardPos(endPos(move));
 }
+
+bool isCapturingTag(int tag)
+{
+	if ( (tag <= 3) || ( (8 <= tag) && (tag <= 11) ))
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}

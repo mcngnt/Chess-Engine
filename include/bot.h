@@ -3,7 +3,8 @@
 
 #define maxBotDepth 50
 
-
+// #define openingsNB 2800
+// #define maxDurationOpening 30
 
 
 #define pawnValue 100
@@ -27,13 +28,6 @@ struct MoveScore
     int score;
 };
 
-// struct MoveSeq
-// {
-//     int moveNB;
-//     int moves[maxBotDepth];
-// };
-
-
 
 class Bot
 {
@@ -44,6 +38,8 @@ public:
 	int playRandom(BoardManager* board);
 	int playWell(BoardManager* board);
 
+	int quietSearch(BoardManager* board, int alpha, int beta);
+
 	int search(BoardManager* board, char depth, int alpha, int beta);
 	int evaluate(BoardManager* board);
 
@@ -52,9 +48,14 @@ public:
 
 	int accessHeatMap(int pType,int i, int j, bool whitePlaying);
 
+	// void addMove(std::string moveString, int openingNB, int moveNB);
+
 	int botType = Random;
 
+	// std::pair <char, char> openingMoves[openingsNB][maxDurationOpening];
+
 	int nbMoves = 0;
+	int nbTranspo = 0;
 
 	// int moveSeq[maxBotDepth];
 	// int bestMoveSeq[maxBotDepth];
@@ -81,6 +82,8 @@ public:
 
 
 	bool reachedTime;
+
+	int nbQMoves;
 
 	TranspositionTable transpositionTable;
 

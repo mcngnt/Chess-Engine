@@ -13,6 +13,7 @@
 #include <iostream>
 #include <random>
 #include <cstdint>
+#include <fstream>
 
 #define SCREEN_W 1300
 #define SCREEN_H 1000

@@ -274,33 +274,19 @@ void BoardManager::resetControl()
 	}
 }
 
-std::vector<int> BoardManager::generateMoves()
+std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 {
 	std::vector<int> pseudoMoves = generatePseudoMoves();
 
 	std::vector<int> legalMoves;
 
-	// int kingPos;
-
-
 	for (int pseudoMove : pseudoMoves)
 	{
-		// if (startPos(pseudoMove) == endPos(pseudoMove))
-		// {
-		// 	printf("WTF %s\n", standardNotation(pseudoMove).c_str());
-		// 	continue;
-		// }
-
+		if (onlyCaptures && !isCapturingTag(tag(pseudoMove)))
+		{
+			continue;
+		}
 		makeMove(pseudoMove);
-		// kingPos = !whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos;
-		// bool check = false;
-		// for (int opponentMove : generatePseudoMoves())
-		// {
-		// 	if (endPos(opponentMove) == kingPos)
-		// 	{
-		// 		check = true;
-		// 	}
-		// }
 
 		whiteToMove = !whiteToMove;
 
@@ -312,18 +298,7 @@ std::vector<int> BoardManager::generateMoves()
 		whiteToMove = !whiteToMove;
 
 		unmakeMove(pseudoMove);
-		// if (get(5) == (Black | Bishop))
-		// {
-		// 	printf("%s\n", standardNotation(pseudoMove).c_str());
-		// }
-		// if (!check)
-		// {
-		// 	legalMoves.push_back(pseudoMove);
-		// }
 	}
-
-	// printf("%s\n", "Ouf !");
-
 
 	return legalMoves;
 }
@@ -493,6 +468,10 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						if (    (currentGameState.canWhiteQueenCastle && whiteToMove) ||  (currentGameState.canBlackQueenCastle && !whiteToMove))
 						{
 							bool isOK = true;
+							if (!isSquareEmpty(1,j))
+							{
+								isOK = false;
+							}
 							for (int p = 2; p <= 3; ++p )
 							{
 								if (!isSquareEmpty(p, j) || controlled[j][p])
@@ -863,106 +842,6 @@ std::string BoardManager::convertFen()
 
 
 
-// BitBoard BoardManager::boardToBitBoard()
-// {
-// 	BitBoard bitboard;
-// 		// printf("White pawn : %llu\n", bitboard.whitePawn);
-// 	for (int i = 0 ; i < 64 ; ++i)
-// 	{
-// 		int piece = get(i);
-// 		uint64_t bitPos = 1;
-// 		bitPos <<= i;
-// 		switch (piece)
-// 		{
-// 				case White | Pawn:
-// 						// printf("%llu\n", bitboard.whitePawn);
-// 						bitboard.whitePawn |= bitPos;
-// 						break;
-// 				case White | Rook:
-// 						bitboard.whiteRook |= bitPos;
-// 						break;
-// 				case White | Knight:
-// 						bitboard.whiteKnight |= bitPos;
-// 						break;
-// 				case White | Bishop:
-// 						bitboard.whiteBishop |= bitPos;
-// 						break;
-// 				case White | Queen:
-// 						bitboard.whiteQueen |= bitPos;
-// 						break;
-// 				case White | King:
-// 						bitboard.whiteKing |= bitPos;
-// 						break;
-// 				case Black | Pawn:
-// 						bitboard.blackPawn |= bitPos;
-// 						break;
-// 				case Black | Rook:
-// 						bitboard.blackRook |= bitPos;
-// 						break;
-// 				case Black | Knight:
-// 						bitboard.blackKnight |= bitPos;
-// 						break;
-// 				case Black | Bishop:
-// 						bitboard.blackBishop |= bitPos;
-// 						break;
-// 				case Black | Queen:
-// 						bitboard.blackQueen |= bitPos;
-// 						break;
-// 				case Black | King:
-// 						bitboard.blackKing |= bitPos;
-// 						break;
-// 		}
-// 	}
-// 	return bitboard;
-// }
-
-
-
-
-
-// void BoardManager::loadBitBoard(BitBoard bitboard)
-// {
-// 	// printf("%llu\n",bitboard.blackQueen);
-// 	for (int i = 0 ; i < 64; ++i)
-// 	{
-// 		int piece =     ((bitboard.whitePawn >> i) & 1) * (White | Pawn) +
-// 						((bitboard.whiteRook >> i) & 1) * (White | Rook) +
-// 						((bitboard.whiteKnight >> i) & 1) * (White | Knight) +
-// 						((bitboard.whiteBishop >> i) & 1) * (White | Bishop) +
-// 						((bitboard.whiteQueen >> i) & 1) * (White | Queen) +
-// 						((bitboard.whiteKing >> i) & 1) * (White | King) +
-// 						((bitboard.blackPawn >> i) & 1) * (Black | Pawn) +
-// 						((bitboard.blackRook >> i) & 1) * (Black | Rook) +
-// 						((bitboard.blackKnight >> i) & 1) * (Black | Knight) +
-// 						((bitboard.blackBishop >> i) & 1) * (Black | Bishop) +
-// 						((bitboard.blackQueen >> i) & 1) * (Black | Queen) +
-// 						((bitboard.blackKing >> i) & 1) * (Black | King);
-
-// 		if (piece > 22)
-// 		{
-// 			printf("%s %d\n", "load", i);
-// 			// printf("%llu %llu %llu %llu %llu %llu\n", ((bitboard.blackPawn >> i) & 1) * (Black | Pawn),
-// 			// 			((bitboard.blackRook >> i) & 1) * (Black | Rook) ,
-// 			// 			((bitboard.blackKnight >> i) & 1) * (Black | Knight) ,
-// 			// 			((bitboard.blackBishop >> i) & 1) * (Black | Bishop) ,
-// 			// 			((bitboard.blackQueen >> i) & 1) * (Black | Queen) ,
-// 			// 			((bitboard.blackKing >> i) & 1) * (Black | King) );
-// 		}
-// 		board[i / 8][i % 8] = piece;
-// 		if (piece == (White | King))
-// 		{
-// 			whiteKingPos = i;
-// 		}
-// 		if (piece == (Black | King))
-// 		{
-// 			blackKingPos = i;
-// 		}
-// 	}
-// }
-
-
-
-
 void BoardManager::makeMove(int move)
 {
 
@@ -1135,10 +1014,10 @@ void BoardManager::makeMove(int move)
 		}
 		else
 		{
-			board[startPos.y][4] = board[startPos.y][0];
+			board[startPos.y][3] = board[startPos.y][0];
 			board[startPos.y][0] = None;
 			zobristKey ^= piecesZobrist[Rook][whiteToMove][startPos.y * 8];
-			zobristKey ^= piecesZobrist[Rook][whiteToMove][4 + startPos.y * 8];
+			zobristKey ^= piecesZobrist[Rook][whiteToMove][3 + startPos.y * 8];
 		}
 	}
 
@@ -1165,10 +1044,14 @@ void BoardManager::makeMove(int move)
 		if (isPieceWhite(get(startPosi)))
 		{
 			board[endPos.y][endPos.x] = White | piecePromoType;
+			zobristKey ^= piecesZobrist[Pawn][1][endPosi];
+			zobristKey ^= piecesZobrist[piecePromoType][1][endPosi];
 		}
 		else
 		{
 			board[endPos.y][endPos.x] = Black | piecePromoType;
+			zobristKey ^= piecesZobrist[Pawn][0][endPosi];
+			zobristKey ^= piecesZobrist[piecePromoType][0][endPosi];
 		}
 		board[startPos.y][startPos.x] = None;
 	}
@@ -1228,6 +1111,8 @@ void BoardManager::unmakeMove(int move)
 	{
 		board[startPos.y][startPos.x] = board[endPos.y][endPos.x];
 		board[endPos.y][endPos.x] = None;
+		// set(startPosi, get(endPosi));
+		// set(endPosi, None);
 	}
 
 
@@ -1235,6 +1120,8 @@ void BoardManager::unmakeMove(int move)
 	{
 		board[startPos.y][startPos.x] = board[endPos.y][endPos.x];
 		board[endPos.y][endPos.x] = currentGameState.capturedPiece;
+		// set(startPosi, get(endPosi));
+		// set(endPosi, None);
 
 	}
 
@@ -1246,10 +1133,12 @@ void BoardManager::unmakeMove(int move)
 		if (!whiteToMove)
 		{
 			board[endPos.y + 1][endPos.x] = Black | Pawn;
+			// set(endPos.x, endPos.y + 1, Black | Pawn);
 		}
 		else
 		{
 			board[endPos.y - 1][endPos.x] = White | Pawn;
+			// set(endPos.x, endPos.y - 1, White | Pawn);
 		}
 	}
 
@@ -1257,15 +1146,21 @@ void BoardManager::unmakeMove(int move)
 	{
 		board[startPos.y][startPos.x] = board[endPos.y][endPos.x];
 		board[endPos.y][endPos.x] = None;
+		// set(startPosi, get(endPosi));
+		// set(endPosi, None);
 		if (tag == KingCastle)
 		{
-			board[startPos.y][7] = board[startPos.y][startPos.x+1];
-			board[startPos.y][startPos.x+1] = None;
+			// set(7, startPos.y, get(5, startPos.y));
+			// set(5, startPos.y, None);
+			board[startPos.y][7] = board[startPos.y][5];
+			board[startPos.y][5] = None;
 		}
 		else
 		{
-			board[startPos.y][0] = board[startPos.y][startPos.x-1];
-			board[startPos.y][startPos.x-1] = None;
+			board[startPos.y][0] = board[startPos.y][3];
+			board[startPos.y][3] = None;
+			// set(0, startPos.y, get(3, startPos.y));
+			// set(3, startPos.y, None);
 		}
 	}
 
@@ -1274,12 +1169,15 @@ void BoardManager::unmakeMove(int move)
 		if (!whiteToMove)
 		{
 			board[startPos.y][startPos.x] = White | Pawn;
+			// set(startPosi, White | Pawn);
 		}
 		else
 		{
 			board[startPos.y][startPos.x] = Black | Pawn;
+			// set(startPosi, Black | Pawn);
 		}
 		board[endPos.y][endPos.x] = None;
+		// set(startPosi, None);
 	}
 
 	if (tag == KnightPromCapture || tag == RookPromCapture || tag == BishopPromCapture || tag == QueenPromCapture)
@@ -1287,12 +1185,15 @@ void BoardManager::unmakeMove(int move)
 		if (!whiteToMove)
 		{
 			board[startPos.y][startPos.x] = White | Pawn;
+			// set(startPosi, White | Pawn);
 		}
 		else
 		{
 			board[startPos.y][startPos.x] = Black | Pawn;
+			// set(startPosi, Black | Pawn);
 		}
 		board[endPos.y][endPos.x] = currentGameState.capturedPiece;
+		// set(endPosi,currentGameState.capturedPiece);
 	}
 
 	
@@ -1343,6 +1244,23 @@ int BoardManager::get(int x, int y)
 	}
 }
 
+
+// void BoardManager::set(int pos, int piece)
+// {
+// 	if (pos >= 0 && pos < 64)
+// 	{
+// 		board[pos / 8][pos % 8] = piece;
+// 	}
+// }
+
+
+// void BoardManager::set(int x, int y, int piece)
+// {
+// 	if (x >= 0 && x < 8 && y  >= 0 && y < 8)
+// 	{
+// 		board[y][x] = piece;
+// 	}
+// }
 
 
 uint64_t BoardManager::computeZobrist()
