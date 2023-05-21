@@ -56,12 +56,8 @@ BoardManager::BoardManager()
 			numSquares[i + j*8][5] = min(numNorth, numWest);
 			numSquares[i + j*8][6] = min(numSouth, numEast);
 			numSquares[i + j*8][7] = min(numSouth, numWest);
-
-			// printf("%d %d\n", i + j*8, min(numSouth, numEast));
 		}
 	}
-
-	// currentGameState = canCastleMask;
 	currentGameState.capturedPiece = 0;
 	currentGameState.canWhiteKingCastle = true;
 	currentGameState.canWhiteQueenCastle = true;
@@ -146,12 +142,10 @@ void BoardManager::controlledSquares()
 					{
 						if (numSquares[currentPID][NorthEastID] >= 1 && isSquareFree(i+1,j-1))
 						{
-							// controlled[j-1][i+1] = true;
 							assign(j-1,i+1);
 						}
 						if (numSquares[currentPID][NorthWestID] >= 1 && isSquareFree(i-1,j-1))
 						{
-							// controlled[j-1][i+1] = true;
 							assign(j-1,i-1);
 						}
 
@@ -160,12 +154,10 @@ void BoardManager::controlledSquares()
 					{
 						if (numSquares[currentPID][SouthEastID] >= 1 && isSquareFree(i+1,j+1))
 						{
-							// controlled[j+1][i+1] = true;
 							assign(j+1, i+1);
 						}
 						if (numSquares[currentPID][SouthWestID] >= 1 && isSquareFree(i-1,j+1))
 						{
-							// controlled[j+1][i-1] = true;
 							assign(j+1,i-1);
 						}
 					}		
@@ -181,7 +173,6 @@ void BoardManager::controlledSquares()
 
 						if (numSquares[currentPID][dirID] >= 1 && isSquareFree(targetPos))
 						{
-							// controlled[targetPos / 8][targetPos % 8] = true;
 							assign(targetPos/8, targetPos % 8);
 						}
 					}
@@ -244,7 +235,6 @@ void BoardManager::controlledSquares()
 								break;
 							}
 
-							// controlled[targetPos / 8][targetPos % 8] = true;
 							assign(targetPos / 8, targetPos % 8);
 
 							if (isSquareEnemy(targetPos))
@@ -374,9 +364,6 @@ std::vector<int> BoardManager::generatePseudoMoves()
 								moves.push_back(genMove(i,j,i-1,j-1, Capture));
 							}
 						}
-
-						// En passant
-						// (currentGameState >> 10) & 7) - 1 == i+1)
 
 						if (numSquares[currentPID][NorthEastID] >= 1 && j == 3 && isSquareEnemy(i+1,j) && pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j-1) && currentGameState.doublePushFile - 1 == i+1)
 						{
@@ -575,8 +562,6 @@ std::vector<int> BoardManager::generatePseudoMoves()
 			}
 		}
 	}
-
-	// printf("Bruh8 %d \n", currentGameState.blackKingPos);
 
 	return moves;
 }
@@ -845,20 +830,6 @@ std::string BoardManager::convertFen()
 void BoardManager::makeMove(int move)
 {
 
-	// BoardStruct nboard;
-	// // nboard.board = {0};
-	// for (int i = 0; i < 64; ++i)
-	// {
-	// 	printf("%d\n",i );
-	// 	nboard.board[i/8][i%8] = board[i/8][i%8];
-	// }
-
-	// nboard.whiteKingPos = whiteKingPos;
-	// nboard.blackKingPos = blackKingPos;
-	// boardHistory.push(nboard);
-	// // printf("%s\n", "aga");
-
-
 	int startPosi = startPos(move);
 	int endPosi = endPos(move);
 	int tag = (move & tagMask) >> 12;
@@ -1079,10 +1050,6 @@ void BoardManager::makeMove(int move)
 
 	newGameState.zobristKey = zobristKey;
 
-
-	// currentBitboard = boardToBitBoard();
-
-
 	whiteToMove = !whiteToMove;
 
 
@@ -1111,8 +1078,6 @@ void BoardManager::unmakeMove(int move)
 	{
 		board[startPos.y][startPos.x] = board[endPos.y][endPos.x];
 		board[endPos.y][endPos.x] = None;
-		// set(startPosi, get(endPosi));
-		// set(endPosi, None);
 	}
 
 
@@ -1120,9 +1085,6 @@ void BoardManager::unmakeMove(int move)
 	{
 		board[startPos.y][startPos.x] = board[endPos.y][endPos.x];
 		board[endPos.y][endPos.x] = currentGameState.capturedPiece;
-		// set(startPosi, get(endPosi));
-		// set(endPosi, None);
-
 	}
 
 
@@ -1133,12 +1095,10 @@ void BoardManager::unmakeMove(int move)
 		if (!whiteToMove)
 		{
 			board[endPos.y + 1][endPos.x] = Black | Pawn;
-			// set(endPos.x, endPos.y + 1, Black | Pawn);
 		}
 		else
 		{
 			board[endPos.y - 1][endPos.x] = White | Pawn;
-			// set(endPos.x, endPos.y - 1, White | Pawn);
 		}
 	}
 
@@ -1146,12 +1106,8 @@ void BoardManager::unmakeMove(int move)
 	{
 		board[startPos.y][startPos.x] = board[endPos.y][endPos.x];
 		board[endPos.y][endPos.x] = None;
-		// set(startPosi, get(endPosi));
-		// set(endPosi, None);
 		if (tag == KingCastle)
 		{
-			// set(7, startPos.y, get(5, startPos.y));
-			// set(5, startPos.y, None);
 			board[startPos.y][7] = board[startPos.y][5];
 			board[startPos.y][5] = None;
 		}
@@ -1159,8 +1115,6 @@ void BoardManager::unmakeMove(int move)
 		{
 			board[startPos.y][0] = board[startPos.y][3];
 			board[startPos.y][3] = None;
-			// set(0, startPos.y, get(3, startPos.y));
-			// set(3, startPos.y, None);
 		}
 	}
 
@@ -1169,15 +1123,12 @@ void BoardManager::unmakeMove(int move)
 		if (!whiteToMove)
 		{
 			board[startPos.y][startPos.x] = White | Pawn;
-			// set(startPosi, White | Pawn);
 		}
 		else
 		{
 			board[startPos.y][startPos.x] = Black | Pawn;
-			// set(startPosi, Black | Pawn);
 		}
 		board[endPos.y][endPos.x] = None;
-		// set(startPosi, None);
 	}
 
 	if (tag == KnightPromCapture || tag == RookPromCapture || tag == BishopPromCapture || tag == QueenPromCapture)
@@ -1185,15 +1136,12 @@ void BoardManager::unmakeMove(int move)
 		if (!whiteToMove)
 		{
 			board[startPos.y][startPos.x] = White | Pawn;
-			// set(startPosi, White | Pawn);
 		}
 		else
 		{
 			board[startPos.y][startPos.x] = Black | Pawn;
-			// set(startPosi, Black | Pawn);
 		}
 		board[endPos.y][endPos.x] = currentGameState.capturedPiece;
-		// set(endPosi,currentGameState.capturedPiece);
 	}
 
 	
@@ -1204,19 +1152,6 @@ void BoardManager::unmakeMove(int move)
 	currentGameState = gameStateHistory.top();
 	zobristKey = currentGameState.zobristKey;
 	gameStateHistory.pop();
-
-
-	// BoardStruct nboard = boardHistory.top();
-
-	// for (int i = 0; i < 64; ++i)
-	// {
-	// 	board[i/8][i%8] = nboard.board[i/8][i%8];
-	// }
-	// whiteKingPos = nboard.whiteKingPos;
-	// blackKingPos = nboard.blackKingPos;
-	// boardHistory.pop();
-
-	// printf("%s\n", "aaaaaa");
 
 }
 
@@ -1243,25 +1178,6 @@ int BoardManager::get(int x, int y)
 		return 0;
 	}
 }
-
-
-// void BoardManager::set(int pos, int piece)
-// {
-// 	if (pos >= 0 && pos < 64)
-// 	{
-// 		board[pos / 8][pos % 8] = piece;
-// 	}
-// }
-
-
-// void BoardManager::set(int x, int y, int piece)
-// {
-// 	if (x >= 0 && x < 8 && y  >= 0 && y < 8)
-// 	{
-// 		board[y][x] = piece;
-// 	}
-// }
-
 
 uint64_t BoardManager::computeZobrist()
 {
@@ -1308,9 +1224,7 @@ uint64_t BoardManager::computeZobrist()
 void BoardManager::initZobrist()
 {
 
-	// std::random_device rd;
-
-    std::mt19937_64 gen(1926113);
+    std::mt19937_64 gen(time(NULL));
     std::uniform_int_distribution<uint64_t> dis(0, std::numeric_limits<uint64_t>::max());
 
     for (int pType = 1; pType <= 6; ++pType)

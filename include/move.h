@@ -40,3 +40,7 @@ int startPos(int move);
 int tag(int move);
 std::string standardNotation(int move);
 bool isCapturingTag(int tag);
+
+
+int standPosToInt(char c1, char c2);
+int standNotToMove(std::string standNot);

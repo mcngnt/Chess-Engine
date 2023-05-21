@@ -1,102 +1,9 @@
 #include "bot.h"
 
-// int convertPos(char x, char y)
-// {
-// 	return (x - 'a') + 8 * (7 - (y - '1'));
-// }
 
-// int pieceTypeFromLetter(char c)
-// {
-// 	switch (c)
-// 	{
-// 		case 'N':
-// 			return Knight;
-// 			break;
-// 		case 'Q':
-// 			return Queen;
-// 			break;
-// 		case 'B':
-// 			return Bishop;
-// 			break;
-// 		case 'K':
-// 			return King;
-// 			break;
-// 		case 'R':
-// 			return Rook;
-// 			break;
-// 	}
-// 	return 0;
-// }
-
-
-// void Bot::addMove(std::string moveString, int openingNB, int moveNB)
-// {
-// 	// printf("%d\n",moveNB );
-// 	int moveSize = moveString.size();
-
-// 	if (moveSize == 2)
-// 	{
-// 		openingMoves[openingNB][moveNB].first = convertPos(moveString[0], moveString[1]);
-// 		openingMoves[openingNB][moveNB].second = Pawn;
-// 	}
-// 	if (moveSize == 3)
-// 	{
-// 		if (moveString[0] == 'O')
-// 		{
-// 			openingMoves[openingNB][moveNB].second = King + 1;
-// 		}
-// 		else
-// 		{
-// 			openingMoves[openingNB][moveNB].first = convertPos(moveString[1], moveString[2]);
-// 			openingMoves[openingNB][moveNB].second = pieceTypeFromLetter(moveString[0]);
-// 		}
-// 	}
-// 	if (moveSize == 4)
-// 	{
-// 		openingMoves[openingNB][moveNB].second = King + 2;
-// 	}
-// }
 
 Bot::Bot()
 {
-	// std::ifstream file("res/openings.txt");
-
-    // if (file.is_open())
-    // {
-    //     std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-    //     file.close();
-
-    //     int openingNB = 0;
-    //     int moveNB = 0;
-
-    //     std::string moveString;
-
-    //     for (char c : content)
-    //     {
-    //     	if (c == '\n')
-    //     	{
-    //     		openingNB += 1;
-    //     		moveNB = 0;
-    //     		// std::cout << moveString << std::endl;
-    //     		addMove(moveString, openingNB, moveNB);
-    //     		moveString = "";
-    //     		continue;
-    //     	}
-    //     	if (c == ' ')
-    //     	{
-    //     		moveNB += 1;
-    //     		// std::cout << moveString << std::endl;
-    //     		addMove(moveString, openingNB, moveNB);
-    //     		moveString = "";
-    //     		continue;
-    //     	}
-    //     	moveString += c;
-    //     }
-    // } 
-    // else
-    // {
-    //     std::cout << "Unable to open the file." << std::endl;
-    // }
 }
 
 int pieceValue(int ptype)
@@ -212,19 +119,20 @@ std::vector<int> Bot::orderMoves(BoardManager* board, std::vector<int> moves, ch
 
 int Bot::play(BoardManager* board)
 {
+	int move = 0;
 	if (botType == Random)
 	{
-		return playRandom(board);
+		move =  playRandom(board);
 	}
 
 	if (botType == Good)
 	{
-		return playWell(board);
+		move =  playWell(board);
 	}
 
+	board->makeMove(move);
 
-
-	return 0;
+	return move;
 }
 
 int heatMapJ(int j, bool whitePlaying)
@@ -280,9 +188,9 @@ int restrainKingEndGame(BoardManager* board, int myKingPos, int opponentKingPos)
 
 	newScore += distCenterOpp - distCenterFriend;
 
-	// int distKings = abs((myKingPos % 8) - (opponentKingPos % 8)) + abs((myKingPos / 8) - (opponentKingPos / 8));
+	int distKings = abs((myKingPos % 8) - (opponentKingPos % 8)) + abs((myKingPos / 8) - (opponentKingPos / 8));
 
-	// newScore += 14 - distKings;
+	newScore += 2 * (14 - distKings);
 
 
 	return newScore;
@@ -501,23 +409,25 @@ int Bot::playWell(BoardManager* board)
 		}
 		else
 		{
-			printf(" Last iter : %d\n", i);
 			break;
 		}
 
 	}
 
-	printf("NBMove : %d\n", nbMoves);
-	printf("NBTranspo : %d\n", nbTranspo);
-	printf("Count : %d\n", transpositionTable.count);
-	printf("NBQMoves : %d\n", nbQMoves);
+	// printf("Profondeur : %d\n", currentDepth);
+	// printf("Nombre positions evaluees : %d\n", nbMoves);
+	// printf("Nombre transpositions rencontrees : %d\n", nbTranspo);
+	// printf("Nombre d'entrees dans la table de transposition : %d\n", transpositionTable.count);
+	// printf("Nombre de positions silencieuses evaluees : %d\n", nbQMoves);
 
-	if (bestMove != -1)
-	{
-		board->makeMove(bestMove);
-	}
+	// if (bestMove != -1)
+	// {
+	// 	board->makeMove(bestMove);
+	// }
 
-	printf("--> %s   :  %d\n", standardNotation(bestMove).c_str(), eval);;
+	// printf("Mouvement --> %s  : eval =  %d\n", standardNotation(bestMove).c_str(), eval);
+
+	// printf("----------\n");
 
 	transpositionTable.clear();
 
@@ -536,7 +446,7 @@ int Bot::playRandom(BoardManager* board)
 	// srand(6);
 	int random = rand() % moves.size();
 	int move = moves[random];
-	board->makeMove(move);
+	// board->makeMove(move);
 
 	return move;
 }

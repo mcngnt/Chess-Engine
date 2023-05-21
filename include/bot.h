@@ -3,13 +3,9 @@
 
 #define maxBotDepth 50
 
-// #define openingsNB 2800
-// #define maxDurationOpening 30
-
-
 #define pawnValue 100
-#define knightValue 300
-#define bishopValue 300
+#define knightValue 320
+#define bishopValue 330
 #define rookValue 500
 #define queenValue 900
 #define kingValue 20000
@@ -48,46 +44,27 @@ public:
 
 	int accessHeatMap(int pType,int i, int j, bool whitePlaying);
 
-	// void addMove(std::string moveString, int openingNB, int moveNB);
+
 
 	int botType = Random;
-
-	// std::pair <char, char> openingMoves[openingsNB][maxDurationOpening];
 
 	int nbMoves = 0;
 	int nbTranspo = 0;
 
-	// int moveSeq[maxBotDepth];
-	// int bestMoveSeq[maxBotDepth];
-
-	// std::stack<int> moveStack;
-	// std::stack<int> pvMoves;
-
 	char currentDepth;
 
-	// int itDeepMoves[maxBotDepth];
-
-	float maxTime = 2000.0;
-
-	// int pvMoves[maxBotDepth];
+	float maxTime = 3000.0;
 
 	int bestMove;
 	int currentBestMove;
 
 	std::chrono::high_resolution_clock::time_point startTime;
 
-	// bool isDeepOrdering = true;
-
-	// int moveToPlay;
-
-
 	bool reachedTime;
 
 	int nbQMoves;
 
 	TranspositionTable transpositionTable;
-
-
 
 
 	int heatMapPawn[8][8] = { 
@@ -155,17 +132,6 @@ public:
 		{-10,-20,-20,-20,-20,-20,-20,-10},
 		{ 20, 20,  0,  0,  0,  0, 20, 20},
 		{ 20, 30, 10,  0,  0, 10, 30, 20}
-	};
-
-	int heatMapKingEnd[8][8] = {
-		{-50,-40,-30,-20,-20,-30,-40,-50},
-		{-30,-20,-10,  0,  0,-10,-20,-30},
-		{-30,-10, 20, 30, 30, 20,-10,-30},
-		{-30,-10, 30, 40, 40, 30,-10,-30},
-		{-30,-10, 30, 40, 40, 30,-10,-30},
-		{-30,-10, 20, 30, 30, 20,-10,-30},
-		{-30,-30,  0,  0,  0,  0,-30,-30},
-		{-50,-30,-30,-30,-30,-30,-30,-50}
 	};
 
 };

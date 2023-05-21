@@ -17,10 +17,6 @@ Engine::Engine(int whiteBotType_, int blackBotType_)
 
 
 	currentMoves = board.generateMoves(false);
-
-	printf("True  : %llu\n", board.computeZobrist());
-	printf("Board : %llu\n", board.zobristKey);
-	printf("---\n");
 }
 
 int Engine::aux(int depth)
@@ -29,8 +25,6 @@ int Engine::aux(int depth)
 	{
 		return 1;
 	}
-
-	// printf("%d\n", board.get(3,1));
 
 	std::vector<int> moves = board.generateMoves(false);
 	int nb = 0;
@@ -78,7 +72,7 @@ int Engine::isLegal(int move)
 }
 
 
-int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2)
+int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2, char c)
 {
 	int move = genMove(pos2DToInt(p1), pos2DToInt(p2), 0);
 
@@ -89,25 +83,48 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2)
 		if (  tag(legalMove) >= 8)
 		{
 			int newTag = 0;
+			int newTagPr = QueenProm;
+			int newTagPrCap = QueenPromCapture;
+			if (c == 'q')
+			{
+				newTagPr = QueenProm;
+				newTagPrCap = QueenPromCapture;
+			}
+			if (c == 'n')
+			{
+				newTagPr = KnightProm;
+				newTagPrCap = KnightPromCapture;
+			}
+			if (c == 'b')
+			{
+				newTagPr = BishopProm;
+				newTagPrCap = BishopPromCapture;
+			}
+			if (c == 'r')
+			{
+				newTagPr = RookProm;
+				newTagPrCap = RookPromCapture;
+			}
+
 			switch (tag(legalMove))
 			{
 				case KnightProm:
-					newTag = QueenProm;
+					newTag = newTagPr;
 					break;
 				case BishopProm:
-					newTag = QueenProm;
+					newTag = newTagPr;
 					break;
 				case RookProm:
-					newTag = QueenProm;
+					newTag = newTagPr;
 					break;
 				case KnightPromCapture:
-					newTag = QueenPromCapture;
+					newTag = newTagPrCap;
 					break;
 				case BishopPromCapture:
-					newTag = QueenPromCapture;
+					newTag = newTagPrCap;
 					break;
 				case RookPromCapture:
-					newTag = QueenPromCapture;
+					newTag = newTagPrCap;
 					break;
 				
 			}
@@ -116,17 +133,97 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2)
 		}
 		board.makeMove(legalMove);
 
-		printf("True  : %llu\n", board.computeZobrist());
-		printf("Board : %llu\n", board.zobristKey);
-		printf("%d %d %d %d\n", board.currentGameState.canWhiteKingCastle, board.currentGameState.canWhiteQueenCastle, board.currentGameState.canBlackKingCastle, board.currentGameState.canBlackQueenCastle);
-		printf("---\n");
-
 		currentMoves = board.generateMoves(false);
 		movesHistory.push(legalMove);
-		// update();
 		return legalMove;
 	}
 	return 0;
+}
+
+int Engine::tryMove(int move, char c)
+{
+	int legalMove = isLegal(move);
+
+	if (legalMove > 0)
+	{
+		if (  tag(legalMove) >= 8)
+		{
+			int newTag = 0;
+			int newTagPr = QueenProm;
+			int newTagPrCap = QueenPromCapture;
+			if (c == 'q')
+			{
+				newTagPr = QueenProm;
+				newTagPrCap = QueenPromCapture;
+			}
+			if (c == 'n')
+			{
+				newTagPr = KnightProm;
+				newTagPrCap = KnightPromCapture;
+			}
+			if (c == 'b')
+			{
+				newTagPr = BishopProm;
+				newTagPrCap = BishopPromCapture;
+			}
+			if (c == 'r')
+			{
+				newTagPr = RookProm;
+				newTagPrCap = RookPromCapture;
+			}
+
+			switch (tag(legalMove))
+			{
+				case KnightProm:
+					newTag = newTagPr;
+					break;
+				case BishopProm:
+					newTag = newTagPr;
+					break;
+				case RookProm:
+					newTag = newTagPr;
+					break;
+				case KnightPromCapture:
+					newTag = newTagPrCap;
+					break;
+				case BishopPromCapture:
+					newTag = newTagPrCap;
+					break;
+				case RookPromCapture:
+					newTag = newTagPrCap;
+					break;
+				
+			}
+			
+			legalMove = discardTag(legalMove) | (newTag << 12);
+		}
+		board.makeMove(legalMove);
+
+		currentMoves = board.generateMoves(false);
+		movesHistory.push(legalMove);
+		return legalMove;
+	}
+	return 0;
+}
+
+int Engine::tryMove(int move)
+{
+	board.makeMove(move);
+	currentMoves = board.generateMoves(false);
+	movesHistory.push(move);
+	return move;
+}
+
+int Engine::getBestMove()
+{
+	if (board.whiteToMove)
+	{
+		return whiteBot.playWell(&board);
+	}
+	else
+	{
+		return blackBot.playWell(&board);
+	}
 }
 
 void Engine::update()
@@ -137,7 +234,6 @@ void Engine::update()
 		{
 			checkmate = true;
 		}
-
 	}
 	else
 	{
@@ -145,25 +241,17 @@ void Engine::update()
 		if (board.whiteToMove)
 		{
 			move = whiteBot.play(&board);
-			printf("True  : %llu\n", board.computeZobrist());
-			printf("Board : %llu\n", board.zobristKey);
-			printf("%d %d %d %d\n", board.currentGameState.canWhiteKingCastle, board.currentGameState.canWhiteQueenCastle, board.currentGameState.canBlackKingCastle, board.currentGameState.canBlackQueenCastle);
-			printf("---\n");
 		}
 		else
 		{
 			move = blackBot.play(&board);
-			printf("True  : %llu\n", board.computeZobrist());
-			printf("Board : %llu\n", board.zobristKey);
-			printf("%d %d %d %d\n", board.currentGameState.canWhiteKingCastle, board.currentGameState.canWhiteQueenCastle, board.currentGameState.canBlackKingCastle, board.currentGameState.canBlackQueenCastle);
-			printf("---\n");
 		}
 		if (move == -1)
 		{
 			checkmate = true;
 		}
-		currentMoves = board.generateMoves(false);
 		movesHistory.push(move);
+		currentMoves = board.generateMoves(false);
 	}
 }
 

@@ -63,7 +63,36 @@ std::string standardPos(int pos)
 
 std::string standardNotation(int move)
 {
-	return standardPos(startPos(move)) + standardPos(endPos(move));
+	int t = tag(move);
+	char c = ' ';
+	switch (t)
+	{
+		case QueenProm:
+			c = 'q';
+			break;
+		case QueenPromCapture:
+			c = 'q';
+			break;
+		case KnightProm:
+			c = 'k';
+			break;
+		case KnightPromCapture:
+			c = 'k';
+			break;
+		case RookProm:
+			c = 'r';
+			break;
+		case RookPromCapture:
+			c = 'r';
+			break;
+		case BishopProm:
+			c = 'b';
+			break;
+		case BishopPromCapture:
+			c = 'b';
+			break;
+	}
+	return standardPos(startPos(move)) + standardPos(endPos(move)) + c;
 }
 
 bool isCapturingTag(int tag)
@@ -76,4 +105,23 @@ bool isCapturingTag(int tag)
 	{
 		return true;
 	}
+}
+
+int standPosToInt(char c1, char c2)
+{
+	return (c1 - 'a') + 8 * (7 - (c2 - '1'));
+}
+
+// int promTag(char c)
+// {
+// 	switch (c)
+// 	{
+// 		case q:
+
+// 	}
+// }
+
+int standNotToMove(std::string standNot)
+{
+	return genMove(standPosToInt(standNot[0],standNot[1]), standPosToInt(standNot[2],standNot[3]), 0);
 }

@@ -24,57 +24,73 @@ void centerText(sf::Text* t_)
     textRect.top  + textRect.height/2.0f);
 }
 
+int time_to_alloc(int baseTime, int inc)
+{
+    if (baseTime < 2 * inc)
+    {
+        return inc;
+    }
+    return (baseTime/50) + inc;
+}
+
 
 
 int main()
 {
-	srand(time(NULL));
-    sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
-    window.setVerticalSyncEnabled(true);
+    bool useUCI = true;
 
-    sf::Color evenPieceCol(231,209,186);
-    sf::Color oddPieceCol(155,106,92);
-    sf::Color hoverEvenCol(210, 91, 85);
-    sf::Color hoverOddCol(244, 137, 127);
+	// srand(time(NULL));
+    // sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
+    // window.setVerticalSyncEnabled(true);
 
-    sf::Color fromEvenCol(244,213,79);
-    sf::Color fromOddCol(212,168,39);
-    sf::Color toEvenCol(215,190,124);
-    sf::Color toOddCol(164, 121, 61);
+    // sf::Color evenPieceCol(231,209,186);
+    // sf::Color oddPieceCol(155,106,92);
+    // sf::Color hoverEvenCol(210, 91, 85);
+    // sf::Color hoverOddCol(244, 137, 127);
 
-    sf::Color greenCol(20, 240, 50);
+    // sf::Color fromEvenCol(244,213,79);
+    // sf::Color fromOddCol(212,168,39);
+    // sf::Color toEvenCol(215,190,124);
+    // sf::Color toOddCol(164, 121, 61);
 
-    sf::Font font;
-    font.loadFromFile("res/GoogleSans-Bold.ttf");
-    sf::Text text;
-    text.setFont(font);
+    // sf::Color greenCol(20, 240, 50);
 
+    // sf::Font font;
+    // font.loadFromFile("res/GoogleSans-Bold.ttf");
+    // sf::Text text;
+    // text.setFont(font);
 
-
-    Engine engine(NotBot, Good);
-
-    // engine.currentMoves = engine.board.generateMoves();
-
-    sf::Texture piecesTex[23];
-    sf::Sprite piecesSpr[23];
-    piecesSpr[White | Pawn] = create_sprite(&piecesTex[White | Pawn], "res/w_pawn.png");
-    piecesSpr[White | Rook] = create_sprite(&piecesTex[White | Rook], "res/w_rook.png");
-    piecesSpr[White | Knight] = create_sprite(&piecesTex[White | Knight], "res/w_knight.png");
-    piecesSpr[White | Bishop] = create_sprite(&piecesTex[White | Bishop], "res/w_bishop.png");
-    piecesSpr[White | Queen] = create_sprite(&piecesTex[White | Queen], "res/w_queen.png");
-    piecesSpr[White | King] = create_sprite(&piecesTex[White | King], "res/w_king.png");
-    piecesSpr[Black | Pawn] = create_sprite(&piecesTex[Black | Pawn], "res/b_pawn.png");
-    piecesSpr[Black | Rook] = create_sprite(&piecesTex[Black | Rook], "res/b_rook.png");
-    piecesSpr[Black | Knight] = create_sprite(&piecesTex[Black | Knight], "res/b_knight.png");
-    piecesSpr[Black | Bishop] = create_sprite(&piecesTex[Black | Bishop], "res/b_bishop.png");
-    piecesSpr[Black | Queen] = create_sprite(&piecesTex[Black | Queen], "res/b_queen.png");
-    piecesSpr[Black | King] = create_sprite(&piecesTex[Black | King], "res/b_king.png");
+    // sf::Texture screenTexture;
+    // screenTexture.create(SCREEN_W, SCREEN_H); 
 
 
-    for (int i = 0 ; i < 23 ; ++i)
-    {
-        piecesSpr[i].scale(2.0f, 2.0f);
-    }
+    Engine engine(NotBot, NotBot);
+
+
+    // sf::Texture piecesTex[23];
+    // sf::Sprite piecesSpr[23];
+
+    // if (true)
+    // {
+    //     piecesSpr[White | Pawn] = create_sprite(&piecesTex[White | Pawn], "res/w_pawn.png");
+    //     piecesSpr[White | Rook] = create_sprite(&piecesTex[White | Rook], "res/w_rook.png");
+    //     piecesSpr[White | Knight] = create_sprite(&piecesTex[White | Knight], "res/w_knight.png");
+    //     piecesSpr[White | Bishop] = create_sprite(&piecesTex[White | Bishop], "res/w_bishop.png");
+    //     piecesSpr[White | Queen] = create_sprite(&piecesTex[White | Queen], "res/w_queen.png");
+    //     piecesSpr[White | King] = create_sprite(&piecesTex[White | King], "res/w_king.png");
+    //     piecesSpr[Black | Pawn] = create_sprite(&piecesTex[Black | Pawn], "res/b_pawn.png");
+    //     piecesSpr[Black | Rook] = create_sprite(&piecesTex[Black | Rook], "res/b_rook.png");
+    //     piecesSpr[Black | Knight] = create_sprite(&piecesTex[Black | Knight], "res/b_knight.png");
+    //     piecesSpr[Black | Bishop] = create_sprite(&piecesTex[Black | Bishop], "res/b_bishop.png");
+    //     piecesSpr[Black | Queen] = create_sprite(&piecesTex[Black | Queen], "res/b_queen.png");
+    //     piecesSpr[Black | King] = create_sprite(&piecesTex[Black | King], "res/b_king.png");
+
+
+    //     for (int i = 0 ; i < 23 ; ++i)
+    //     {
+    //         piecesSpr[i].scale(2.4f, 2.4f);
+    //     }
+    // }
 
 
 
@@ -82,233 +98,456 @@ int main()
     // engine.test(depth);
 
 
-    // printf("%d\n", engine.board.whiteToMove);
-    // printf("%d\n", engine.aux(depth));
+    // int tick = 0;
 
-    // BitBoard bitboard = engine.board.boardToBitBoard();
-    // engine.board.loadBitBoard(bitboard);
-
+    // int pieceSize = 138;
+    // sf::Vector2f startPosDraw(0,0);
 
 
-    int tick = 0;
+    // bool holdPiece = false;
 
-    int pieceSize = 95;
-    sf::Vector2f startPosDraw(270, 170);
+    // sf::Vector2i pieceHeld(-1,-1);
+    // int pieceHeldType = 0;
+    // bool spaceTriggered = false;
 
+    // bool doUpdate = false;
 
-    bool holdPiece = false;
+    // std::string totalCom;
 
-    sf::Vector2i pieceHeld(-1,-1);
-    int pieceHeldType = 0;
-    bool spaceTriggered = false;
+    // if(useUCI)
+    // {
+    //     window.close();
+    // }
 
-    bool doUpdate = true;
-
-
-
-
-    while(window.isOpen())
+    // while(window.isOpen())
+    while(true)
     {
-        doUpdate = true;
-    	sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
+    //     doUpdate = true;
+    // 	sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
 
-        sf::Vector2i gridPos(int((mousePos.x - startPosDraw.x)/pieceSize), int((mousePos.y - startPosDraw.y)/pieceSize));
+    //     sf::Vector2i gridPos(int((mousePos.x - startPosDraw.x)/pieceSize), int((mousePos.y - startPosDraw.y)/pieceSize));
 
 
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if ((event.type == sf::Event::Closed) || ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape)))
-            {
-                window.close();
-                break;
-            }
+    //     sf::Event event;
+    //     while (window.pollEvent(event) && !useUCI)
+    //     {
+    //         if ((event.type == sf::Event::Closed) || ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape)))
+    //         {
+    //             window.close();
+    //             break;
+    //         }
 
-            // if(((engine.board.whiteToMove && !engine.isWhiteBot) || (!engine.board.whiteToMove && !engine.isBlackBot)) && !engine.checkmate )
-            // {
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-                {
-                    if (!holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7 && engine.get(gridPos) > 0)
-                    {
-                        holdPiece = true;
-                        pieceHeld = gridPos;
-                        pieceHeldType = engine.get(gridPos);
-                    }
-                }
-                if (event.type == sf::Event::MouseButtonReleased)
-                {
-                    if (holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7)
-                    {
-                        holdPiece = false;
-                        engine.tryMove(pieceHeld, gridPos);
-                        pieceHeld = sf::Vector2i(-1,-1);
-                        doUpdate = false;
-                    }
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !spaceTriggered)
-                {
-                    // engine.unmakeMove();
-                    spaceTriggered = true;
+    //         // if(((engine.board.whiteToMove && !engine.isWhiteBot) || (!engine.board.whiteToMove && !engine.isBlackBot)) && !engine.checkmate )
+    //         // {
+    //             if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    //             {
+    //                 if (!holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7 && engine.get(gridPos) > 0)
+    //                 {
+    //                     holdPiece = true;
+    //                     pieceHeld = gridPos;
+    //                     pieceHeldType = engine.get(gridPos);
+    //                 }
+    //             }
+    //             if (event.type == sf::Event::MouseButtonReleased)
+    //             {
+    //                 if (holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7)
+    //                 {
+    //                     holdPiece = false;
+    //                     engine.tryMove(pieceHeld, gridPos, 'q');
+    //                     pieceHeld = sf::Vector2i(-1,-1);
+    //                     doUpdate = false;
+    //                 }
+    //             }
+    //             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !spaceTriggered)
+    //             {
+    //                 // engine.unmakeMove();
+    //                 spaceTriggered = true;
 
-                    // engine.update();
+    //                 // engine.update();
 
-                    // std::string currentFen = engine.board.convertFen();
-                    // printf("%s\n", currentFen.c_str());
-                    // engine.board.loadFen(currentFen);
+    //                 // std::string currentFen = engine.board.convertFen();
+    //                 // engine.board.loadFen(currentFen);
 
-                    // printf("Olala\n");
-                }
-                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && !spaceTriggered)
-                {
-                    engine.unmakeMove();
+    //             }
+    //             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && !spaceTriggered)
+    //             {
+    //                 engine.unmakeMove();
 
-                }
-                // if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-                // {
-                //     for (int i = 1; i <= 5;++i)
-                //     {
-                //         printf("%s\n", standardNotation(engine.whiteBot.pvMoves[i]).c_str());
-                //     }
-                // }
-            // }
+    //             }
+    //             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+    //             {
+    //                 screenTexture.update(window);
+    //                 if (screenTexture.copyToImage().saveToFile("res/" + std::to_string(engine.board.zobristKey) + ".png"))
+    //                 {
+    //                     std::cout << "screenshot saved to " << "res/" + std::to_string(engine.board.zobristKey) + ".png" << std::endl;
+    //                 }
+    //             }
+    //         // }
 
-        }
+    //     }
 
-        tick++;
-        window.clear();
+    //     tick++;
+    //     window.clear(sf::Color(255, 255, 255));
 
-        spaceTriggered = false;
+    //     spaceTriggered = false;
+
         
-        if (doUpdate)
+    //     if (doUpdate)
+    //     {
+    //         engine.update();
+    //     }
+
+
+
+    //     if (true)
+    //     {
+    //         for (int i = 0 ; i < 8; ++i)
+    //         {
+    //             for (int j = 0 ; j < 8; ++j)
+    //             {
+
+    //                 // Draw Squares
+                                    
+    //                 sf::Vector2f pos = startPosDraw + sf::Vector2f(j * pieceSize,i * pieceSize);
+
+
+
+    //                 sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
+    //                 if ((i + j) % 2 == 0)
+    //                 {
+    //                     rectangle.setFillColor(evenPieceCol);
+    //                 }
+    //                 else
+    //                 {
+    //                     rectangle.setFillColor(oddPieceCol);
+    //                 }
+
+
+    //                 if (!engine.movesHistory.empty())
+    //                 {
+    //                     int move = engine.movesHistory.top();
+    //                     sf::Vector2i start = posIntTo2D(startPos(move));
+    //                     sf::Vector2i end = posIntTo2D(endPos(move));
+    //                     if (j == start.x && i == start.y)
+    //                     {
+    //                         if ((i + j) % 2 == 0)
+    //                         {
+    //                             rectangle.setFillColor(fromEvenCol);
+    //                         }
+    //                         else
+    //                         {
+    //                             rectangle.setFillColor(fromOddCol);
+    //                         }
+    //                     }
+    //                     if (j == end.x && i == end.y)
+    //                     {
+    //                         if ((i + j) % 2 == 0)
+    //                         {
+    //                             rectangle.setFillColor(toEvenCol);
+    //                         }
+    //                         else
+    //                         {
+    //                             rectangle.setFillColor(toOddCol);
+    //                         }
+    //                     }
+    //                 }
+
+
+    //                 if (holdPiece)
+    //                 {
+    //                     if (engine.isLegal(genMove(pieceHeld.x, pieceHeld.y, j,i, 0)))
+    //                     {
+    //                         if ((i + j) % 2 == 0)
+    //                         {
+    //                             rectangle.setFillColor(hoverEvenCol);
+    //                         }
+    //                         else
+    //                         {
+    //                             rectangle.setFillColor(hoverOddCol);
+    //                         }
+    //                     }
+    //                 }
+
+
+    //                 // for (int k = 0; k < 64; ++k)
+    //                 // {
+    //                 //     if (engine.isLegal(genMove(k%8, k/8, j,i, 0)))
+    //                 //     {
+    //                 //         if ((i + j) % 2 == 0)
+    //                 //         {
+    //                 //             rectangle.setFillColor(hoverEvenCol);
+    //                 //         }
+    //                 //         else
+    //                 //         {
+    //                 //             rectangle.setFillColor(hoverOddCol);
+    //                 //         }
+    //                 //     }
+    //                 // }
+                    
+                    
+    //                 // engine.board.whiteToMove = !engine.board.whiteToMove;
+    //                 // engine.board.controlledSquares();
+    //                 // engine.board.whiteToMove = !engine.board.whiteToMove;
+    //                 // if (engine.board.controlled[i][j])
+    //                 // {
+    //                 //     engine.board.whiteToMove = !engine.board.whiteToMove;
+    //                 //     engine.board.controlledSquares();
+    //                 //     engine.board.whiteToMove = !engine.board.whiteToMove;
+    //                 //     rectangle.setFillColor(greenCol);
+    //                 // }
+
+                   
+
+    //                 rectangle.setPosition(pos);
+    //                 window.draw(rectangle);
+
+
+    //                 int pnum = engine.get(j,i);
+
+    //                 if (pnum > 0 && sf::Vector2i(j,i) != pieceHeld)
+    //                 {
+    //                     piecesSpr[pnum].setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
+    //                     window.draw(piecesSpr[pnum]);
+    //                 }
+
+    //                 // text.setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
+    //                 // text.setColor(sf::Color(0,0,0));
+    //                 // centerText(&text);
+    //                 // text.setString(std::to_string(j + 8 * i));
+    //                 // text.setCharacterSize(80);
+    //                 // window.draw(text);
+
+    //             }
+    //         }
+    //     }
+
+
+
+        // if (holdPiece)
+        // {
+        //     piecesSpr[pieceHeldType].setPosition(mousePos);
+        //     window.draw(piecesSpr[pieceHeldType]);
+        // }
+
+
+        // if (engine.checkmate)
+        // {
+        //     if (engine.board.isChecked())
+        //     {
+        //         text.setString("Echec et mat");
+        //     }
+        //     else
+        //     {
+        //         text.setString("Pat");
+        //     }
+        //     text.setPosition(sf::Vector2f(550, 550));
+        //     text.setCharacterSize(80);
+        //     text.setOutlineColor(sf::Color(0,0,0));
+        //     text.setOutlineThickness(5);
+        //     centerText(&text);
+        //     window.draw(text);
+        //     // engine.checkmate = false;
+        //     // engine.board.loadFen(engine.board.startingFen);
+        // }
+
+
+        // window.display();
+
+        if (useUCI)
         {
-            engine.update();
-        }
-
-
-
-        for (int i = 0 ; i < 8; ++i)
-        {
-            for (int j = 0 ; j < 8; ++j)
-            {
-
-                // Draw Squares
-                
-                int size = 95;
-                
-                sf::Vector2f pos = startPosDraw + sf::Vector2f(j * pieceSize,i * pieceSize);
-
-                sf::RectangleShape rectangle(sf::Vector2f(size,size));
-                if ((i + j) % 2 == 0)
-                {
-                    rectangle.setFillColor(evenPieceCol);
-                }
-                else
-                {
-                    rectangle.setFillColor(oddPieceCol);
-                }
-
-
-                if (!engine.movesHistory.empty())
-                {
-                    int move = engine.movesHistory.top();
-                    sf::Vector2i start = posIntTo2D(startPos(move));
-                    sf::Vector2i end = posIntTo2D(endPos(move));
-                    if (j == start.x && i == start.y)
-                    {
-                        if ((i + j) % 2 == 0)
-                        {
-                            rectangle.setFillColor(fromEvenCol);
-                        }
-                        else
-                        {
-                            rectangle.setFillColor(fromOddCol);
-                        }
-                    }
-                    if (j == end.x && i == end.y)
-                    {
-                        if ((i + j) % 2 == 0)
-                        {
-                            rectangle.setFillColor(toEvenCol);
-                        }
-                        else
-                        {
-                            rectangle.setFillColor(toOddCol);
-                        }
-                    }
-                }
-                
-
-                if (holdPiece)
-                {
-                    if (engine.isLegal(genMove(pieceHeld.x, pieceHeld.y, j,i, 0)))
-                    {
-                        if ((i + j) % 2 == 0)
-                        {
-                            rectangle.setFillColor(hoverEvenCol);
-                        }
-                        else
-                        {
-                            rectangle.setFillColor(hoverOddCol);
-                        }
-                    }
-                }
-                
-                // engine.board.whiteToMove = !engine.board.whiteToMove;
-                // engine.board.controlledSquares();
-                // engine.board.whiteToMove = !engine.board.whiteToMove;
-                // if (engine.board.controlled[i][j])
-                // {
-                //     engine.board.whiteToMove = !engine.board.whiteToMove;
-                //     engine.board.controlledSquares();
-                //     engine.board.whiteToMove = !engine.board.whiteToMove;
-                //     rectangle.setFillColor(greenCol);
-                // }
-
-               
-
-                rectangle.setPosition(pos);
-                window.draw(rectangle);
-
-
-                int pnum = engine.get(j,i);
-
-                if (pnum > 0 && sf::Vector2i(j,i) != pieceHeld)
-                {
-                    piecesSpr[pnum].setPosition(pos + sf::Vector2f(size/2, size/2));
-                    window.draw(piecesSpr[pnum]);
-                }
-
+            std::string command;
+            std::getline(std::cin, command);
+            std::string zstring = std::to_string(engine.board.whiteToMoveZobrist);
+            std::ofstream file(  zstring + ".txt", std::ios::app);
+            if (file.is_open()) {
+                file << command << std::endl;
+                file.close();
             }
-        }
 
+            // totalCom += command + '\n';
 
+            // int count = 0;
 
-        if (holdPiece)
-        {
-            piecesSpr[pieceHeldType].setPosition(mousePos);
-            window.draw(piecesSpr[pieceHeldType]);
-        }
+            // text.setPosition(sf::Vector2f(550, 550));
+            // text.setCharacterSize(30);
+            // // text.setOutlineColor(sf::Color(0,0,0));
+            // // text.setOutlineThickness(5);
+            // text.setString(totalCom);
+            // centerText(&text);
+            // window.draw(text);
 
-
-        if (engine.checkmate)
-        {
-            if (engine.board.isChecked())
+            // std::cin >> command;
+            std::vector<std::string> words;
+            std::stringstream ss(command);
+            std::string str;
+            while (std::getline(ss, str, ' ')) 
             {
-                text.setString("Echec et mat");
+                words.push_back(str);
             }
-            else
+
+            bool readPos = false;
+
+            // Pos mode :
+            // 0 : None
+            // 1 : Fen
+            // 2 : startpos
+            int posMode = 0;
+            bool readMoves = false;
+
+            bool readBlackTime = false;
+            bool readWhiteTime = false;
+            bool readBlackInc = false;
+            bool readWhiteInc = false;
+
+            bool needToGo = false;
+
+            int whiteBaseTime = 0;
+            int whiteInc = 0;
+            int blackBaseTime = 0;
+            int blackInc = 0;
+
+            std::string word;
+
+            std::string fen;
+
+            for (std::string word : words)
             {
-                text.setString("Pat");
+                // count += 1;
+                // std::cout << readPos << std::endl;
+                if (word == "quit")
+                {
+                    return 0;
+                }
+                if (word == "uci")
+                {
+                    std::cout << "uciok" << std::endl;
+                    break;
+                }
+                if (word == "isready")
+                {
+                    std::cout << "readyok" << std::endl;
+                    break;
+                }
+                if (word == "go")
+                {
+                    needToGo = true;
+                }
+                if (word == "wtime")
+                {
+                    readWhiteTime = true;
+                    continue;
+                }
+                if (readWhiteTime)
+                {
+                    whiteBaseTime = atoi(word.c_str());
+                    readWhiteTime = false;
+                    continue;
+                }
+                if (word == "btime")
+                {
+                    readBlackTime = true;
+                    continue;
+                }
+                if (readBlackTime)
+                {
+                    blackBaseTime = atoi(word.c_str());
+                    readBlackTime = false;
+                    continue;
+                }
+                if (word == "winc")
+                {
+                    readWhiteInc = true;
+                    continue;
+                }
+                if (readWhiteInc)
+                {
+                    whiteInc = atoi(word.c_str());
+                    readWhiteInc = false;
+                    continue;
+                }
+                if (word == "binc")
+                {
+                    readBlackInc = true;
+                    continue;
+                }
+                if (readBlackInc)
+                {
+                    blackInc = atoi(word.c_str());
+                    readBlackInc = false;
+                    continue;
+                }
+                if (word == "position")
+                {
+                    readPos = true;
+                    continue;
+                }
+                if (word == "startpos" && readPos)
+                {
+                    posMode = 2;
+                    engine.board.loadFen(engine.board.startingFen);
+                    engine.currentMoves = engine.board.generateMoves(false);
+                    engine.movesHistory = std::stack<int>();
+                    continue;
+                }
+                if (word == "fen" && readPos)
+                {
+                    posMode = 1;
+                    continue;
+                }
+                if (readPos && posMode == 1)
+                {
+                    fen += word + " ";
+                    continue;
+                }
+                if (posMode == 2 && word == "moves")
+                {
+                    engine.board.whiteToMove = true;
+                    readMoves = true;
+                    continue;
+                }
+                if(posMode == 2 && readMoves)
+                {
+                    // printf("hihi\n");
+                    if (word.size() == 4)
+                    {
+                        engine.tryMove(standNotToMove(word), ' ');
+                    }
+                    else
+                    {
+                        char c = word[4];
+                        word.pop_back();
+                        engine.tryMove(standNotToMove(word), c);
+                    }
+                    continue;
+                }
             }
-            text.setPosition(sf::Vector2f(650, 80));
-            text.setCharacterSize(80);
-            centerText(&text);
-            window.draw(text);
-            // engine.checkmate = false;
-            // engine.board.loadFen(engine.board.startingFen);
+
+            // printf("%d %d\n", whiteBaseTime, whiteInc);
+
+            if (readPos && posMode == 1)
+            {
+                engine.board.loadFen(fen);
+                engine.currentMoves = engine.board.generateMoves(false);
+                engine.movesHistory = std::stack<int>();
+            }
+
+            if (needToGo)
+            {
+                engine.whiteBot.maxTime = float(time_to_alloc(whiteBaseTime, whiteInc));
+                engine.blackBot.maxTime = float(time_to_alloc(blackBaseTime, blackInc));
+
+                int bestMove = engine.getBestMove();
+                std::string bestMoveString;
+                bestMoveString  = standardNotation(bestMove);
+                std::cout << "bestmove ";
+                std:: cout << bestMoveString << std:: endl;
+            }
+
         }
 
-        window.display();
+
+
+        // window.display();
 
     }
 
