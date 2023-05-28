@@ -19,6 +19,8 @@ struct GameState
 	int whiteKingPos;
 	int blackKingPos;
 	uint64_t zobristKey;
+	bool hasWhiteCastled;
+	bool hasBlackCastled;
 };
 
 enum Pieces
@@ -76,10 +78,7 @@ class BoardManager
 public:
 	BoardManager();
 	void makeMove(int move);
-	// void unmakeMove(int move);
 	int get(int pos);
-	// void set(int x, int y, int piece);
-	// void set(int pos, int piece);
 	int get(int x, int y);
 	std::vector<int> generatePseudoMoves();
 	std::vector<int> generateMoves(bool onlyCaptures);
@@ -137,6 +136,9 @@ public:
 
 	int board[8][8];
 	std::stack<GameState> gameStateHistory;
+
+
+	std::vector<uint64_t> zobristHistory;
 
 	GameState currentGameState;
 

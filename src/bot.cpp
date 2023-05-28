@@ -91,8 +91,8 @@ std::vector<int> Bot::orderMoves(BoardManager* board, std::vector<int> moves, ch
 	{
 		MoveScore mscore;
 		mscore.move = move;
-		
-		if (depth == currentDepth && move == bestMove)
+
+		if (move == PVmoves[currentDepth - depth])
 		{
 			mscore.score = infinity;
 		}
@@ -130,7 +130,10 @@ int Bot::play(BoardManager* board)
 		move =  playWell(board);
 	}
 
-	board->makeMove(move);
+	if (move != -1)
+	{
+		board->makeMove(move);
+	}
 
 	return move;
 }
@@ -147,34 +150,70 @@ int heatMapJ(int j, bool whitePlaying)
 	}
 }
 
-int Bot::accessHeatMap(int pType,int i, int j, bool whitePlaying)
+int rotate(int i, bool whitePlaying)
+{
+	if (whitePlaying)
+	{
+		return i;
+	}
+	else
+	{
+		return ( (7 - (i%8)) + (i/8) * 7);
+	}
+}
+
+int Bot::accessHeatMapMG(int pType,int i, bool whitePlaying)
 {
 	switch(pType)
 	{
-		case None:
-			return 0;
-			break;
 		case Pawn:
-			return heatMapPawn[heatMapJ(j, whitePlaying)][i];
+			return mg_pawn_table[rotate(i, whitePlaying)];
 			break;
 		case Knight:
-			return heatMapKnight[heatMapJ(j, whitePlaying)][i];
+			return mg_knight_table[rotate(i, whitePlaying)];
 			break;
 		case Bishop:
-			return heatMapBishop[heatMapJ(j, whitePlaying)][i];
+			return mg_bishop_table[rotate(i, whitePlaying)];
 			break;
 		case Rook:
-			return heatMapRook[heatMapJ(j, whitePlaying)][i];
+			return mg_rook_table[rotate(i, whitePlaying)];
 			break;
 		case Queen:
-			return heatMapQueen[heatMapJ(j, whitePlaying)][i];
+			return mg_queen_table[rotate(i, whitePlaying)];
 			break;
 		case King:
-			return heatMapKingMiddle[heatMapJ(j, whitePlaying)][i];
+			return mg_king_table[rotate(i, whitePlaying)];
 			break;
 	}
 	return 0;
 }
+
+int Bot::accessHeatMapEG(int pType,int i, bool whitePlaying)
+{
+	switch(pType)
+	{
+		case Pawn:
+			return eg_pawn_table[rotate(i, whitePlaying)];
+			break;
+		case Knight:
+			return eg_knight_table[rotate(i, whitePlaying)];
+			break;
+		case Bishop:
+			return eg_bishop_table[rotate(i, whitePlaying)];
+			break;
+		case Rook:
+			return eg_rook_table[rotate(i, whitePlaying)];
+			break;
+		case Queen:
+			return eg_queen_table[rotate(i, whitePlaying)];
+			break;
+		case King:
+			return eg_king_table[rotate(i, whitePlaying)];
+			break;
+	}
+	return 0;
+}
+
 
 int restrainKingEndGame(BoardManager* board, int myKingPos, int opponentKingPos)
 {
@@ -198,6 +237,7 @@ int restrainKingEndGame(BoardManager* board, int myKingPos, int opponentKingPos)
 }
 
 
+
 int Bot::evaluate(BoardManager* board)
 {
 	int score = 0;
@@ -205,8 +245,13 @@ int Bot::evaluate(BoardManager* board)
 	int whiteScoreValue = 0;
 	int blackScoreValue = 0;
 
-	int heatMapScoreWhite = 0;
-	int heatMapScoreBlack = 0;
+	int heatMapScoreMGWhite = 0;
+	int heatMapScoreMGBlack = 0;
+	int heatMapScoreEGWhite = 0;
+	int heatMapScoreEGBlack = 0;
+
+	// int whitePawnPerFile[8];
+	// int blackPawnPerFile[8];
 
 	int pieceNumber = 0;
 
@@ -218,27 +263,44 @@ int Bot::evaluate(BoardManager* board)
 		{
 			pieceNumber += 1;
 		}
+		/*if (pType == Pawn)
+		{
+			if(isPieceWhite(piece))
+			{
+				whitePawnPerFile[i % 8] += 1;
+			}
+			else
+			{
+				blackPawnPerFile[i % 8] += 1;
+			}
+		}*/
 		if (isPieceWhite(piece))
 		{
 			whiteScoreValue += pieceValue(pType);
-			heatMapScoreWhite += accessHeatMap(pType, i%8, i/8,board->whiteToMove);
+			heatMapScoreMGWhite += accessHeatMapMG(pType,i, board->whiteToMove);
+			heatMapScoreEGWhite += accessHeatMapEG(pType,i, board->whiteToMove);
 		}
 		else
 		{
 			blackScoreValue += pieceValue(pType);
-			heatMapScoreBlack += accessHeatMap(pType, i%8, i/8,board->whiteToMove);
+			heatMapScoreMGBlack += accessHeatMapMG(pType,i, board->whiteToMove);
+			heatMapScoreEGBlack += accessHeatMapEG(pType,i, board->whiteToMove);
 		}
 
 	}
 
 	float endGameWeight = 1.0 - (float(pieceNumber) / 32.0);
 
+	// for (int k = 0 ; k < 8 ; ++k)
+	// {
+	// 	score -= int( ( (whitePawnPerFile[k] > 1) - (blackPawnPerFile[k] > 1)) * (board->whiteToMove ? 1 : -1) * 10);
+	// }
 
+	score += int((1.0 - endGameWeight) * ( (board->currentGameState.hasWhiteCastled) - (board->currentGameState.hasBlackCastled)) * (board->whiteToMove ? 1 : -1) * 50);
 
-	score += int( 0.5 * (1.0 - endGameWeight) * (heatMapScoreWhite - heatMapScoreBlack) * (board->whiteToMove ? 1 : -1));
+	score += int( 0.5 * ( (1.0 - endGameWeight) * (heatMapScoreMGWhite - heatMapScoreMGBlack) + endGameWeight * (heatMapScoreEGWhite - heatMapScoreEGBlack) )* (board->whiteToMove ? 1 : -1));
 
-	score += 20 * ((board->currentGameState.canWhiteKingCastle + board->currentGameState.canWhiteQueenCastle) - (board->currentGameState.canBlackKingCastle + board->currentGameState.canBlackQueenCastle)) * (board->whiteToMove ? 1 : -1);
-
+	score -= board->isChecked() * 50;
 
 	if (board->whiteToMove)
 	{
@@ -252,9 +314,7 @@ int Bot::evaluate(BoardManager* board)
 
 	score += (whiteScoreValue - blackScoreValue) * (board->whiteToMove ? 1 : -1);
 
-	// printf("%d\n", score);
 
-	// printf("%d\n", score);
 	return score;
 }
 
@@ -269,7 +329,6 @@ int Bot::quietSearch(BoardManager* board, int alpha, int beta)
 	{
 		alpha = eval;
 	}
-	// printf("QSEARCH\n");
 
 	std::vector<int> moves = board->generateMoves(true);
 	std::vector<int> sortedMoves = orderMoves(board, moves, 0);
@@ -309,12 +368,22 @@ int Bot::search(BoardManager* board, char depth, int alpha, int beta)
 	if (t.isValid)
 	{
 		nbTranspo += 1;
-		if (depth == currentDepth)
-		{
-			currentBestMove = t.bestMove;
-		}
 		return t.value;
 	}
+
+	// int count = 0;
+	// for (uint64_t z : board->zobristHistory)
+	// {
+	// 	if (z == board->zobristKey)
+	// 	{
+	// 		count += 1;
+	// 	}
+	// }
+
+	// if (count >= 2)
+	// {
+	// 	return -1000;
+	// }
 
 
 
@@ -352,13 +421,13 @@ int Bot::search(BoardManager* board, char depth, int alpha, int beta)
 
 	int bestPositionMove = 0;
 
-
 	for (int move : sortedMoves)
 	{
 
 		board->makeMove(move);
 		int eval = -search(board, depth - 1, -beta, -alpha);
 		board->unmakeMove(move);
+
 
 		if (eval >= beta)
 		{
@@ -368,27 +437,24 @@ int Bot::search(BoardManager* board, char depth, int alpha, int beta)
 		if (eval > alpha)
 		{
 			nodeType = ExactNode;
-			if (depth == currentDepth)
-			{
-				currentBestMove = move;
-			}
 			bestPositionMove = move;
 			alpha = eval;
 		}
+
 	}
 
 	transpositionTable.set(board->zobristKey, depth, alpha, nodeType, bestPositionMove);
-
 	return alpha;
 
 }
+
+
 
 int Bot::playWell(BoardManager* board)
 {
 	nbMoves = 0;
 	nbTranspo = 0;
 	reachedTime = false;
-	bestMove = 0;
 	nbQMoves = 0;
 
 
@@ -397,6 +463,7 @@ int Bot::playWell(BoardManager* board)
 
 
 	int eval = 0;
+	int finalEval = 0;
 
 	for (char i = 1; i <= maxBotDepth; ++i)
 	{
@@ -404,8 +471,28 @@ int Bot::playWell(BoardManager* board)
 		eval = search(board, i, -infinity, infinity);
 		if (!reachedTime)
 		{
-			bestMove = currentBestMove;
-
+			finalEval = eval;
+			std::stack<int> moves;
+			for (int j = 0; j < 1; ++j)
+			{
+				Transposition t = transpositionTable.get(board->zobristKey, 0, 0, 0);
+				// printf("Depth : %d, PVNB : %d Node Type : %d Best move : %s\n",currentDepth, j, t.nodeType, standardNotation(t.bestMove).c_str() );
+				if (t.isValid)
+				{
+					PVmoves[j] = t.bestMove;
+					board->makeMove(t.bestMove);
+					moves.push(t.bestMove);
+				}
+				else
+				{
+					break;
+				}
+			}
+			while (!moves.empty())
+			{
+				board->unmakeMove(moves.top());
+				moves.pop();
+			}
 		}
 		else
 		{
@@ -414,24 +501,21 @@ int Bot::playWell(BoardManager* board)
 
 	}
 
-	// printf("Profondeur : %d\n", currentDepth);
-	// printf("Nombre positions evaluees : %d\n", nbMoves);
-	// printf("Nombre transpositions rencontrees : %d\n", nbTranspo);
-	// printf("Nombre d'entrees dans la table de transposition : %d\n", transpositionTable.count);
-	// printf("Nombre de positions silencieuses evaluees : %d\n", nbQMoves);
 
-	// if (bestMove != -1)
-	// {
-	// 	board->makeMove(bestMove);
-	// }
+	printf("info Profondeur : %d\n", currentDepth - 1);
+	printf("info Nombre positions evaluees : %d\n", nbMoves);
+	printf("info Nombre transpositions rencontrees : %d\n", nbTranspo);
+	printf("info Nombre d'entrees dans la table de transposition : %d\n", transpositionTable.count);
+	printf("info Nombre de positions silencieuses evaluees : %d\n", nbQMoves);
 
-	// printf("Mouvement --> %s  : eval =  %d\n", standardNotation(bestMove).c_str(), eval);
 
-	// printf("----------\n");
+	printf("info Mouvement --> %s  : eval =  %d\n", standardNotation(PVmoves[0]).c_str(), finalEval);                                                                                                                                                       
+
+	printf("info ----------\n");
 
 	transpositionTable.clear();
 
-	return bestMove;
+	return PVmoves[0];
 }
 
 int Bot::playRandom(BoardManager* board)

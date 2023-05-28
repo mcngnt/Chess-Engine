@@ -63,6 +63,8 @@ BoardManager::BoardManager()
 	currentGameState.canWhiteQueenCastle = true;
 	currentGameState.canBlackKingCastle = true;
 	currentGameState.canBlackQueenCastle = true;
+	currentGameState.hasWhiteCastled = false;
+	currentGameState.hasBlackCastled = false;
 	currentGameState.doublePushFile = 0;
 	currentGameState.moveCount = 0;
 
@@ -842,6 +844,8 @@ void BoardManager::makeMove(int move)
 	newGameState.doublePushFile = 0;
 	newGameState.whiteKingPos = currentGameState.whiteKingPos;
 	newGameState.blackKingPos = currentGameState.blackKingPos;
+	newGameState.hasWhiteCastled = currentGameState.hasWhiteCastled;
+	newGameState.hasBlackCastled = currentGameState.hasBlackCastled;
 
 	sf::Vector2i startPos = posIntTo2D(startPosi);
 	sf::Vector2i endPos = posIntTo2D(endPosi);
@@ -969,12 +973,14 @@ void BoardManager::makeMove(int move)
 			newGameState.canWhiteKingCastle = false;
 			newGameState.canWhiteQueenCastle = false;
 			newGameState.whiteKingPos = endPosi;
+			newGameState.hasWhiteCastled = true;
 		}
 		else
 		{
 			newGameState.canBlackKingCastle = false;
 			newGameState.canBlackQueenCastle = false;
 			newGameState.blackKingPos = endPosi;
+			newGameState.hasBlackCastled = true;
 		}
 		if (tag == KingCastle)
 		{
@@ -1054,6 +1060,7 @@ void BoardManager::makeMove(int move)
 
 
 	gameStateHistory.push(currentGameState);
+	// zobristHistory.push_back(zobristKey);
 
 	currentGameState = newGameState;
 	
@@ -1152,6 +1159,7 @@ void BoardManager::unmakeMove(int move)
 	currentGameState = gameStateHistory.top();
 	zobristKey = currentGameState.zobristKey;
 	gameStateHistory.pop();
+	// zobristHistory.pop_back();
 
 }
 

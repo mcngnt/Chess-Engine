@@ -228,12 +228,12 @@ int Engine::getBestMove()
 
 void Engine::update()
 {
+	if (checkmate)
+	{
+		return;
+	}
 	if ((board.whiteToMove && whiteBotType == NotBot) || (!board.whiteToMove && blackBotType == NotBot))
 	{
-		if (currentMoves.size() == 0)
-		{
-			checkmate = true;
-		}
 	}
 	else
 	{
@@ -246,12 +246,13 @@ void Engine::update()
 		{
 			move = blackBot.play(&board);
 		}
-		if (move == -1)
+		movesHistory.push(move);
+		currentMoves = board.generateMoves(false);
+		if (currentMoves.size() == 0)
 		{
 			checkmate = true;
 		}
-		movesHistory.push(move);
-		currentMoves = board.generateMoves(false);
+		printf("%d %d\n",board.currentGameState.hasWhiteCastled, board.currentGameState.hasBlackCastled );
 	}
 }
 
