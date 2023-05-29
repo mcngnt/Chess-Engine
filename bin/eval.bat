@@ -1,1 +1,0 @@
-bin\\STS_Rating_v3.exe  -e "bin\\main.exe" -f "bin\\STS1-STS15_LAN.EPD" --getrating
