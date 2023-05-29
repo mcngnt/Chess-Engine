@@ -252,7 +252,6 @@ void Engine::update()
 		{
 			checkmate = true;
 		}
-		printf("%d %d\n",board.currentGameState.hasWhiteCastled, board.currentGameState.hasBlackCastled );
 	}
 }
 
