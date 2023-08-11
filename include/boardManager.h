@@ -1,4 +1,5 @@
 #include "move.h"
+#include "piece.h"
 
 
 #define northMask 7
@@ -21,20 +22,6 @@ struct GameState
 	uint64_t zobristKey;
 	bool hasWhiteCastled;
 	bool hasBlackCastled;
-};
-
-enum Pieces
-{
-	None = 0,
-	Pawn = 1,
-	Rook = 2,
-	Knight = 3,
-	Bishop = 4,
-	Queen = 5,
-	King = 6,
-	
-	White = 8,
-	Black = 16
 };
 
 enum Directions
@@ -64,15 +51,6 @@ enum DirectionsID
 };
 
 
-
-bool isPieceWhite(int piece);
-int pieceType(int piece);
-
-
-int pid(int i, int j);
-
-
-
 class BoardManager
 {
 public:
@@ -91,9 +69,9 @@ public:
 	bool isSquareEnemy(int pid);
 	bool isSquareFriendly(int pid);
 	void unmakeMove(int move);
-	std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	// std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-	// std::string startingFen = "8/8/8/8/8/8/8/8";
+	std::string startingFen = "2qnR3/8/2P2P2/K1B1p3/b4N2/1k2p1P1/2R5/8 w - - 0 1";
 
 	// std::string startingFen = "4r1k1/ppp1bp2/2br1n2/P2pQ3/4pN1R/1P2PqP1/1BPP1P2/RN2K3 w Q - 15 41";
 	// std::string startingFen = "7k/8/8/2p1p2p/2P1p2P/4P3/7K/8 b";
@@ -123,21 +101,21 @@ public:
 
 
 	void controlledSquares();
+	void resetControl();
 
 	bool isChecked();
 
 	void assign(int i, int j);
 
-	void resetControl();
 
 
 	bool whiteToMove = true;
 
 
 	int board[8][8];
+
+	
 	std::stack<GameState> gameStateHistory;
-
-
 	std::vector<uint64_t> zobristHistory;
 
 	GameState currentGameState;

@@ -3,9 +3,9 @@
 
 
 int directions[8] = {North, South, East, West, NorthEast, NorthWest, SouthEast, SouthWest};
-
-
 int numSquares[64][8];
+
+
 
 bool BoardManager::isChecked()
 {
@@ -22,19 +22,6 @@ bool BoardManager::isChecked()
     }
 }
 
-bool isPieceWhite(int piece)
-{
-	return (piece >> 3) == 1;
-}
-int pieceType(int piece)
-{
-	return piece & 7;
-}
-
-int pid(int i, int j)
-{
-	return i + 8 * j;
-}
 
 
 
@@ -73,7 +60,6 @@ BoardManager::BoardManager()
 	computeZobrist();
 
 	currentGameState.zobristKey = zobristKey;
-	// currentBitboard = boardToBitBoard();
 }
 
 
@@ -265,6 +251,8 @@ void BoardManager::resetControl()
 		}
 	}
 }
+
+
 
 std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 {
@@ -1159,7 +1147,6 @@ void BoardManager::unmakeMove(int move)
 	currentGameState = gameStateHistory.top();
 	zobristKey = currentGameState.zobristKey;
 	gameStateHistory.pop();
-	// zobristHistory.pop_back();
 
 }
 

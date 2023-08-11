@@ -31,8 +31,6 @@ public:
 	void clear();
 
 	int count;
-	
-
 	Transposition table[tableSize];
 
 };

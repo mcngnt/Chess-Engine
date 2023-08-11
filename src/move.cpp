@@ -112,15 +112,6 @@ int standPosToInt(char c1, char c2)
 	return (c1 - 'a') + 8 * (7 - (c2 - '1'));
 }
 
-// int promTag(char c)
-// {
-// 	switch (c)
-// 	{
-// 		case q:
-
-// 	}
-// }
-
 int standNotToMove(std::string standNot)
 {
 	return genMove(standPosToInt(standNot[0],standNot[1]), standPosToInt(standNot[2],standNot[3]), 0);

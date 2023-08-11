@@ -36,7 +36,6 @@ public:
 
 	int quietSearch(BoardManager* board, int alpha, int beta);
 
-	// int search(BoardManager* board, char depth, int alpha, int beta);
 	int search(BoardManager* board, char depth, int alpha, int beta);
 	int evaluate(BoardManager* board);
 
@@ -59,13 +58,11 @@ public:
 
 
 	std::chrono::high_resolution_clock::time_point startTime;
-
 	bool reachedTime;
 
 	int nbQMoves;
 
 	TranspositionTable transpositionTable;
-
 
 	int PVmoves[maxBotDepth];
 

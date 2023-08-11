@@ -138,17 +138,6 @@ int Bot::play(BoardManager* board)
 	return move;
 }
 
-int heatMapJ(int j, bool whitePlaying)
-{
-	if(whitePlaying)
-	{
-		return j;
-	}
-	else
-	{
-		return 7 - j;
-	}
-}
 
 int rotate(int i, bool whitePlaying)
 {

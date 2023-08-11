@@ -3,7 +3,7 @@
 #include "utils.h"
 #include "engine.h"
 
-#define botBaseTime 3000
+#define botBaseTime 1000
 
 inline sf::Sprite create_sprite(sf::Texture* tex,std::string path)
 {
@@ -104,18 +104,18 @@ int main()
 
 
 
-    // // int depth = 4;
-    // // engine.test(depth);
+    // // // int depth = 4;
+    // // // engine.test(depth);
 
-    // // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+    // // // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
 
-    // // engine.whiteBot.search(&engine.board, 6, -infinity, infinity);
-    // // engine.whiteBot.playWell(&engine.board);
+    // // // engine.whiteBot.search(&engine.board, 6, -infinity, infinity);
+    // // // engine.whiteBot.playWell(&engine.board);
 
-    // // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-    // // std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+    // // // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
+    // // // std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
 
-    // // std::cout << duration.count() << std::endl;
+    // // // std::cout << duration.count() << std::endl;
 
 
     int tick = 0;
@@ -131,17 +131,21 @@ int main()
     bool spaceTriggered = false;
 
     bool doUpdate = false;
+    bool rendering = false;
+
+    sf::Texture saveTex;
+    saveTex.create(window.getSize().x, window.getSize().y);
 
     int countIm = 0;
 
     std::string totalCom;
 
-    if(useUCI)
-    {
-        window.close();
-    }
+    // if(useUCI)
+    // {
+    //     window.close();
+    // }
 
-    while(true)
+    // while(true)
     while(window.isOpen())
     {
         doUpdate = true;
@@ -168,6 +172,10 @@ int main()
                     pieceHeldType = engine.get(gridPos);
                 }
             }
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+            {
+                rendering = !rendering;
+            }
             if (event.type == sf::Event::MouseButtonReleased)
             {
                 if (holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7)
@@ -187,6 +195,10 @@ int main()
             {
                 engine.unmakeMove();
             }
+            // if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+            // {
+            //     rendering = !rendering;
+            // }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
             {
                 screenTexture.update(window);
@@ -365,6 +377,12 @@ int main()
 
 
         window.display();
+
+        if(rendering)
+        {
+            saveTex.update(window);
+            saveTex.copyToImage().saveToFile("res/img/frame" + std::to_string(tick) + ".png");
+        }
 
         if (useUCI)
         {
