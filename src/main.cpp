@@ -3,9 +3,10 @@
 #include "utils.h"
 #include "engine.h"
 
-#define botBaseTime 1000
+#define botBaseTime 500
+#define USE_UCI false
 
-inline sf::Sprite create_sprite(sf::Texture* tex,std::string path)
+inline sf::Sprite createSprite(sf::Texture* tex,std::string path)
 {
     tex->loadFromFile(path);
     sf::Sprite spr;
@@ -17,7 +18,6 @@ inline sf::Sprite create_sprite(sf::Texture* tex,std::string path)
 }
 
 
-
 void centerText(sf::Text* t_)
 {
     sf::FloatRect textRect = t_->getLocalBounds();
@@ -25,7 +25,7 @@ void centerText(sf::Text* t_)
     textRect.top  + textRect.height/2.0f);
 }
 
-int time_to_alloc(int baseTime, int inc)
+int timeToAlloc(int baseTime, int inc)
 {
     if (baseTime == 0)
     {
@@ -42,349 +42,13 @@ int time_to_alloc(int baseTime, int inc)
 
 int main()
 {
-    bool useUCI = false;
+    Engine engine(TrueBot, TrueBot);
 
-	srand(time(NULL));
-    sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
-    window.setVerticalSyncEnabled(true);
+    engine.bot.maxTime = botBaseTime;
 
-    sf::Color evenPieceCol(231,209,186);
-    sf::Color oddPieceCol(155,106,92);
-    sf::Color hoverEvenCol(210, 91, 85);
-    sf::Color hoverOddCol(244, 137, 127);
-
-    sf::Color fromEvenCol(244,213,79);
-    sf::Color fromOddCol(212,168,39);
-    sf::Color toEvenCol(215,190,124);
-    sf::Color toOddCol(164, 121, 61);
-
-    sf::Color greenCol(20, 240, 50);
-
-    sf::Font font;
-    font.loadFromFile("res/GoogleSans-Bold.ttf");
-    sf::Text text;
-    text.setFont(font);
-
-    sf::Texture screenTexture;
-    screenTexture.create(SCREEN_W, SCREEN_H); 
-
-
-    Engine engine(NotBot, Good);
-
-
-
-    engine.whiteBot.maxTime = botBaseTime;
-    engine.blackBot.maxTime = botBaseTime;
-
-
-    sf::Texture piecesTex[23];
-    sf::Sprite piecesSpr[23];
-
-    if (!useUCI)
+    if (USE_UCI)
     {
-        piecesSpr[White | Pawn] = create_sprite(&piecesTex[White | Pawn], "res/w_pawn.png");
-        piecesSpr[White | Rook] = create_sprite(&piecesTex[White | Rook], "res/w_rook.png");
-        piecesSpr[White | Knight] = create_sprite(&piecesTex[White | Knight], "res/w_knight.png");
-        piecesSpr[White | Bishop] = create_sprite(&piecesTex[White | Bishop], "res/w_bishop.png");
-        piecesSpr[White | Queen] = create_sprite(&piecesTex[White | Queen], "res/w_queen.png");
-        piecesSpr[White | King] = create_sprite(&piecesTex[White | King], "res/w_king.png");
-        piecesSpr[Black | Pawn] = create_sprite(&piecesTex[Black | Pawn], "res/b_pawn.png");
-        piecesSpr[Black | Rook] = create_sprite(&piecesTex[Black | Rook], "res/b_rook.png");
-        piecesSpr[Black | Knight] = create_sprite(&piecesTex[Black | Knight], "res/b_knight.png");
-        piecesSpr[Black | Bishop] = create_sprite(&piecesTex[Black | Bishop], "res/b_bishop.png");
-        piecesSpr[Black | Queen] = create_sprite(&piecesTex[Black | Queen], "res/b_queen.png");
-        piecesSpr[Black | King] = create_sprite(&piecesTex[Black | King], "res/b_king.png");
-
-
-        for (int i = 0 ; i < 23 ; ++i)
-        {
-            piecesSpr[i].scale(2.4f, 2.4f);
-        }
-    }
-
-
-
-    // // // int depth = 4;
-    // // // engine.test(depth);
-
-    // // // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-
-    // // // engine.whiteBot.search(&engine.board, 6, -infinity, infinity);
-    // // // engine.whiteBot.playWell(&engine.board);
-
-    // // // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-    // // // std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-
-    // // // std::cout << duration.count() << std::endl;
-
-
-    int tick = 0;
-
-    int pieceSize = 138;
-    sf::Vector2f startPosDraw(0,0);
-
-
-    bool holdPiece = false;
-
-    sf::Vector2i pieceHeld(-1,-1);
-    int pieceHeldType = 0;
-    bool spaceTriggered = false;
-
-    bool doUpdate = false;
-    bool rendering = false;
-
-    sf::Texture saveTex;
-    saveTex.create(window.getSize().x, window.getSize().y);
-
-    int countIm = 0;
-
-    std::string totalCom;
-
-    // if(useUCI)
-    // {
-    //     window.close();
-    // }
-
-    // while(true)
-    while(window.isOpen())
-    {
-        doUpdate = true;
-    	sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
-
-        sf::Vector2i gridPos(int((mousePos.x - startPosDraw.x)/pieceSize), int((mousePos.y - startPosDraw.y)/pieceSize));
-
-
-        sf::Event event;
-        while (window.pollEvent(event) && !useUCI)
-        {
-            if ((event.type == sf::Event::Closed) || ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape)))
-            {
-                window.close();
-                break;
-            }
-
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-            {
-                if (!holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7 && engine.get(gridPos) > 0)
-                {
-                    holdPiece = true;
-                    pieceHeld = gridPos;
-                    pieceHeldType = engine.get(gridPos);
-                }
-            }
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-            {
-                rendering = !rendering;
-            }
-            if (event.type == sf::Event::MouseButtonReleased)
-            {
-                if (holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7)
-                {
-                    holdPiece = false;
-                    engine.tryMove(pieceHeld, gridPos, 'q');
-                    pieceHeld = sf::Vector2i(-1,-1);
-                    doUpdate = false;
-                }
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !spaceTriggered)
-            {
-                spaceTriggered = true;
-                engine.update();
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && !spaceTriggered)
-            {
-                engine.unmakeMove();
-            }
-            // if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
-            // {
-            //     rendering = !rendering;
-            // }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-            {
-                screenTexture.update(window);
-                if (screenTexture.copyToImage().saveToFile("res/" + std::to_string(engine.board.zobristKey + countIm) + ".png"))
-                {
-                    std::cout << "screenshot saved to " << "res/" + std::to_string(engine.board.zobristKey + countIm) + ".png" << std::endl;
-                }
-                countIm += 1;
-            }
-        }
-
-        tick++;
-        window.clear(sf::Color(255, 255, 255));
-
-        spaceTriggered = false;
-
-        
-        if (doUpdate)
-        {
-            engine.update();
-            doUpdate=false;
-        }
-
-
-
-        if (!useUCI)
-        {
-            for (int i = 0 ; i < 8; ++i)
-            {
-                for (int j = 0 ; j < 8; ++j)
-                {
-
-                    // Draw Squares
-                                    
-                    sf::Vector2f pos = startPosDraw + sf::Vector2f(j * pieceSize,i * pieceSize);
-
-
-
-                    sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
-                    if ((i + j) % 2 == 0)
-                    {
-                        rectangle.setFillColor(evenPieceCol);
-                    }
-                    else
-                    {
-                        rectangle.setFillColor(oddPieceCol);
-                    }
-
-
-                    if (!engine.movesHistory.empty())
-                    {
-                        int move = engine.movesHistory.top();
-                        sf::Vector2i start = posIntTo2D(startPos(move));
-                        sf::Vector2i end = posIntTo2D(endPos(move));
-                        if (j == start.x && i == start.y)
-                        {
-                            if ((i + j) % 2 == 0)
-                            {
-                                rectangle.setFillColor(fromEvenCol);
-                            }
-                            else
-                            {
-                                rectangle.setFillColor(fromOddCol);
-                            }
-                        }
-                        if (j == end.x && i == end.y)
-                        {
-                            if ((i + j) % 2 == 0)
-                            {
-                                rectangle.setFillColor(toEvenCol);
-                            }
-                            else
-                            {
-                                rectangle.setFillColor(toOddCol);
-                            }
-                        }
-                    }
-
-
-                    if (holdPiece)
-                    {
-                        if (engine.isLegal(genMove(pieceHeld.x, pieceHeld.y, j,i, 0)))
-                        {
-                            if ((i + j) % 2 == 0)
-                            {
-                                rectangle.setFillColor(hoverEvenCol);
-                            }
-                            else
-                            {
-                                rectangle.setFillColor(hoverOddCol);
-                            }
-                        }
-                    }
-
-
-                    // for (int k = 0; k < 64; ++k)
-                    // {
-                    //     if (engine.isLegal(genMove(k%8, k/8, j,i, 0)))
-                    //     {
-                    //         if ((i + j) % 2 == 0)
-                    //         {
-                    //             rectangle.setFillColor(hoverEvenCol);
-                    //         }
-                    //         else
-                    //         {
-                    //             rectangle.setFillColor(hoverOddCol);
-                    //         }
-                    //     }
-                    // }
-                    
-                    
-                    // engine.board.whiteToMove = !engine.board.whiteToMove;
-                    // engine.board.controlledSquares();
-                    // engine.board.whiteToMove = !engine.board.whiteToMove;
-                    // if (engine.board.controlled[i][j])
-                    // {
-                    //     engine.board.whiteToMove = !engine.board.whiteToMove;
-                    //     engine.board.controlledSquares();
-                    //     engine.board.whiteToMove = !engine.board.whiteToMove;
-                    //     rectangle.setFillColor(greenCol);
-                    // }
-
-                   
-
-                    rectangle.setPosition(pos);
-                    window.draw(rectangle);
-
-
-                    int pnum = engine.get(j,i);
-
-                    if (pnum > 0 && sf::Vector2i(j,i) != pieceHeld)
-                    {
-                        piecesSpr[pnum].setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
-                        window.draw(piecesSpr[pnum]);
-                    }
-
-                    // text.setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
-                    // text.setColor(sf::Color(0,0,0));
-                    // centerText(&text);
-                    // text.setString(std::to_string(j + 8 * i));
-                    // text.setCharacterSize(80);
-                    // window.draw(text);
-
-                }
-            }
-        }
-
-
-
-        if (holdPiece)
-        {
-            piecesSpr[pieceHeldType].setPosition(mousePos);
-            window.draw(piecesSpr[pieceHeldType]);
-        }
-
-
-        if (engine.checkmate)
-        {
-            if (engine.board.isChecked())
-            {
-                text.setString("Echec et mat");
-            }
-            else
-            {
-                text.setString("Pat");
-            }
-            text.setPosition(sf::Vector2f(550, 550));
-            text.setCharacterSize(80);
-            text.setOutlineColor(sf::Color(0,0,0));
-            text.setOutlineThickness(5);
-            centerText(&text);
-            window.draw(text);
-            // engine.checkmate = false;
-            // engine.board.loadFen(engine.board.startingFen);
-        }
-
-
-        window.display();
-
-        if(rendering)
-        {
-            saveTex.update(window);
-            saveTex.copyToImage().saveToFile("res/img/frame" + std::to_string(tick) + ".png");
-        }
-
-        if (useUCI)
+        while(true)
         {
             std::string command;
             std::getline(std::cin, command);
@@ -516,7 +180,7 @@ int main()
                     posMode = 2;
                     engine.board.loadFen(engine.board.startingFen);
                     engine.currentMoves = engine.board.generateMoves(false);
-                    engine.movesHistory = std::stack<int>();
+                    engine.board.movesHistory = std::stack<int>();
                     continue;
                 }
                 if (word == "fen" && readPos)
@@ -555,18 +219,23 @@ int main()
             {
                 engine.board.loadFen(fen);
                 engine.currentMoves = engine.board.generateMoves(false);
-                engine.movesHistory = std::stack<int>();
+                engine.board.movesHistory = std::stack<int>();
             }
 
             if (needToGo)
             {
-                engine.whiteBot.maxTime = time_to_alloc(whiteBaseTime, whiteInc);
-                engine.blackBot.maxTime = time_to_alloc(blackBaseTime, blackInc);
+                if (engine.board.whiteToMove)
+                {
+                    engine.bot.maxTime = timeToAlloc(whiteBaseTime, whiteInc);
+                }
+                else
+                {
+                    engine.bot.maxTime = timeToAlloc(blackBaseTime, blackInc);
+                }
 
                 if (moveTime > 0)
                 {
-                    engine.whiteBot.maxTime = moveTime;
-                    engine.blackBot.maxTime = moveTime;   
+                    engine.bot.maxTime = moveTime;
                 }
 
                 int bestMove = engine.getBestMove();
@@ -575,13 +244,241 @@ int main()
                 std::cout << "bestmove ";
                 std:: cout << bestMoveString << std:: endl;
             }
+        }
 
+    }
+	else
+    {
+        engine.whiteBotType = Human;
+        sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
+        window.setVerticalSyncEnabled(true);
+
+        sf::Color evenPieceCol(231,209,186);
+        sf::Color oddPieceCol(155,106,92);
+        sf::Color hoverEvenCol(210, 91, 85);
+        sf::Color hoverOddCol(244, 137, 127);
+        sf::Color fromEvenCol(244,213,79);
+        sf::Color fromOddCol(212,168,39);
+        sf::Color toEvenCol(215,190,124);
+        sf::Color toOddCol(164, 121, 61);
+        sf::Color greenCol(20, 240, 50);
+
+        sf::Font font;
+        font.loadFromFile("res/GoogleSans-Bold.ttf");
+        sf::Text text;
+        text.setFont(font);
+
+        sf::Texture screenTexture;
+        screenTexture.create(SCREEN_W, SCREEN_H); 
+
+        sf::Texture piecesTex[23];
+        sf::Sprite piecesSpr[23];
+
+        piecesSpr[White | Pawn] = createSprite(&piecesTex[White | Pawn], "res/w_pawn.png");
+        piecesSpr[White | Rook] = createSprite(&piecesTex[White | Rook], "res/w_rook.png");
+        piecesSpr[White | Knight] = createSprite(&piecesTex[White | Knight], "res/w_knight.png");
+        piecesSpr[White | Bishop] = createSprite(&piecesTex[White | Bishop], "res/w_bishop.png");
+        piecesSpr[White | Queen] = createSprite(&piecesTex[White | Queen], "res/w_queen.png");
+        piecesSpr[White | King] = createSprite(&piecesTex[White | King], "res/w_king.png");
+        piecesSpr[Black | Pawn] = createSprite(&piecesTex[Black | Pawn], "res/b_pawn.png");
+        piecesSpr[Black | Rook] = createSprite(&piecesTex[Black | Rook], "res/b_rook.png");
+        piecesSpr[Black | Knight] = createSprite(&piecesTex[Black | Knight], "res/b_knight.png");
+        piecesSpr[Black | Bishop] = createSprite(&piecesTex[Black | Bishop], "res/b_bishop.png");
+        piecesSpr[Black | Queen] = createSprite(&piecesTex[Black | Queen], "res/b_queen.png");
+        piecesSpr[Black | King] = createSprite(&piecesTex[Black | King], "res/b_king.png");
+
+
+        for (int i = 0 ; i < 23 ; ++i)
+        {
+            piecesSpr[i].scale(2.4f, 2.4f);
         }
 
 
+        int tick = 0;
 
-        // window.display();
+        int pieceSize = 138;
+        sf::Vector2f startPosDraw(0,0);
 
+        bool holdPiece = false;
+
+        sf::Vector2i pieceHeld(-1,-1);
+        int pieceHeldType = 0;
+
+        bool doUpdate = true;
+
+
+
+        while(window.isOpen())
+        {
+            doUpdate = true;
+            sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
+
+            sf::Vector2i gridPos(int((mousePos.x - startPosDraw.x)/pieceSize), int((mousePos.y - startPosDraw.y)/pieceSize));
+
+
+            sf::Event event;
+            while (window.pollEvent(event))
+            {
+                if ((event.type == sf::Event::Closed) || ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape)))
+                {
+                    window.close();
+                    break;
+                }
+
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+                {
+                    if (!holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7 && engine.get(gridPos.x, gridPos.y) > 0)
+                    {
+                        holdPiece = true;
+                        pieceHeld = sf::Vector2i(gridPos.x, gridPos.y);
+                        pieceHeldType = engine.get(gridPos.x, gridPos.y);
+                    }
+                }
+                if (event.type == sf::Event::MouseButtonReleased)
+                {
+                    if (holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7)
+                    {
+                        holdPiece = false;
+                        engine.tryMove(pieceHeld, sf::Vector2i(gridPos.x, gridPos.y), 'q');
+                        pieceHeld = sf::Vector2i(-1,-1);
+                        doUpdate = false;
+                    }
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+                {
+                    engine.unmakeMove();
+                }
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+                {
+                    engine.reset();
+                }
+            }
+
+            tick++;
+            window.clear(sf::Color(255, 255, 255));
+
+
+                
+            if (doUpdate)
+            {
+                engine.update();
+                doUpdate=false;
+            }
+
+
+            for (int i = 0 ; i < 8; ++i)
+            {
+                for (int j = 0 ; j < 8; ++j)
+                {
+
+                                        
+                    sf::Vector2f pos = startPosDraw + sf::Vector2f((j) * pieceSize,(i) * pieceSize);
+
+
+                    sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
+                    if ((i + j) % 2 == 0)
+                    {
+                        rectangle.setFillColor(evenPieceCol);
+                    }
+                    else
+                    {
+                         rectangle.setFillColor(oddPieceCol);
+                    }
+
+
+                    if (!engine.board.movesHistory.empty())
+                    {
+                        int move = engine.board.movesHistory.top();
+                        sf::Vector2i start = posIntTo2D(startPos(move));
+                        sf::Vector2i end = posIntTo2D(endPos(move));
+                        if (j == start.x && i == start.y)
+                        {
+                            if ((i + j) % 2 == 0)
+                            {
+                                rectangle.setFillColor(fromEvenCol);
+                            }
+                            else
+                            {
+                                rectangle.setFillColor(fromOddCol);
+                            }
+                        }
+                        if (j == end.x && i == end.y)
+                        {
+                            if ((i + j) % 2 == 0)
+                            {
+                                rectangle.setFillColor(toEvenCol);
+                            }
+                            else
+                            {
+                                rectangle.setFillColor(toOddCol);
+                            }
+                        }
+                    }
+
+
+                    if (holdPiece)
+                    {
+                        if (engine.isLegal(genMove(pieceHeld.x, pieceHeld.y, j,i, 0)))
+                        {
+                            if ((i + j) % 2 == 0)
+                            {
+                                rectangle.setFillColor(hoverEvenCol);
+                            }
+                            else
+                            {
+                                rectangle.setFillColor(hoverOddCol);
+                            }
+                        }
+                    }
+
+                       
+                    rectangle.setPosition(pos);
+                    window.draw(rectangle);
+
+
+                    int pnum = engine.get(j,i);
+
+                    if (pnum > 0 && sf::Vector2i(j,i) != pieceHeld)
+                    {
+                        piecesSpr[pnum].setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
+                        window.draw(piecesSpr[pnum]);
+                    }
+
+                }
+            }
+
+
+
+            if (holdPiece)
+            {
+                piecesSpr[pieceHeldType].setPosition(mousePos);
+                window.draw(piecesSpr[pieceHeldType]);
+            }
+
+
+            if (engine.checkmate)
+            {
+                if (engine.board.isChecked())
+                {
+                    text.setString("Echec et mat");
+                }
+                else
+                {
+                    text.setString("Pat");
+                }
+                text.setPosition(sf::Vector2f(550, 550));
+                text.setCharacterSize(80);
+                text.setOutlineColor(sf::Color(0,0,0));
+                text.setOutlineThickness(5);
+                centerText(&text);
+                window.draw(text);
+            }
+
+
+            window.display();
+
+
+            }
     }
 
 	return 0;

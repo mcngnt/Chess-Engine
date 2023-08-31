@@ -12,9 +12,8 @@
 
 enum BotType
 {
-	NotBot = 0,
-	Random = 1,
-	Good = 2
+	Human = 0,
+	TrueBot = 1
 
 };
 
@@ -31,8 +30,6 @@ public:
 	Bot();
 	
 	int play(BoardManager* board);
-	int playRandom(BoardManager* board);
-	int playWell(BoardManager* board);
 
 	int quietSearch(BoardManager* board, int alpha, int beta);
 
@@ -46,15 +43,12 @@ public:
 	int accessHeatMapEG(int pType,int i, bool whitePlaying);
 
 
-
-	int botType = Random;
-
 	int nbMoves = 0;
 	int nbTranspo = 0;
 
 	char currentDepth;
 
-	int maxTime;
+	int maxTime = 500;
 
 
 	std::chrono::high_resolution_clock::time_point startTime;

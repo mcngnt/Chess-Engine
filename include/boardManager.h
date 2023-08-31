@@ -69,20 +69,8 @@ public:
 	bool isSquareEnemy(int pid);
 	bool isSquareFriendly(int pid);
 	void unmakeMove(int move);
-	// std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-	std::string startingFen = "2qnR3/8/2P2P2/K1B1p3/b4N2/1k2p1P1/2R5/8 w - - 0 1";
-
-	// std::string startingFen = "4r1k1/ppp1bp2/2br1n2/P2pQ3/4pN1R/1P2PqP1/1BPP1P2/RN2K3 w Q - 15 41";
-	// std::string startingFen = "7k/8/8/2p1p2p/2P1p2P/4P3/7K/8 b";
-	// std::string startingFen = "6kr/8/8/8/8/3K4/8/8 w";
-	// std::string startingFen = "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1";
-	// std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
-	// std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/5Q1p/PPPBBPPP/RN2K2R w KQkq - ";
-	// std::string startingFen = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ";
-	// std::string startingFen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8";
-	// std::string startingFen = "k7/3Qppp1/1R4p1/8/p7/P1p1P1N1/5PP1/2K5 b 0 1";
-
+	std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 	void loadFen(std::string fen);
 	std::string convertFen();
 
@@ -116,6 +104,7 @@ public:
 
 	
 	std::stack<GameState> gameStateHistory;
+	std::stack<int> movesHistory;
 	std::vector<uint64_t> zobristHistory;
 
 	GameState currentGameState;

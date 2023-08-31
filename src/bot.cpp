@@ -117,26 +117,6 @@ std::vector<int> Bot::orderMoves(BoardManager* board, std::vector<int> moves, ch
 	return sortedMoves;
 }
 
-int Bot::play(BoardManager* board)
-{
-	int move = 0;
-	if (botType == Random)
-	{
-		move =  playRandom(board);
-	}
-
-	if (botType == Good)
-	{
-		move =  playWell(board);
-	}
-
-	if (move != -1)
-	{
-		board->makeMove(move);
-	}
-
-	return move;
-}
 
 
 int rotate(int i, bool whitePlaying)
@@ -239,9 +219,6 @@ int Bot::evaluate(BoardManager* board)
 	int heatMapScoreEGWhite = 0;
 	int heatMapScoreEGBlack = 0;
 
-	// int whitePawnPerFile[8];
-	// int blackPawnPerFile[8];
-
 	int pieceNumber = 0;
 
 	for (int i = 0 ; i < 64 ; ++i)
@@ -252,17 +229,6 @@ int Bot::evaluate(BoardManager* board)
 		{
 			pieceNumber += 1;
 		}
-		/*if (pType == Pawn)
-		{
-			if(isPieceWhite(piece))
-			{
-				whitePawnPerFile[i % 8] += 1;
-			}
-			else
-			{
-				blackPawnPerFile[i % 8] += 1;
-			}
-		}*/
 		if (isPieceWhite(piece))
 		{
 			whiteScoreValue += pieceValue(pType);
@@ -280,10 +246,6 @@ int Bot::evaluate(BoardManager* board)
 
 	float endGameWeight = 1.0 - (float(pieceNumber) / 32.0);
 
-	// for (int k = 0 ; k < 8 ; ++k)
-	// {
-	// 	score -= int( ( (whitePawnPerFile[k] > 1) - (blackPawnPerFile[k] > 1)) * (board->whiteToMove ? 1 : -1) * 10);
-	// }
 
 	score += int((1.0 - endGameWeight) * ( (board->currentGameState.hasWhiteCastled) - (board->currentGameState.hasBlackCastled)) * (board->whiteToMove ? 1 : -1) * 50);
 
@@ -439,7 +401,7 @@ int Bot::search(BoardManager* board, char depth, int alpha, int beta)
 
 
 
-int Bot::playWell(BoardManager* board)
+int Bot::play(BoardManager* board)
 {
 	nbMoves = 0;
 	nbTranspo = 0;
@@ -505,21 +467,4 @@ int Bot::playWell(BoardManager* board)
 	transpositionTable.clear();
 
 	return PVmoves[0];
-}
-
-int Bot::playRandom(BoardManager* board)
-{
-	std::vector<int> moves = board->generateMoves(false);
-
-	if (moves.size() == 0)
-	{
-		return -1;
-	}
-
-	// srand(6);
-	int random = rand() % moves.size();
-	int move = moves[random];
-	// board->makeMove(move);
-
-	return move;
 }

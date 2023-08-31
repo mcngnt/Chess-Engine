@@ -12,6 +12,7 @@ public:
 	int tryMove(sf::Vector2i p1, sf::Vector2i p2, char c);
 	int tryMove(int move, char c);
 	int tryMove(int move);
+	void reset();
 
 	int getBestMove();
 
@@ -28,16 +29,13 @@ public:
 
 	int whiteBotType;
 	int blackBotType;
+
 	BoardManager board;
 
 
-
-	std::stack<int> movesHistory;
-
 	std::vector<int> currentMoves;
 
-	Bot whiteBot;
-	Bot blackBot;
+	Bot bot;
 
 	bool checkmate = false;
 

@@ -6,18 +6,16 @@ Engine::Engine(int whiteBotType_, int blackBotType_)
 	whiteBotType = whiteBotType_;
 	blackBotType = blackBotType_;
 
-	if (whiteBotType != NotBot)
-	{
-		whiteBot.botType = whiteBotType;
-	}
-	if (blackBotType != NotBot)
-	{
-		blackBot.botType = blackBotType;
-	}
-
-
 	currentMoves = board.generateMoves(false);
 }
+
+
+void Engine::reset()
+{
+	board = BoardManager();
+	currentMoves = board.generateMoves(false);
+}
+
 
 int Engine::aux(int depth)
 {
@@ -134,7 +132,7 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2, char c)
 		board.makeMove(legalMove);
 
 		currentMoves = board.generateMoves(false);
-		movesHistory.push(legalMove);
+		board.movesHistory.push(legalMove);
 		return legalMove;
 	}
 	return 0;
@@ -200,7 +198,7 @@ int Engine::tryMove(int move, char c)
 		board.makeMove(legalMove);
 
 		currentMoves = board.generateMoves(false);
-		movesHistory.push(legalMove);
+		board.movesHistory.push(legalMove);
 		return legalMove;
 	}
 	return 0;
@@ -210,20 +208,13 @@ int Engine::tryMove(int move)
 {
 	board.makeMove(move);
 	currentMoves = board.generateMoves(false);
-	movesHistory.push(move);
+	board.movesHistory.push(move);
 	return move;
 }
 
 int Engine::getBestMove()
 {
-	if (board.whiteToMove)
-	{
-		return whiteBot.playWell(&board);
-	}
-	else
-	{
-		return blackBot.playWell(&board);
-	}
+	return bot.play(&board);
 }
 
 void Engine::update()
@@ -232,7 +223,7 @@ void Engine::update()
 	{
 		return;
 	}
-	if ((board.whiteToMove && whiteBotType == NotBot) || (!board.whiteToMove && blackBotType == NotBot))
+	if ((board.whiteToMove && whiteBotType == Human) || (!board.whiteToMove && blackBotType == Human))
 	{
 	}
 	else
@@ -240,13 +231,15 @@ void Engine::update()
 		int move;
 		if (board.whiteToMove)
 		{
-			move = whiteBot.play(&board);
+			move = bot.play(&board);
+			board.makeMove(move);
 		}
 		else
 		{
-			move = blackBot.play(&board);
+			move = bot.play(&board);
+			board.makeMove(move);
 		}
-		movesHistory.push(move);
+		board.movesHistory.push(move);
 		currentMoves = board.generateMoves(false);
 		if (currentMoves.size() == 0)
 		{
@@ -257,10 +250,10 @@ void Engine::update()
 
 void Engine::unmakeMove()
 {
-	if (!movesHistory.empty())
+	if (!board.movesHistory.empty())
 	{
-		board.unmakeMove(movesHistory.top());
-		movesHistory.pop();
+		board.unmakeMove(board.movesHistory.top());
+		board.movesHistory.pop();
 		currentMoves = board.generateMoves(false);
 		// update();
 	}
