@@ -1,13 +1,11 @@
 #include "boardManager.h"
 #include "transposition.h"
 
-#define maxBotDepth 50
-
 #define pawnValue 100
-#define knightValue 280
-#define bishopValue 320
-#define rookValue 479
-#define queenValue 929
+#define knightValue 320
+#define bishopValue 330
+#define rookValue 500
+#define queenValue 900
 #define kingValue 20000
 
 enum BotType
@@ -17,10 +15,11 @@ enum BotType
 
 };
 
-struct MoveScore
-{
-    int move;
-    int score;
+struct moveOrdering {
+    bool operator ()(std::pair<int, int> const& a, 
+                     std::pair<int, int> const& b) {
+        return a.second < b.second;
+    }
 };
 
 
@@ -31,7 +30,14 @@ public:
 	
 	int play(BoardManager* board);
 
-	int quietSearch(BoardManager* board, int alpha, int beta);
+	int evaluate(BoardManager* board);
+
+	int getDurationFromStart();
+
+	int search(BoardManager* board,int alpha, int beta, char depth, int plyFromRoot);
+
+
+	/*int quietSearch(BoardManager* board, int alpha, int beta);
 
 	int search(BoardManager* board, char depth, int alpha, int beta);
 	int evaluate(BoardManager* board);
@@ -58,7 +64,15 @@ public:
 
 	TranspositionTable transpositionTable;
 
-	int PVmoves[maxBotDepth];
+	int rootMove;*/
+
+	int maxTime = 500;
+	std::chrono::high_resolution_clock::time_point startTime;
+	int nodes;
+	int rootMove;
+
+	TranspositionTable transpositionTable;
+
 
 
 	int mg_pawn_table[64] = {

@@ -14,6 +14,7 @@ void Engine::reset()
 {
 	board = BoardManager();
 	currentMoves = board.generateMoves(false);
+	gameFinished = false;
 }
 
 
@@ -219,7 +220,11 @@ int Engine::getBestMove()
 
 void Engine::update()
 {
-	if (checkmate)
+	if (currentMoves.size() == 0)
+	{
+		gameFinished = true;
+	}
+	if (gameFinished)
 	{
 		return;
 	}
@@ -241,10 +246,6 @@ void Engine::update()
 		}
 		board.movesHistory.push(move);
 		currentMoves = board.generateMoves(false);
-		if (currentMoves.size() == 0)
-		{
-			checkmate = true;
-		}
 	}
 }
 
@@ -257,5 +258,5 @@ void Engine::unmakeMove()
 		currentMoves = board.generateMoves(false);
 		// update();
 	}
-	checkmate = false;
+	gameFinished = false;
 }

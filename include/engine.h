@@ -37,7 +37,7 @@ public:
 
 	Bot bot;
 
-	bool checkmate = false;
+	bool gameFinished = false;
 
 
 

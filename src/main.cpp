@@ -4,7 +4,7 @@
 #include "engine.h"
 
 #define botBaseTime 500
-#define USE_UCI false
+#define USE_UCI true
 
 inline sf::Sprite createSprite(sf::Texture* tex,std::string path)
 {
@@ -456,7 +456,7 @@ int main()
             }
 
 
-            if (engine.checkmate)
+            if (engine.gameFinished)
             {
                 if (engine.board.isChecked())
                 {
