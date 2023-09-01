@@ -55,7 +55,7 @@ int Bot::search(BoardManager* board,int alpha, int beta, int depth, int plyFromR
 	bool inQuiescence = depth <= 0;
 
 	Transposition t = transpositionTable.get(board->zobristKey, depth, alpha, beta);
-	if (t.isValid)
+	if (plyFromRoot > 0 && t.isValid)
 	{
 		return t.value;
 	}
@@ -94,14 +94,16 @@ int Bot::search(BoardManager* board,int alpha, int beta, int depth, int plyFromR
 	sort(moveScorePair.begin(), moveScorePair.end(), moveOrdering());
 
 
-
 	if (moves.size() == 0)
 	{
 		if (inCheck)
 		{
 			return plyFromRoot - 999999;
 		}
-		return 0;
+		if (!inQuiescence)
+		{
+			return 0;
+		}
 	}
 
 
@@ -175,6 +177,8 @@ int Bot::play(BoardManager* board)
 
 
 	}
+
+	std::cout << "info bestmove : " << standardNotation(rootMove) << std::endl;
 
 	std::cout << "info --------------------------------------" << std::endl;
 
