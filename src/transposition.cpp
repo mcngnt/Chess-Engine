@@ -5,7 +5,7 @@ TranspositionTable::TranspositionTable()
 	clear();
 }
 
-Transposition TranspositionTable::get(uint64_t key, char depth, int alpha, int beta)
+Transposition TranspositionTable::get(uint64_t key, int depth, int alpha, int beta)
 {
 	int index = key % tableSize;
 	Transposition t = table[index];
@@ -32,7 +32,7 @@ Transposition TranspositionTable::get(uint64_t key, char depth, int alpha, int b
 }
 
 
-void TranspositionTable::set(uint64_t key, char depth, int value, char nodeType, int bestMove)
+void TranspositionTable::set(uint64_t key, int depth, int value, int nodeType, int bestMove)
 {
 	Transposition t;
 	t.isValid = true;

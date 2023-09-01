@@ -12,10 +12,10 @@ enum NodeType
 struct Transposition
 {
 	uint64_t key;
-	char depth;
+	int depth;
 	int value;
 	int bestMove;
-	char nodeType;
+	int nodeType;
 	bool isValid = false;
 };
 
@@ -24,9 +24,9 @@ class TranspositionTable
 public:
 	TranspositionTable();
 
-	Transposition get(uint64_t key, char depth, int alpha, int beta);
+	Transposition get(uint64_t key, int depth, int alpha, int beta);
 
-	void set(uint64_t key, char depth, int value, char nodeType, int bestMove);
+	void set(uint64_t key, int depth, int value, int nodeType, int bestMove);
 
 	void clear();
 

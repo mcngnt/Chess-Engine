@@ -6,37 +6,13 @@ Bot::Bot()
 {
 }
 
+
 int Bot::getDurationFromStart()
 {
 	std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
 	return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 }
 
-int pieceValue(int ptype)
-{
-	switch (ptype)
-	{
-		case Pawn:
-			return pawnValue;
-			break;
-		case Knight:
-			return knightValue;
-			break;
-		case Rook:
-			return rookValue;
-			break;
-		case Bishop:
-			return bishopValue;
-			break;
-		case Queen:
-			return queenValue;
-			break;
-		case King:
-			return kingValue;
-			break;
-	}
-	return 0;
-}
 
 int Bot::evaluate(BoardManager* board)
 {
@@ -47,14 +23,19 @@ int Bot::evaluate(BoardManager* board)
 		int piece = board->get(i);
 		int pType = pieceType(piece);
 		
-		if (isPieceWhite(piece))
+		if (pType > None)
 		{
-			score += pieceValue(pType);
+			if (isPieceWhite(piece))
+			{
+				score += pieceValues[pType - 1];
+			}
+			else
+			{
+				score -= pieceValues[pType - 1];
+			}
+
 		}
-		else
-		{
-			score -= pieceValue(pType);
-		}
+		
 
 	}
 
@@ -63,11 +44,11 @@ int Bot::evaluate(BoardManager* board)
 }
 
 
-int Bot::search(BoardManager* board,int alpha, int beta, char depth, int plyFromRoot)
+int Bot::search(BoardManager* board,int alpha, int beta, int depth, int plyFromRoot)
 {
 	nodes++;
 
-	char nodeType = AlphaNode;
+	int nodeType = AlphaNode;
 	int bestEval = -999999;
 	int bestMove = 0;
 	bool inCheck = board->isChecked();
@@ -98,14 +79,14 @@ int Bot::search(BoardManager* board,int alpha, int beta, char depth, int plyFrom
 	}
 
 
-	std::vector<int> moves = board->generateMoves(false);
+	std::vector<int> moves = board->generateMoves(inQuiescence && !inCheck);
 
 	std::vector<std::pair<int, int>> moveScorePair(moves.size());
 	for (int i = 0; i < (int)moves.size(); ++i){
 		int move = moves[i];
 	    moveScorePair[i] = std::make_pair(move, 
 
-	    	-(   move == t.bestMove ? 9000000 : tag(move) == Capture ? 1000000 * pieceValue(pieceType(board->get(endPos(move)))) - pieceValue(pieceType(board->get(startPos(move)))) : 0 )
+	    	-(   move == t.bestMove ? 9000000 : tag(move) == Capture ? 1000000 * pieceType(board->get(endPos(move))) - pieceType(board->get(startPos(move))) : 0 )
 
 	    	);
 	}
@@ -162,6 +143,8 @@ int Bot::search(BoardManager* board,int alpha, int beta, char depth, int plyFrom
 	}
 
 	transpositionTable.set(board->zobristKey, depth, bestEval, nodeType, bestMove);
+
+
 	return bestEval;
 
 }
@@ -170,6 +153,8 @@ int Bot::search(BoardManager* board,int alpha, int beta, char depth, int plyFrom
 
 int Bot::play(BoardManager* board)
 {
+
+	// std::cout << "Playing ! " << std::endl;
 
 	startTime = std::chrono::high_resolution_clock::now();
 
@@ -181,12 +166,13 @@ int Bot::play(BoardManager* board)
 	    nodes = 0;
 	    int eval = search(board, alpha, beta, d, 0);
 	            
-	    std::cout << "info Depth : " << d << "  ||  Eval : " << eval << "  ||  Nodes : " << nodes << " || Best Move : " << standardNotation(rootMove) << std::endl;
-
 	    if (getDurationFromStart() > maxTime)
 	    {
 	    	break;
 	    }
+
+	  	std::cout << "info Depth : " << d << "  ||  Eval : " << eval << "  ||  Nodes : " << nodes << " || Best Move : " << standardNotation(rootMove) << std::endl;
+
 
 	}
 
