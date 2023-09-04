@@ -93,6 +93,8 @@ public:
 
 	bool isChecked();
 
+	bool isRepetitionDraw();
+
 	void assign(int i, int j);
 
 
@@ -106,6 +108,7 @@ public:
 	std::stack<GameState> gameStateHistory;
 	std::stack<int> movesHistory;
 	std::vector<uint64_t> zobristHistory;
+	int historySize = 0;
 
 	GameState currentGameState;
 

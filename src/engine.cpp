@@ -7,6 +7,8 @@ Engine::Engine(int whiteBotType_, int blackBotType_)
 	blackBotType = blackBotType_;
 
 	currentMoves = board.generateMoves(false);
+
+	bot.evaluate(&board);
 }
 
 

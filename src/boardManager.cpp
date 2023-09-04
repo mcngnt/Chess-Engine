@@ -22,7 +22,10 @@ bool BoardManager::isChecked()
     }
 }
 
-
+bool BoardManager::isRepetitionDraw()
+{
+	return historySize >= 5 && (zobristHistory[historySize - 5] == zobristKey);
+}
 
 
 BoardManager::BoardManager()
@@ -571,6 +574,8 @@ int BoardManager::isLegal(std::vector<int> moves, int move)
 void BoardManager::loadFen(std::string fen)
 {
 	gameStateHistory = std::stack<GameState>();
+	zobristHistory.clear();
+	historySize = 0;
 
 	currentGameState.canBlackQueenCastle = false;
 	currentGameState.canWhiteQueenCastle = false;
@@ -1048,7 +1053,8 @@ void BoardManager::makeMove(int move)
 
 
 	gameStateHistory.push(currentGameState);
-	// zobristHistory.push_back(zobristKey);
+	zobristHistory.push_back(zobristKey);
+	historySize++;
 
 	currentGameState = newGameState;
 	
@@ -1147,6 +1153,8 @@ void BoardManager::unmakeMove(int move)
 	currentGameState = gameStateHistory.top();
 	zobristKey = currentGameState.zobristKey;
 	gameStateHistory.pop();
+	zobristHistory.pop_back();
+	historySize--;
 
 }
 
@@ -1244,5 +1252,6 @@ void BoardManager::initZobrist()
     }
 
     zobristKey = computeZobrist();
+    // zobristHistory.push_back(zobristKey);
 }
 

@@ -4,7 +4,7 @@
 #include "engine.h"
 
 #define botBaseTime 500
-#define USE_UCI false
+#define USE_UCI true
 
 inline sf::Sprite createSprite(sf::Texture* tex,std::string path)
 {
@@ -52,12 +52,12 @@ int main()
         {
             std::string command;
             std::getline(std::cin, command);
-            std::string zstring = std::to_string(engine.board.whiteToMoveZobrist);
+/*            std::string zstring = std::to_string(engine.board.whiteToMoveZobrist);
             std::ofstream file(  zstring + ".txt", std::ios::app);
             if (file.is_open()) {
                 file << command << std::endl;
                 file.close();
-            }
+            }*/
 
             std::vector<std::string> words;
             std::stringstream ss(command);
@@ -250,6 +250,7 @@ int main()
 	else
     {
         engine.whiteBotType = Human;
+        engine.blackBotType = Human;
         sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
         window.setVerticalSyncEnabled(true);
 
@@ -326,7 +327,7 @@ int main()
                 }
 
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-                {
+                {                    
                     if (!holdPiece && gridPos.x >= 0 && gridPos.y >= 0 && gridPos.x <= 7 && gridPos.y <= 7 && engine.get(gridPos.x, gridPos.y) > 0)
                     {
                         holdPiece = true;
@@ -342,6 +343,16 @@ int main()
                         engine.tryMove(pieceHeld, sf::Vector2i(gridPos.x, gridPos.y), 'q');
                         pieceHeld = sf::Vector2i(-1,-1);
                         doUpdate = false;
+
+                        // std::cout << "Pos NB : " << engine.board.zobristHistory.size() << " Draw : " << engine.board.isRepetitionDraw() << std::endl;
+
+                        // std::cout << "Current Zob Key : " << engine.board.zobristKey << std::endl;
+
+                        // for (int i = 0; i < engine.board.zobristHistory.size(); ++i)
+                        // {
+                        //     std::cout << engine.board.zobristHistory[i] << std::endl;
+                        // }
+                        // std::cout << "----" << std::endl;
                     }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
@@ -363,6 +374,7 @@ int main()
             {
                 engine.update();
                 doUpdate=false;
+
             }
 
 
