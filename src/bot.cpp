@@ -71,6 +71,7 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
     int bestEval = -999999;
     int currentNodeType = AlphaNode;
     int bestMove = 0;
+    int eval = 0;
 
     if (depth > 2 && getDurationFromStart() > maxTime)
     {
@@ -177,7 +178,56 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 
 
 		board->makeMove(move);
-		int eval = -search(board,-beta, -alpha, depth - 1, plyFromRoot + 1);
+
+
+
+/*		if (moveCount++ == 0 || isQuiescence)
+                LambdaSearch(beta, allowNullMove);
+            else
+            {
+                if (moveCount >= 5 && depth >= 2)
+                    LambdaSearch(alpha + 1, allowNullMove, 3);
+                else
+                    eval = alpha + 1;
+                if (eval > alpha)
+                {
+                    LambdaSearch(alpha + 1, allowNullMove);
+                    if (eval > alpha)
+                        LambdaSearch(beta, allowNullMove);
+                }
+            }*/
+
+		// int LambdaSearch(int alphaBis, bool allowNull, int R = 1) => eval = -Search(-alphaBis, -alpha, depth - R, plyFromRoot + 1, allowNull);
+
+
+
+		if( moveCount == 0 || inQuiescence )
+		{
+			eval = -search(board,-beta, -alpha, depth - 1, plyFromRoot + 1);
+		}
+		else
+		{
+			if(moveCount >= 4 && depth >= 2)
+			{
+				eval = -search(board,-alpha - 1, -alpha, depth - 2, plyFromRoot + 1);
+			}
+			else
+			{
+				eval = alpha + 1;
+			}
+
+			if(eval > alpha)
+			{
+				eval = -search(board,-alpha - 1, -alpha, depth - 1, plyFromRoot + 1);
+				if (eval > alpha)
+				{
+					eval = -search(board,-beta, -alpha, depth - 1, plyFromRoot + 1);
+				}
+			}
+		}
+
+
+
 		board->unmakeMove(move);
 
 		// if(plyFromRoot == 0)
