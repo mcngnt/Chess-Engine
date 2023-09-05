@@ -23,8 +23,8 @@ public:
 	int isLegal(int move);
 
 
-	void test(int depth);
-	int aux(int depth);
+	void perft(int depth);
+	int perft_no_log(int depth);
 
 
 	int whiteBotType;

@@ -20,7 +20,7 @@ void Engine::reset()
 }
 
 
-int Engine::aux(int depth)
+int Engine::perft_no_log(int depth)
 {
 	if (depth == 0)
 	{
@@ -32,14 +32,14 @@ int Engine::aux(int depth)
 	for(int move : moves)
 	{
 		board.makeMove(move);
-		nb += aux(depth-1);
+		nb += perft_no_log(depth-1);
 		board.unmakeMove(move);
 	}
 	return nb;
 }
 
 
-void Engine::test(int depth)
+void Engine::perft(int depth)
 {
 	std::vector<int> moves = board.generateMoves(false);
 
@@ -48,12 +48,12 @@ void Engine::test(int depth)
 	for(int move : moves)
 	{
 		board.makeMove(move);
-		int i = aux(depth-1);
-		printf("%s: %d\n", standardNotation(move).c_str(), i);
+		int currentNB = perft_no_log(depth-1);
+		std::cout << standardNotation(move) << " : " << currentNB << std::endl;
 		board.unmakeMove(move);
-		nb += i;
+		nb += currentNB;
 	}
-	printf("%d\n", nb);
+	std::cout << nb << std::endl;
 }
 
 

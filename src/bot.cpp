@@ -69,6 +69,7 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
     int currentNodeType = AlphaNode;
     int bestMove = 0;
     int eval = 0;
+    // bool canPrune = false;
 
     if (depth > 2 && getDurationFromStart() > maxTime)
     {
@@ -97,8 +98,9 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
     else if (!inCheck && beta - alpha == 1)
     {
 /*        if (depth <= 6 && Evaluate() - depth * 165 > beta)
-            return beta;
-        canPrune = depth <= 6 && Evaluate() + depth * 165 < alpha;*/
+            return beta;*/
+
+        // canPrune = depth <= 6 && evaluate(board) + depth * 165 < alpha;
 
 
         if (depth >= 3)
@@ -117,8 +119,8 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 
 
 
-        // foreach (Move move in moves)
-        //     scores[scoreIter++] = -(move == entry.bestMove ? 9000000 :  move.IsCapture ? 1000000 * (int)move.CapturePieceType - (int)move.MovePieceType : killerMoves[plyFromRoot] == move ? 900000 : counterMoves[isWhiteMult, (int)previousMove.MovePieceType, previousMove.TargetSquare.Index] == move ? 800000 : historyHeuristicTable[isWhiteMult,(int)move.MovePieceType, move.TargetSquare.Index]);
+     // foreach (Move move in moves)
+     //     scores[scoreIter++] = -(move == entry.bestMove ? 9000000 :  move.IsCapture ? 1000000 * (int)move.CapturePieceType - (int)move.MovePieceType : killerMoves[plyFromRoot] == move ? 900000 : counterMoves[isWhiteMult, (int)previousMove.MovePieceType, previousMove.TargetSquare.Index] == move ? 800000 : historyHeuristicTable[isWhiteMult,(int)move.MovePieceType, move.TargetSquare.Index]);
 
 
     std::vector<int> moves = board->generateMoves(inQuiescence && !inCheck);
@@ -159,46 +161,15 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 		int move = moveScorePair[moveCount].first;
 
 
-
-         // if (canPrune && moveCount > 1 && !move.IsCapture)
-         // {
-         //      continue;
-         // }
-
-            // board.MakeMove(move);
-
-
-            // if (moveCount++ == 0 || isQuiescence)
-            //     LambdaSearch(beta, move);
-            // else
-            //     if ((moveCount >= 5 && depth >= 2 ? LambdaSearch(alpha + 1, move, 3) : 999999) > alpha && LambdaSearch(alpha + 1, move) > alpha)
-            //     LambdaSearch(beta, move);
-
-            // board.UndoMove(move);
+/*
+        if (canPrune && moveCount > 1 && tag(move) != Capture && tag(move) != QueenProm)
+        {
+             continue;
+        }*/
 
 
 
 		board->makeMove(move);
-
-
-
-/*		if (moveCount++ == 0 || isQuiescence)
-                LambdaSearch(beta, allowNullMove);
-            else
-            {
-                if (moveCount >= 5 && depth >= 2)
-                    LambdaSearch(alpha + 1, allowNullMove, 3);
-                else
-                    eval = alpha + 1;
-                if (eval > alpha)
-                {
-                    LambdaSearch(alpha + 1, allowNullMove);
-                    if (eval > alpha)
-                        LambdaSearch(beta, allowNullMove);
-                }
-            }*/
-
-		// int LambdaSearch(int alphaBis, bool allowNull, int R = 1) => eval = -Search(-alphaBis, -alpha, depth - R, plyFromRoot + 1, allowNull);
 
 
 

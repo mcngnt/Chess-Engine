@@ -4,7 +4,7 @@
 #include "engine.h"
 
 #define botBaseTime 500
-#define USE_UCI true
+#define USE_UCI false
 
 inline sf::Sprite createSprite(sf::Texture* tex,std::string path)
 {
@@ -250,7 +250,7 @@ int main()
 	else
     {
         engine.whiteBotType = Human;
-        // engine.blackBotType = Human;
+        engine.blackBotType = Human;
         sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
         window.setVerticalSyncEnabled(true);
 
@@ -306,6 +306,8 @@ int main()
         int pieceHeldType = 0;
 
         bool doUpdate = true;
+
+        engine.perft(4);
 
 
 
