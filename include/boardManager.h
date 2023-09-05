@@ -87,6 +87,9 @@ public:
 
 	uint64_t zobristKey;
 
+	void makeNullMove();
+	void unmakeNullMove();
+
 
 	void controlledSquares();
 	void resetControl();

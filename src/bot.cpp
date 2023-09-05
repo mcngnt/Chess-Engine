@@ -32,22 +32,19 @@ int Bot::evaluate(BoardManager* board)
 			if (isPieceWhite(piece))
 			{
 				// std::cout << "Piece type : " << pType << " Index : " << (int)(i ^ 56) << std::endl;
-				middleGame += pieceTable[pType - 1][i ^ 56] + pscore;
-				endGame += pieceTable[pType - 1 + 6][i ^56] + pscore;
+				middleGame += pieceTable[pType - 1][i] + pscore;
+				endGame += pieceTable[pType - 1 + 6][i] + pscore;
 			}
 			else
 			{
-				middleGame -= pieceTable[pType - 1][i] + pscore;
-				endGame -= pieceTable[pType - 1 + 6][i] + pscore;
+				middleGame -= pieceTable[pType - 1][i ^ 56] + pscore;
+				endGame -= pieceTable[pType - 1 + 6][i ^ 56] + pscore;
 			}
 
 		}
 		
 
 	}
-
-	// std::cout << (middleGame * phase + endGame * (24 - phase)) / 24 * (board->whiteToMove ? 1 : -1) << std::endl;
-	// std::cout << phase << std::endl;
 
 
 	return (middleGame * phase + endGame * (24 - phase)) / 24 * (board->whiteToMove ? 1 : -1);
@@ -97,22 +94,26 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
         if (alpha >= beta)
             return bestEval;
     }
-
-
-/*    else if (!inCheck && beta - alpha == 1)
+    else if (!inCheck && beta - alpha == 1)
     {
-        if (depth <= 6 && Evaluate() - depth * 165 > beta)
+/*        if (depth <= 6 && Evaluate() - depth * 165 > beta)
             return beta;
-        canPrune = depth <= 6 && Evaluate() + depth * 165 < alpha;
-        if (depth >= 2)
+        canPrune = depth <= 6 && Evaluate() + depth * 165 < alpha;*/
+
+
+        if (depth >= 3)
         {
-            board.ForceSkipTurn();
-            LambdaSearch(beta,previousMove, 3 + depth / 3);
-            board.UndoSkipTurn();
+            board->makeNullMove();
+            int eval = -search(board,-beta, -alpha, depth - 3, plyFromRoot + 1);
+            board->unmakeNullMove();
             if (eval > beta)
+            {
                 return beta;
+            }
         }
-    }*/
+
+
+    }
 
 
 

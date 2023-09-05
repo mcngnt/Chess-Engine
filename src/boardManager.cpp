@@ -24,16 +24,6 @@ bool BoardManager::isChecked()
 
 bool BoardManager::isRepetitionDraw()
 {
-	// return historySize >= 5 && (zobristHistory[historySize - 5] == zobristKey);
-	/*int counter = 0;
-	for (int i = historySize >= 6 ? historySize - 6 : 0; i < historySize && i < 1024; ++i)
-	{
-		if (repetitionTable[i] == zobristKey)
-		{
-			counter += 1;
-		}
-	}
-	return counter >= 3;*/
 
 	if (historySize >= 1024)
 	{
@@ -47,6 +37,50 @@ bool BoardManager::isRepetitionDraw()
 		}
 	}
 	return false;
+
+}
+
+
+void BoardManager::makeNullMove()
+{
+
+	whiteToMove = !whiteToMove;
+
+    uint64_t newZobristKey = zobristKey;
+    newZobristKey ^= whiteToMoveZobrist;
+    newZobristKey ^= doublePushFileZobrist[currentGameState.doublePushFile];
+    newZobristKey ^= doublePushFileZobrist[0];
+
+    GameState newGameState;
+	newGameState.canBlackQueenCastle = currentGameState.canBlackQueenCastle;
+	newGameState.canWhiteQueenCastle = currentGameState.canWhiteQueenCastle;
+	newGameState.canWhiteKingCastle = currentGameState.canWhiteKingCastle;
+	newGameState.canBlackKingCastle = currentGameState.canBlackKingCastle;
+	newGameState.doublePushFile = 0;
+	newGameState.whiteKingPos = currentGameState.whiteKingPos;
+	newGameState.blackKingPos = currentGameState.blackKingPos;
+	newGameState.hasWhiteCastled = currentGameState.hasWhiteCastled;
+	newGameState.hasBlackCastled = currentGameState.hasBlackCastled;
+	newGameState.zobristKey = newZobristKey;
+
+    gameStateHistory.push(currentGameState);
+
+    currentGameState = newGameState;
+    zobristKey = newZobristKey;
+
+
+    historySize++;
+
+}
+
+
+void BoardManager::unmakeNullMove()
+{
+	 whiteToMove = !whiteToMove;
+     currentGameState = gameStateHistory.top();
+     zobristKey = currentGameState.zobristKey;
+     gameStateHistory.pop();
+     historySize--;
 
 }
 

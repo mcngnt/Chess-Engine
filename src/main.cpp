@@ -250,7 +250,7 @@ int main()
 	else
     {
         engine.whiteBotType = Human;
-        engine.blackBotType = Human;
+        // engine.blackBotType = Human;
         sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
         window.setVerticalSyncEnabled(true);
 
