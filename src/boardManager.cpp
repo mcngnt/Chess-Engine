@@ -24,7 +24,30 @@ bool BoardManager::isChecked()
 
 bool BoardManager::isRepetitionDraw()
 {
-	return historySize >= 5 && (zobristHistory[historySize - 5] == zobristKey);
+	// return historySize >= 5 && (zobristHistory[historySize - 5] == zobristKey);
+	/*int counter = 0;
+	for (int i = historySize >= 6 ? historySize - 6 : 0; i < historySize && i < 1024; ++i)
+	{
+		if (repetitionTable[i] == zobristKey)
+		{
+			counter += 1;
+		}
+	}
+	return counter >= 3;*/
+
+	if (historySize >= 1024)
+	{
+		return false;
+	}
+	for (int i = historySize - 2; i > 0; --i)
+	{
+		if(repetitionTable[i] == zobristKey)
+		{
+			return true;
+		}
+	}
+	return false;
+
 }
 
 
@@ -574,7 +597,6 @@ int BoardManager::isLegal(std::vector<int> moves, int move)
 void BoardManager::loadFen(std::string fen)
 {
 	gameStateHistory = std::stack<GameState>();
-	zobristHistory.clear();
 	historySize = 0;
 
 	currentGameState.canBlackQueenCastle = false;
@@ -1053,11 +1075,16 @@ void BoardManager::makeMove(int move)
 
 
 	gameStateHistory.push(currentGameState);
-	zobristHistory.push_back(zobristKey);
-	historySize++;
 
 	currentGameState = newGameState;
-	
+
+	if (historySize < 1024)
+	{
+		repetitionTable[historySize] = zobristKey;
+	}
+
+
+	historySize++;
 }
 
 void BoardManager::unmakeMove(int move)
@@ -1153,7 +1180,6 @@ void BoardManager::unmakeMove(int move)
 	currentGameState = gameStateHistory.top();
 	zobristKey = currentGameState.zobristKey;
 	gameStateHistory.pop();
-	zobristHistory.pop_back();
 	historySize--;
 
 }
@@ -1252,6 +1278,5 @@ void BoardManager::initZobrist()
     }
 
     zobristKey = computeZobrist();
-    // zobristHistory.push_back(zobristKey);
 }
 

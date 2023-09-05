@@ -250,7 +250,7 @@ int main()
 	else
     {
         engine.whiteBotType = Human;
-        // engine.blackBotType = Human;
+        engine.blackBotType = Human;
         sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
         window.setVerticalSyncEnabled(true);
 
@@ -344,13 +344,16 @@ int main()
                         pieceHeld = sf::Vector2i(-1,-1);
                         doUpdate = false;
 
-                        // std::cout << "Pos NB : " << engine.board.zobristHistory.size() << " Draw : " << engine.board.isRepetitionDraw() << std::endl;
+                        // std::cout << engine.board.maxHistorySize << std::endl;
 
-                        // std::cout << "Current Zob Key : " << engine.board.zobristKey << std::endl;
 
-                        // for (int i = 0; i < engine.board.zobristHistory.size(); ++i)
+                        std::cout << "Pos NB : " << engine.board.historySize << " Draw : " << engine.board.isRepetitionDraw() << std::endl;
+
+                        std::cout << "Current Zob Key : " << engine.board.zobristKey << std::endl;
+
+                        // for (int i = 0; i < engine.board.historySize ; ++i)
                         // {
-                        //     std::cout << engine.board.zobristHistory[i] << std::endl;
+                        //     std::cout << engine.board.gameStateHistory[i].zobristKey << std::endl;
                         // }
                         // std::cout << "----" << std::endl;
                     }

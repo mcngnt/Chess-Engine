@@ -107,8 +107,9 @@ public:
 	
 	std::stack<GameState> gameStateHistory;
 	std::stack<int> movesHistory;
-	std::vector<uint64_t> zobristHistory;
 	int historySize = 0;
+
+	uint64_t repetitionTable[1024];
 
 	GameState currentGameState;
 
