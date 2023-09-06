@@ -4,7 +4,9 @@
 #include "engine.h"
 
 #define botBaseTime 500
-#define USE_UCI false
+
+#define SCREEN_W 1100
+#define SCREEN_H 1100
 
 inline sf::Sprite createSprite(sf::Texture* tex,std::string path)
 {

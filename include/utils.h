@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stack>
 #include <iostream>
-#include <SFML/Graphics.hpp>
 #include <string>
 #include <ctype.h>
 #include <algorithm>
@@ -14,13 +13,12 @@
 #include <fstream>
 #include <sstream>
 
-#define SCREEN_W 1100
-#define SCREEN_H 1100
-
-#define infinity 999999
+#include <SFML/Graphics.hpp>
 
 
-int min(int x, int y);
-int abs(int x);
+#define USE_UCI true
+
+#define min(a,b) (a) > (b) ? (b) : (a)
+
 
 #endif
