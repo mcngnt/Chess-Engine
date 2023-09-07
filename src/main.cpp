@@ -8,7 +8,7 @@
 #define SCREEN_W 1100
 #define SCREEN_H 1100
 
-inline sf::Sprite createSprite(sf::Texture* tex,std::string path)
+sf::Sprite createSprite(sf::Texture* tex,std::string path)
 {
     tex->loadFromFile(path);
     sf::Sprite spr;
@@ -48,8 +48,12 @@ int main()
 
     engine.bot.maxTime = botBaseTime;
 
+    uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
+    std::cout << bitboardTest << std::endl;
+
     if (USE_UCI)
     {
+
         while(true)
         {
             std::string command;

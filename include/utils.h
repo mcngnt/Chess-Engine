@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <fstream>
 #include <sstream>
+#include <bitboardHelper.h>
 
 #include <SFML/Graphics.hpp>
 

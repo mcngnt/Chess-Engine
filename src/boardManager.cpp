@@ -5,6 +5,20 @@
 int directions[8] = {North, South, East, West, NorthEast, NorthWest, SouthEast, SouthWest};
 int numSquares[64][8];
 
+int BoardManager::getPieceBitboardIndex(int pieceType, bool isPieceWhite)
+{
+	return isPieceWhite ? pieceType - 1 : pieceType + 5;
+}
+
+uint64_t BoardManager::getPieceBitboard(int pieceType, bool isPieceWhite)
+{
+	return piecesBitboard[getPieceBitboardIndex(pieceType, isPieceWhite)];
+}
+
+void BoardManager::togglePieceBitboard(int pieceType, bool isPieceWhite, int squareIndex)
+{
+	piecesBitboard[getPieceBitboardIndex(pieceType, isPieceWhite)] = toggleSquare(piecesBitboard[getPieceBitboardIndex(pieceType, isPieceWhite)], squareIndex);
+}
 
 
 bool BoardManager::isChecked()
@@ -655,6 +669,7 @@ void BoardManager::loadFen(std::string fen)
 
 	for(char c : fen)
 	{
+		int currentID = i + 8 * j;
 		if (c == ' ')
 		{
 			state +=1;
@@ -673,52 +688,64 @@ void BoardManager::loadFen(std::string fen)
 					break;
 				case 'r':
 					board[j][i] = Black | Rook;
+					togglePieceBitboard(Rook, false, currentID);
 					i += 1; 
 					break;
 				case 'n':
 					board[j][i] = Black | Knight;
+					togglePieceBitboard(Knight, false, currentID);
 					i += 1; 
 					break;
 				case 'b':
 					board[j][i] = Black | Bishop;
+					togglePieceBitboard(Bishop, false, currentID);
 					i += 1;
 					break; 
 				case 'q':
 					board[j][i] = Black | Queen;
+					togglePieceBitboard(Queen, false, currentID);
 					i += 1; 
 					break;
 				case 'k':
 					board[j][i] = Black | King;
+					togglePieceBitboard(King, false, currentID);
 					currentGameState.blackKingPos = i + j*8;
 					i += 1;
 					break; 
 				case 'p':
 					board[j][i] = Black | Pawn;
+					togglePieceBitboard(Pawn, false, currentID);
 					i += 1;
 					break; 
 				case 'R':
 					board[j][i] = White | Rook;
+					togglePieceBitboard(Rook, true, currentID);
 					i += 1;
 					break; 
 				case 'N':
 					board[j][i] = White | Knight;
+					togglePieceBitboard(Knight, true, currentID);
 					i += 1;
 					break; 
 				case 'B':
 					board[j][i] = White | Bishop;
+					togglePieceBitboard(Bishop, true, currentID);
 					i += 1; 
 					break;
 				case 'Q':
 					board[j][i] = White | Queen;
+					togglePieceBitboard(Queen, true, currentID);
 					i += 1; 
 					break;
 				case 'K':
 					board[j][i] = White | King;
+					togglePieceBitboard(King, true, currentID);
 					currentGameState.whiteKingPos = i + j*8;
 					i += 1; 
 					break;
 				case 'P':
 					board[j][i] = White | Pawn;
+					togglePieceBitboard(Pawn, true, currentID);
 					i += 1; 
 					break;
 

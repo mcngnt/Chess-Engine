@@ -81,6 +81,12 @@ public:
 	uint64_t whiteToMoveZobrist;
 	uint64_t castlingRightZobrist[4];
 
+	uint64_t piecesBitboard[12];
+
+	int getPieceBitboardIndex(int pieceType, bool isPieceWhite);
+	uint64_t getPieceBitboard(int pieceType, bool isPieceWhite);
+	void togglePieceBitboard(int pieceType, bool isPieceWhite, int squareIndex);
+
 
 	void initZobrist();
 	uint64_t computeZobrist();
