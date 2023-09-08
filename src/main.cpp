@@ -48,8 +48,12 @@ int main()
 
     engine.bot.maxTime = botBaseTime;
 
-    uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
-    std::cout << bitboardTest << std::endl;
+    // uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
+    // std::cout << bitboardTest << std::endl;
+
+    engine.perft(5);
+    std::cout << "4865609 expected" << std::endl;
+
 
     if (USE_UCI)
     {
@@ -312,8 +316,6 @@ int main()
         int pieceHeldType = 0;
 
         bool doUpdate = true;
-
-        engine.perft(4);
 
 
 
