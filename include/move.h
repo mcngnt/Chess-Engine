@@ -28,10 +28,12 @@ enum Tag
 	QueenPromCapture = 15
 };
 
-
+#if !USE_UCI
 int pos2DToInt(sf::Vector2i pos);
-int pos2DToInt(int x, int y);
 sf::Vector2i posIntTo2D(int pos);
+#endif
+
+int pos2DToInt(int x, int y);
 int genMove(int startPos, int endPos, int tag);
 int genMove(int startPosx, int startPosy, int endPosx, int endPosy, int tag);
 int discardTag(int move);

@@ -1,19 +1,21 @@
 #include <move.h>
 
+#if !USE_UCI
 int pos2DToInt(sf::Vector2i pos)
 {
 	return pos.x + 8 * pos.y;
 }
+sf::Vector2i posIntTo2D(int pos)
+{
+	return sf::Vector2i(pos % 8, pos / 8);
+}
+#endif
 
 int pos2DToInt(int x, int y)
 {
 	return x + 8 * y;
 }
 
-sf::Vector2i posIntTo2D(int pos)
-{
-	return sf::Vector2i(pos % 8, pos / 8);
-}
 
 int genMove(int startPos, int endPos, int tag)
 {

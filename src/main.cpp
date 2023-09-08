@@ -8,6 +8,8 @@
 #define SCREEN_W 1100
 #define SCREEN_H 1100
 
+#if !USE_UCI
+
 sf::Sprite createSprite(sf::Texture* tex,std::string path)
 {
     tex->loadFromFile(path);
@@ -26,6 +28,8 @@ void centerText(sf::Text* t_)
     t_->setOrigin(textRect.left + textRect.width/2.0f,
     textRect.top  + textRect.height/2.0f);
 }
+
+#endif
 
 int timeToAlloc(int baseTime, int inc)
 {
@@ -55,8 +59,7 @@ int main()
     std::cout << "4865609 expected" << std::endl;
 
 
-    if (USE_UCI)
-    {
+    #if USE_UCI
 
         while(true)
         {
@@ -256,9 +259,8 @@ int main()
             }
         }
 
-    }
-	else
-    {
+    #endif
+    #if !USE_UCI
         engine.whiteBotType = Human;
         engine.blackBotType = Human;
         sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
@@ -504,7 +506,7 @@ int main()
 
 
             }
-    }
+    #endif
 
 	return 0;
 }

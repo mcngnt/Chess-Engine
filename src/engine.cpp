@@ -57,15 +57,6 @@ void Engine::perft(int depth)
 }
 
 
-int Engine::get(int x, int y)
-{
-	return board.get(x,y);
-}
-
-int Engine::get(sf::Vector2i pos)
-{
-	return board.get(pos.x, pos.y);
-}
 
 int Engine::isLegal(int move)
 {
@@ -73,6 +64,17 @@ int Engine::isLegal(int move)
 }
 
 
+int Engine::get(int x, int y)
+{
+	return board.get(x,y);
+}
+
+#if !USE_UCI
+
+int Engine::get(sf::Vector2i pos)
+{
+	return board.get(pos.x, pos.y);
+}
 int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2, char c)
 {
 	int move = genMove(pos2DToInt(p1), pos2DToInt(p2), 0);
@@ -140,6 +142,8 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2, char c)
 	}
 	return 0;
 }
+
+#endif
 
 int Engine::tryMove(int move, char c)
 {

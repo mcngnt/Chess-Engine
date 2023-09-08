@@ -14,10 +14,12 @@
 #include <sstream>
 #include <bitboardHelper.h>
 
-#include <SFML/Graphics.hpp>
-
-
 #define USE_UCI true
+
+#if !USE_UCI
+#include <SFML/Graphics.hpp>
+#endif
+
 
 #define min(a,b) (a) > (b) ? (b) : (a)
 
