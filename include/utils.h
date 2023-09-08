@@ -14,7 +14,7 @@
 #include <sstream>
 #include <bitboardHelper.h>
 
-#define USE_UCI true
+#define USE_UCI false
 
 #if !USE_UCI
 #include <SFML/Graphics.hpp>

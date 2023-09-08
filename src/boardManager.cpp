@@ -995,47 +995,47 @@ void BoardManager::makeMove(int move)
 		}
 		board[endPosY][endPosX] = board[startPosY][startPosX];
 		board[startPosY][startPosX] = None;
-		// togglePieceBitboard(pieceType(get(startPosi)), isPieceWhite(get(startPosi)), endPosi);
-		// togglePieceBitboard(pieceType(get(startPosi)), isPieceWhite(get(startPosi)), endPosi);
+		togglePieceBitboard(startPieceType, whiteToMove, endPosi);
+		togglePieceBitboard(startPieceType, whiteToMove, endPosi);
 	}
 
 	if (tag == KnightPromCapture || tag == RookPromCapture || tag == BishopPromCapture || tag == QueenPromCapture)
 	{
-		int pieceCaptureType = Queen;
+		int piecePromoType = Queen;
 		switch (tag)
 		{
 			case KnightPromCapture:
-				pieceCaptureType = Knight;
+				piecePromoType = Knight;
 				break;
 			case BishopPromCapture:
-				pieceCaptureType = Bishop;
+				piecePromoType = Bishop;
 				break;
 			case RookPromCapture:
-				pieceCaptureType = Rook;
+				piecePromoType = Rook;
 				break;
 			default:
-				pieceCaptureType = Queen;
+				piecePromoType = Queen;
 				break;
 		}
 
 
 		if (whiteToMove)
 		{
-			board[endPosY][endPosX] = White | pieceCaptureType;
-			// togglePieceBitboard(pieceCaptureType, false, endPosi);
-			// togglePieceBitboard(Pawn, true, endPosi);
-			// togglePieceBitboard(Pawn, true, startPosi);
+			board[endPosY][endPosX] = White | piecePromoType;
+			togglePieceBitboard(piecePromoType, false, endPosi);
+			togglePieceBitboard(Pawn, true, endPosi);
+			togglePieceBitboard(Pawn, true, startPosi);
 			zobristKey ^= piecesZobrist[Pawn][1][endPosi];
-			zobristKey ^= piecesZobrist[pieceCaptureType][1][endPosi];
+			zobristKey ^= piecesZobrist[piecePromoType][1][endPosi];
 		}
 		else
 		{
-			board[endPosY][endPosX] = Black | pieceCaptureType;
-			// togglePieceBitboard(pieceCaptureType, true, endPosi);
-			// togglePieceBitboard(Pawn, false, endPosi);
-			// togglePieceBitboard(Pawn, false, startPosi);
+			board[endPosY][endPosX] = Black | piecePromoType;
+			togglePieceBitboard(endPieceType, true, endPosi);
+			togglePieceBitboard(Pawn, false, startPosi);
+			togglePieceBitboard(piecePromoType, false, endPosi);
 			zobristKey ^= piecesZobrist[Pawn][0][endPosi];
-			zobristKey ^= piecesZobrist[pieceCaptureType][0][endPosi];
+			zobristKey ^= piecesZobrist[piecePromoType][0][endPosi];
 		}
 		board[startPosY][startPosX] = None;
 	}
@@ -1044,30 +1044,29 @@ void BoardManager::makeMove(int move)
 	if (tag == DoublePawnPush)
 	{
 		board[endPosY][endPosX] = board[startPosY][startPosX];
-		// togglePieceBitboard(Pawn, isPieceWhite(get(startPosi)), endPosi);
 		board[startPosY][startPosX] = None;
-		// togglePieceBitboard(Pawn, isPieceWhite(get(startPosi)), startPosi);
+		togglePieceBitboard(Pawn, whiteToMove, startPosi);
+		togglePieceBitboard(Pawn, whiteToMove, endPosi);
 		newGameState.doublePushFile = startPosX + 1;
 	}
 
 	if (tag == EPCapture)
 	{
 		board[endPosY][endPosX] = board[startPosY][startPosX];
-		// togglePieceBitboard(Pawn, isPieceWhite(get(startPosi)), endPosi);
 		board[startPosY][startPosX] = None;
-		// togglePieceBitboard(Pawn, isPieceWhite(get(startPosi)), startPosi);
+		togglePieceBitboard(pieceType(board[startPosY][endPosX]), !whiteToMove, endPosX + 8 * startPosY);
 		board[startPosY][endPosX] = None;
-		// togglePieceBitboard(Pawn, !isPieceWhite(get(startPosi)), endPosX + 8 * startPosY);
+		togglePieceBitboard(Pawn, whiteToMove, startPosi);
+		togglePieceBitboard(Pawn, whiteToMove, endPosi);
 		zobristKey ^= piecesZobrist[Pawn][!whiteToMove][endPosX + 8 * startPosY];
 	}
 
 	if (tag == KingCastle || tag == QueenCastle)
 	{
 		board[endPosY][endPosX] = board[startPosY][startPosX];
-		// togglePieceBitboard(King, isPieceWhite(get(startPosi)), endPosi);
 		board[startPosY][startPosX] = None;
-		board[endPosY][endPosX] = board[startPosY][startPosX];
-		// togglePieceBitboard(King, isPieceWhite(get(startPosi)), startPosi);
+		togglePieceBitboard(King, whiteToMove, startPosi);
+		togglePieceBitboard(King, whiteToMove, endPosi);
 		if (whiteToMove)
 		{
 			newGameState.canWhiteKingCastle = false;
@@ -1085,18 +1084,18 @@ void BoardManager::makeMove(int move)
 		if (tag == KingCastle)
 		{
 			board[startPosY][5] = board[startPosY][7];
-			// togglePieceBitboard(Rook, isPieceWhite(get(startPosi)), 5 + startPosY * 8);
 			board[startPosY][7] = None;
-			// togglePieceBitboard(Rook, isPieceWhite(get(startPosi)), 7 + startPosY * 8);
+			togglePieceBitboard(Rook, whiteToMove, 5 + startPosY * 8);
+			togglePieceBitboard(Rook, whiteToMove, 7 + startPosY * 8);
 			zobristKey ^= piecesZobrist[Rook][whiteToMove][7 + startPosY * 8];
 			zobristKey ^= piecesZobrist[Rook][whiteToMove][5 + startPosY * 8];
 		}
 		else
 		{
 			board[startPosY][3] = board[startPosY][0];
-			// togglePieceBitboard(Rook, isPieceWhite(get(startPosi)), 3 + startPosY * 8);
 			board[startPosY][0] = None;
-			// togglePieceBitboard(Rook, isPieceWhite(get(startPosi)), 0 + startPosY * 8);
+			togglePieceBitboard(Rook, whiteToMove, 3 + startPosY * 8);
+			togglePieceBitboard(Rook, whiteToMove, 0 + startPosY * 8);
 			zobristKey ^= piecesZobrist[Rook][whiteToMove][startPosY * 8];
 			zobristKey ^= piecesZobrist[Rook][whiteToMove][3 + startPosY * 8];
 		}
@@ -1135,6 +1134,8 @@ void BoardManager::makeMove(int move)
 			zobristKey ^= piecesZobrist[piecePromoType][0][endPosi];
 		}
 		board[startPosY][startPosX] = None;
+		togglePieceBitboard(piecePromoType, whiteToMove, endPosi);
+		togglePieceBitboard(Pawn, whiteToMove, startPosi);
 	}
 
 	if (newGameState.canWhiteKingCastle != currentGameState.canWhiteKingCastle)

@@ -55,8 +55,11 @@ int main()
     // uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
     // std::cout << bitboardTest << std::endl;
 
-    engine.perft(5);
-    std::cout << "4865609 expected" << std::endl;
+    std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+    engine.perft(4);
+    std::cout << "2103487 expected" << std::endl;
+    std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 
 
     #if USE_UCI
