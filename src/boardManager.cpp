@@ -23,17 +23,20 @@ void BoardManager::togglePieceBitboard(int pieceType, bool isPieceWhite, int squ
 
 bool BoardManager::isChecked()
 {
-	whiteToMove = !whiteToMove;
-    controlledSquares();
-    whiteToMove = !whiteToMove;
-    if (whiteToMove)
-    {
-    	return controlled[currentGameState.whiteKingPos / 8][currentGameState.whiteKingPos % 8];
-    }
-    else
-    {
-    	return controlled[currentGameState.blackKingPos / 8][currentGameState.blackKingPos % 8];
-    }
+	// whiteToMove = !whiteToMove;
+    // controlledSquares();
+    // whiteToMove = !whiteToMove;
+    // if (whiteToMove)
+    // {
+    // 	return controlled[currentGameState.whiteKingPos / 8][currentGameState.whiteKingPos % 8];
+    // }
+    // else
+    // {
+    // 	return controlled[currentGameState.blackKingPos / 8][currentGameState.blackKingPos % 8];
+    // }
+    fillBitboardData();
+    return isBitToggled(attackMap, whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos);
+
 }
 
 bool BoardManager::isRepetitionDraw()
@@ -136,195 +139,335 @@ BoardManager::BoardManager()
 	currentGameState.zobristKey = zobristKey;
 }
 
-
-
-bool BoardManager::isSquareEmpty(int i, int j)
+bool BoardManager::isSquareEnemy(int sq)
 {
-	return get(i,j) == 0;
+	return isBitToggled(opponentPiecesBitboard,sq);
 }
-
-bool BoardManager::isSquareEmpty(int pid)
+bool BoardManager::isSquareFriendly(int sq)
 {
-	return get(pid) == 0;
+	return isBitToggled(friendlyPiecesBitboard,sq);
+}
+bool BoardManager::isSquareEmpty(int sq)
+{
+	return !isBitToggled(allPiecesBitboard,sq);
+}
+bool BoardManager::isSquareEmptyFriendly(int sq)
+{
+	return isSquareFriendly(sq) || isSquareEmpty(sq);
+}
+bool BoardManager::isSquareEmptyEnemy(int sq)
+{
+	return isSquareFriendly(sq) || isSquareEmpty(sq);
 }
 
 bool BoardManager::isSquareEnemy(int i, int j)
 {
-	return isPieceWhite(get(i,j)) != whiteToMove && (get(i,j) > 0);
+	return isBitToggled(opponentPiecesBitboard,i + 8 *j);
+}
+bool BoardManager::isSquareFriendly(int i, int j)
+{
+	return isBitToggled(friendlyPiecesBitboard,i + 8 *j);
+}
+bool BoardManager::isSquareEmpty(int i, int j)
+{
+	return !isBitToggled(allPiecesBitboard,i + 8 *j);
+}
+bool BoardManager::isSquareEmptyFriendly(int i, int j)
+{
+	return isSquareFriendly(i,j) || isSquareEmpty(i,j);
+}
+bool BoardManager::isSquareEmptyEnemy(int i, int j)
+{
+	return isSquareFriendly(i,j) || isSquareEmpty(i,j);
 }
 
-bool BoardManager::isSquareEnemy(int pid)
-{
-	return isPieceWhite(get(pid)) != whiteToMove && (get(pid) > 0);
-}
 
-bool BoardManager::isSquareFree(int i, int j)
-{
-	return isPieceWhite(get(i,j)) != whiteToMove || (get(i,j) == 0);
-}
+// void BoardManager::assign(int i, int j)
+// {
+// 	if (i >= 0 && i < 8 && j >= 0 && j < 8)
+// 	{
+// 		controlled[i][j] = true;
+// 	}
+// }
 
-bool BoardManager::isSquareFree(int pid)
+void BoardManager::fillBitboardData()
 {
-	return isPieceWhite(get(pid)) != whiteToMove || (get(pid) == 0);
-}
-
-bool BoardManager::isSquareFriendly(int pid)
-{
-	return isPieceWhite(get(pid)) == whiteToMove && (get(pid) > 0);
-}
-
-void BoardManager::assign(int i, int j)
-{
-	if (i >= 0 && i < 8 && j >= 0 && j < 8)
+	attackMap = 0;
+	friendlyPiecesBitboard = piecesBitboard[0] | piecesBitboard[1] | piecesBitboard[2] | piecesBitboard[3] | piecesBitboard[4] | piecesBitboard[5];
+	opponentPiecesBitboard = piecesBitboard[6] | piecesBitboard[7] | piecesBitboard[8] | piecesBitboard[9] | piecesBitboard[10] | piecesBitboard[11];
+	if(!whiteToMove)
 	{
-		controlled[i][j] = true;
+		uint64_t temp = friendlyPiecesBitboard;
+		friendlyPiecesBitboard = opponentPiecesBitboard;
+		opponentPiecesBitboard = temp;
 	}
-}
+	allPiecesBitboard = friendlyPiecesBitboard | opponentPiecesBitboard;
 
-
-void BoardManager::controlledSquares()
-{
-
-	resetControl();
-
-	for (int i = 0 ; i < 8 ; ++i)
+	for (int pType = 1; pType <= 6; ++pType)
 	{
-		for (int j = 0 ; j < 8 ; ++j)
-		{
-			int piece = get(i,j);
-			int currentPID = pid(i,j);
+	    uint64_t pMask = getPieceBitboard(pType, !whiteToMove);
+	    while (pMask != 0)
+	    {
+			int sq = getAndClearLSB(&pMask);
 
-			if(piece > 0 && isPieceWhite(piece) == whiteToMove)
+			int i = sq % 8;
+			int j = sq / 8;
+
+			if (pType == Pawn)
 			{
-
-				if (pieceType(piece) == Pawn)
+				if (!whiteToMove)
 				{
-
-					if (isPieceWhite(piece))
+					if (numSquares[sq][NorthEastID] >= 1 && isSquareEmptyFriendly(i+1,j-1))
 					{
-						if (numSquares[currentPID][NorthEastID] >= 1 && isSquareFree(i+1,j-1))
-						{
-							assign(j-1,i+1);
-						}
-						if (numSquares[currentPID][NorthWestID] >= 1 && isSquareFree(i-1,j-1))
-						{
-							assign(j-1,i-1);
-						}
-
+						// assign(j-1,i+1);
+						attackMap |= (1 << ((i+1) + 8 * (j-1)));
 					}
-					else
+					if (numSquares[sq][NorthWestID] >= 1 && isSquareEmptyFriendly(i-1,j-1))
 					{
-						if (numSquares[currentPID][SouthEastID] >= 1 && isSquareFree(i+1,j+1))
-						{
-							assign(j+1, i+1);
-						}
-						if (numSquares[currentPID][SouthWestID] >= 1 && isSquareFree(i-1,j+1))
-						{
-							assign(j+1,i-1);
-						}
-					}		
-
-				}
-
-				if (pieceType(piece) == King)
-				{
-
-					for (int dirID = 0 ; dirID <= 7 ; ++dirID)
-					{
-						int targetPos = currentPID + directions[dirID];
-
-						if (numSquares[currentPID][dirID] >= 1 && isSquareFree(targetPos))
-						{
-							assign(targetPos/8, targetPos % 8);
-						}
+						// assign(j-1,i-1);
+						attackMap |= (1 << ((i-1) + 8 * (j-1)));
 					}
-
 				}
-
-				if (pieceType(piece) == Knight)
+				else
 				{
-
-					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareFree(i+1,j-2))
+					if (numSquares[sq][SouthEastID] >= 1 && isSquareEmptyFriendly(i+1,j+1))
 					{
- 						assign(j-2,i+1);
- 					}
-					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareFree(i-1,j-2))
-					{
- 						assign(j-2,i-1);
- 					}
-					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareFree(i+1,j+2))
-					{
- 						assign(j+2,i+1);
- 					}
-					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareFree(i-1,j+2))
-					{
- 						assign(j+2,i-1);
- 					}
-
-					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareFree(i+2,j-1))
-					{
- 						assign(j-1,i+2);
- 					}
-					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareFree(i+2,j+1))
-					{
- 						assign(j+1,i+2);
- 					}
-					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareFree(i-2,j-1))
-					{
- 						assign(j-1,i-2);
- 					}
-					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareFree(i-2,j+1))
-					{
- 						assign(j+1,i - 2);
- 					}
-
-				}
-
-				if (pieceType(piece) == Rook || pieceType(piece) == Bishop || pieceType(piece) == Queen)
-				{
-
-					int startDir = (pieceType(piece) == Bishop) ? 4 : 0;
-					int endDir = (pieceType(piece) == Rook) ? 3 : 7;
-
-					for (int dirID = startDir ; dirID <= endDir ; ++dirID)
-					{
-						for (int i = 0 ; i < numSquares[currentPID][dirID]; ++i)
-						{
-							int targetPos = currentPID + directions[dirID] * (i+1);
-
-							if (isSquareFriendly(targetPos))
-							{
-								break;
-							}
-
-							assign(targetPos / 8, targetPos % 8);
-
-							if (isSquareEnemy(targetPos))
-							{
-								break;
-							}
-
-						}
+						// assign(j+1, i+1);
+						attackMap |= (1 << ((i+1) + 8 * (j+1)));
 					}
-
-				}
-
+					if (numSquares[sq][SouthWestID] >= 1 && isSquareEmptyFriendly(i-1,j+1))
+					{
+						// assign(j+1,i-1);
+						attackMap |= (1 << ((i-1) + 8 * (j+1)));
+					}
+				}		
 			}
+			if (pType == King)
+			{
+				for (int dirID = 0 ; dirID <= 7 ; ++dirID)
+				{
+					int targetPos = sq + directions[dirID];
+					if (numSquares[sq][dirID] >= 1 && isSquareEmptyFriendly(targetPos))
+					{
+						// assign(targetPos/8, targetPos % 8);
+						attackMap |= (1 << targetPos);
+					}
+				}
+			}
+			if (pType == Knight)
+			{
+				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareEmptyFriendly(i+1,j-2))
+				{
+			 		// assign(j-2,i+1);
+			 		attackMap |= (1 << ((i+1) + 8 * (j-2)));
+			 	}
+				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareEmptyFriendly(i-1,j-2))
+				{
+			 		// assign(j-2,i-1);
+			 		attackMap |= (1 << ((i-1) + 8 * (j-2)));
+			 	}
+				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareEmptyFriendly(i+1,j+2))
+				{
+			 		// assign(j+2,i+1);
+			 		attackMap |= (1 << ((i+1) + 8 * (j+2)));
+			 	}
+				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareEmptyFriendly(i-1,j+2))
+				{
+			 		// assign(j+2,i-1);
+			 		attackMap |= (1 << ((i-1) + 8 * (j+2)));
+			 	}
+				if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareEmptyFriendly(i+2,j-1))
+				{
+			 		// assign(j-1,i+2);
+			 		attackMap |= (1 << ((i+2) + 8 * (j-1)));
+			 	}
+				if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareEmptyFriendly(i+2,j+1))
+				{
+			 		// assign(j+1,i+2);
+			 		attackMap |= (1 << ((i+2) + 8 * (j+1)));
+			 	}
+				if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareEmptyFriendly(i-2,j-1))
+				{
+			 		// assign(j-1,i-2);
+			 		attackMap |= (1 << ((i+1) + 8 * (j-1)));
+			 	}
+				if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareEmptyFriendly(i-2,j+1))
+				{
+			 		// assign(j+1,i - 2);
+			 		attackMap |= (1 << ((i-2) + 8 * (j+1)));
+			 	}
+			}
+			if (pType == Rook || pType == Bishop || pType == Queen)
+			{
+				int startDir = (pType == Bishop) ? 4 : 0;
+				int endDir = (pType == Rook) ? 3 : 7;
+				for (int dirID = startDir ; dirID <= endDir ; ++dirID)
+				{
+					for (int i = 0 ; i < numSquares[sq][dirID]; ++i)
+					{
+						int targetPos = sq + directions[dirID] * (i+1);
+						if (isSquareFriendly(targetPos))
+						{
+							break;
+						}
+						// assign(targetPos / 8, targetPos % 8);
+						attackMap |= (1 << targetPos);
+						if (isSquareEnemy(targetPos))
+						{
+							break;
+						}
+					}
+				}
+			}
+
 		}
 	}
-
 }
 
-void BoardManager::resetControl()
-{
-	for (int i = 0 ; i <= 7; ++i)
-	{
-		for (int j = 0; j <= 7; ++j)
-		{
-			controlled[i][j] = false;
-		}
-	}
-}
+
+// void BoardManager::controlledSquares()
+// {
+
+// 	resetControl();
+
+// 	for (int i = 0 ; i < 8 ; ++i)
+// 	{
+// 		for (int j = 0 ; j < 8 ; ++j)
+// 		{
+// 			int piece = get(i,j);
+// 			int sq = pid(i,j);
+
+// 			if(piece > 0 && isPieceWhite(piece) == whiteToMove)
+// 			{
+
+// 				if (pieceType(piece) == Pawn)
+// 				{
+
+// 					if (isPieceWhite(piece))
+// 					{
+// 						if (numSquares[sq][NorthEastID] >= 1 && isSquareFree(i+1,j-1))
+// 						{
+// 							assign(j-1,i+1);
+// 						}
+// 						if (numSquares[sq][NorthWestID] >= 1 && isSquareFree(i-1,j-1))
+// 						{
+// 							assign(j-1,i-1);
+// 						}
+
+// 					}
+// 					else
+// 					{
+// 						if (numSquares[sq][SouthEastID] >= 1 && isSquareFree(i+1,j+1))
+// 						{
+// 							assign(j+1, i+1);
+// 						}
+// 						if (numSquares[sq][SouthWestID] >= 1 && isSquareFree(i-1,j+1))
+// 						{
+// 							assign(j+1,i-1);
+// 						}
+// 					}		
+
+// 				}
+
+// 				if (pieceType(piece) == King)
+// 				{
+
+// 					for (int dirID = 0 ; dirID <= 7 ; ++dirID)
+// 					{
+// 						int targetPos = sq + directions[dirID];
+
+// 						if (numSquares[sq][dirID] >= 1 && isSquareFree(targetPos))
+// 						{
+// 							assign(targetPos/8, targetPos % 8);
+// 						}
+// 					}
+
+// 				}
+
+// 				if (pieceType(piece) == Knight)
+// 				{
+
+// 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareFree(i+1,j-2))
+// 					{
+//  						assign(j-2,i+1);
+//  					}
+// 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareFree(i-1,j-2))
+// 					{
+//  						assign(j-2,i-1);
+//  					}
+// 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareFree(i+1,j+2))
+// 					{
+//  						assign(j+2,i+1);
+//  					}
+// 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareFree(i-1,j+2))
+// 					{
+//  						assign(j+2,i-1);
+//  					}
+
+// 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareFree(i+2,j-1))
+// 					{
+//  						assign(j-1,i+2);
+//  					}
+// 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareFree(i+2,j+1))
+// 					{
+//  						assign(j+1,i+2);
+//  					}
+// 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareFree(i-2,j-1))
+// 					{
+//  						assign(j-1,i-2);
+//  					}
+// 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareFree(i-2,j+1))
+// 					{
+//  						assign(j+1,i - 2);
+//  					}
+
+// 				}
+
+// 				if (pieceType(piece) == Rook || pieceType(piece) == Bishop || pieceType(piece) == Queen)
+// 				{
+
+// 					int startDir = (pieceType(piece) == Bishop) ? 4 : 0;
+// 					int endDir = (pieceType(piece) == Rook) ? 3 : 7;
+
+// 					for (int dirID = startDir ; dirID <= endDir ; ++dirID)
+// 					{
+// 						for (int i = 0 ; i < numSquares[sq][dirID]; ++i)
+// 						{
+// 							int targetPos = sq + directions[dirID] * (i+1);
+
+// 							if (isSquareFriendly(targetPos))
+// 							{
+// 								break;
+// 							}
+
+// 							assign(targetPos / 8, targetPos % 8);
+
+// 							if (isSquareEnemy(targetPos))
+// 							{
+// 								break;
+// 							}
+
+// 						}
+// 					}
+
+// 				}
+
+// 			}
+// 		}
+// 	}
+
+// }
+
+// void BoardManager::resetControl()
+// {
+// 	for (int i = 0 ; i <= 7; ++i)
+// 	{
+// 		for (int j = 0; j <= 7; ++j)
+// 		{
+// 			controlled[i][j] = false;
+// 		}
+// 	}
+// }
 
 
 
@@ -362,33 +505,163 @@ std::vector<int> BoardManager::generatePseudoMoves()
 {
 	std::vector<int> moves;
 
-	whiteToMove = !whiteToMove;
-	controlledSquares();
-	whiteToMove = !whiteToMove;
+	fillBitboardData();
 
 
-	for (int color = 0; color <= 1; ++color)
+	for (int pType = 1; pType <= 6; ++pType)
 	{
-	    for (int pType = 1; pType <= 6; ++pType)
-	    {
-	    uint64_t pMask = getPieceBitboard(pType, color == 0);
+	    uint64_t pMask = getPieceBitboard(pType, whiteToMove);
         while (pMask != 0)
         {
 
-			int piece = ((color == 0) ? White : Black) | pType;
-			int currentPID = getAndClearLSB(&pMask);
-			int i = currentPID % 8;
-			int j = currentPID / 8;
+			int piece = (whiteToMove ? White : Black) | pType;
+			int sq = getAndClearLSB(&pMask);
+			int i = sq % 8;
+			int j = sq / 8;
 
-			if(piece > 0 && isPieceWhite(piece) == whiteToMove)
-			{
+
+				///// King ////
+
+				if (pieceType(piece) == King)
+				{
+
+					for (int dirID = 0 ; dirID <= 7 ; ++dirID)
+					{
+						int targetPos = sq + directions[dirID];
+
+						if (numSquares[sq][dirID] >= 1 && isSquareEmptyEnemy(targetPos))
+						{
+							moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
+						}
+					}
+
+					if (!isBitToggled(attackMap, sq))
+					{
+						if (    (currentGameState.canWhiteQueenCastle && whiteToMove) ||  (currentGameState.canBlackQueenCastle && !whiteToMove))
+						{
+							bool isOK = true;
+							if (!isSquareEmpty(1,j))
+							{
+								isOK = false;
+							}
+							for (int p = 2; p <= 3; ++p )
+							{
+								if (!isSquareEmpty(p, j) || isBitToggled(attackMap, p + 8 * j))
+								{
+									isOK = false;
+								}
+							}
+							if (isOK)
+							{
+								moves.push_back(genMove(sq, sq - 2, QueenCastle));
+							}
+						}
+						if (   (currentGameState.canWhiteKingCastle && whiteToMove) ||  (currentGameState.canBlackKingCastle && !whiteToMove) )
+						{
+							bool isOK = true;
+							for (int p = 5; p <= 6; ++p )
+							{
+								if (!isSquareEmpty(p, j) || isBitToggled(attackMap, p + 8 * j))
+								{
+									isOK = false;
+								}
+							}
+							if (isOK)
+							{
+								moves.push_back(genMove(sq, sq + 2, KingCastle));
+							}
+						}
+					}
+
+				}
+
+				///// King ////
+
+				///// Sliding pieces ////
+
+				if (pieceType(piece) == Rook || pieceType(piece) == Bishop || pieceType(piece) == Queen)
+				{
+
+					int startDir = (pieceType(piece) == Bishop) ? 4 : 0;
+					int endDir = (pieceType(piece) == Rook) ? 3 : 7;
+
+					for (int dirID = startDir ; dirID <= endDir ; ++dirID)
+					{
+						for (int i = 0 ; i < numSquares[sq][dirID]; ++i)
+						{
+							int targetPos = sq + directions[dirID] * (i+1);
+
+							if (isSquareFriendly(targetPos))
+							{
+								break;
+							}
+
+
+							moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
+
+							if (isSquareEnemy(targetPos))
+							{
+								break;
+							}
+
+						}
+					}
+
+				}
+
+				///// Sliding pieces ////
+
+				///// Knight ////
+
+				if (pieceType(piece) == Knight)
+				{
+
+					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareEmptyEnemy(i+1,j-2))
+					{
+						moves.push_back(genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture));
+					}
+					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareEmptyEnemy(i-1,j-2))
+					{
+						moves.push_back(genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture));
+					}
+					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareEmptyEnemy(i+1,j+2))
+					{
+						moves.push_back(genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture));
+					}
+					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareEmptyEnemy(i-1,j+2))
+					{
+						moves.push_back(genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture));
+					}
+
+					if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareEmptyEnemy(i+2,j-1))
+					{
+						moves.push_back(genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture));
+					}
+					if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareEmptyEnemy(i+2,j+1))
+					{
+						moves.push_back(genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture));
+					}
+					if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareEmptyEnemy(i-2,j-1))
+					{
+						moves.push_back(genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture));
+					}
+					if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareEmptyEnemy(i-2,j+1))
+					{
+						moves.push_back(genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture));
+					}
+
+				}
+
+				///// Knight ////
+
+				///// Pawns ////
 
 				if (pieceType(piece) == Pawn)
 				{
 
 					if (isPieceWhite(piece))
 					{
-						if (numSquares[currentPID][NorthID] >= 1 && isSquareEmpty(i,j-1))
+						if (numSquares[sq][NorthID] >= 1 && isSquareEmpty(i,j-1))
 						{
 							if (j > 1)
 							{
@@ -406,7 +679,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						{
 							moves.push_back(genMove(i,j,i,j-2, DoublePawnPush));
 						}
-						if (numSquares[currentPID][NorthEastID] >= 1 && isSquareEnemy(i+1,j-1))
+						if (numSquares[sq][NorthEastID] >= 1 && isSquareEnemy(i+1,j-1))
 						{
 							if (j - 1 == 0)
 							{
@@ -420,7 +693,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 								moves.push_back(genMove(i,j,i+1,j-1, Capture));
 							}
 						}
-						if (numSquares[currentPID][NorthWestID] >= 1 && isSquareEnemy(i-1,j-1))
+						if (numSquares[sq][NorthWestID] >= 1 && isSquareEnemy(i-1,j-1))
 						{
 							if (j - 1 == 0)
 							{
@@ -435,11 +708,11 @@ std::vector<int> BoardManager::generatePseudoMoves()
 							}
 						}
 
-						if (numSquares[currentPID][NorthEastID] >= 1 && j == 3 && isSquareEnemy(i+1,j) && pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j-1) && currentGameState.doublePushFile - 1 == i+1)
+						if (numSquares[sq][NorthEastID] >= 1 && j == 3 && isSquareEnemy(i+1,j) && pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j-1) && currentGameState.doublePushFile - 1 == i+1)
 						{
 							moves.push_back(genMove(i,j,i+1,j-1, EPCapture));
 						}
-						if (numSquares[currentPID][NorthWestID] >= 1 && j == 3 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j-1) && currentGameState.doublePushFile - 1 == i-1)
+						if (numSquares[sq][NorthWestID] >= 1 && j == 3 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j-1) && currentGameState.doublePushFile - 1 == i-1)
 						{
 							moves.push_back(genMove(i,j,i-1,j-1, EPCapture));
 						}
@@ -447,7 +720,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 					}
 					else
 					{
-						if (numSquares[currentPID][NorthID] >= 1 && isSquareEmpty(i,j+1))
+						if (numSquares[sq][NorthID] >= 1 && isSquareEmpty(i,j+1))
 						{
 							if (j < 6)
 							{
@@ -465,7 +738,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						{
 							moves.push_back(genMove(i,j,i,j+2, DoublePawnPush));
 						}
-						if (numSquares[currentPID][SouthEastID] >= 1 && isSquareEnemy(i+1,j+1))
+						if (numSquares[sq][SouthEastID] >= 1 && isSquareEnemy(i+1,j+1))
 						{
 							if (j + 1 == 7)
 							{
@@ -479,7 +752,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 								moves.push_back(genMove(i,j,i+1,j+1, Capture));
 							}
 						}
-						if (numSquares[currentPID][SouthWestID] >= 1 && isSquareEnemy(i-1,j+1))
+						if (numSquares[sq][SouthWestID] >= 1 && isSquareEnemy(i-1,j+1))
 						{
 							if (j + 1 == 7)
 							{
@@ -494,11 +767,11 @@ std::vector<int> BoardManager::generatePseudoMoves()
 							}
 						}
 
-						if (numSquares[currentPID][SouthEastID] >= 1 && j == 4 && isSquareEnemy(i+1,j)&& pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j+1) && (currentGameState.doublePushFile - 1 == i+1))
+						if (numSquares[sq][SouthEastID] >= 1 && j == 4 && isSquareEnemy(i+1,j)&& pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j+1) && (currentGameState.doublePushFile - 1 == i+1))
 						{
 							moves.push_back(genMove(i,j,i+1,j+1, EPCapture));
 						}
-						if (numSquares[currentPID][SouthWestID] >= 1 && j == 4 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j+1) && (currentGameState.doublePushFile - 1 == i-1))
+						if (numSquares[sq][SouthWestID] >= 1 && j == 4 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j+1) && (currentGameState.doublePushFile - 1 == i-1))
 						{
 							moves.push_back(genMove(i,j,i-1,j+1, EPCapture));
 						}
@@ -507,130 +780,9 @@ std::vector<int> BoardManager::generatePseudoMoves()
 
 				}
 
-				if (pieceType(piece) == King)
-				{
-
-					for (int dirID = 0 ; dirID <= 7 ; ++dirID)
-					{
-						int targetPos = currentPID + directions[dirID];
-
-						if (numSquares[currentPID][dirID] >= 1 && isSquareFree(targetPos))
-						{
-							moves.push_back(genMove(currentPID, targetPos, isSquareEnemy(targetPos) * Capture));
-						}
-					}
-
-					if (!controlled[j][i])
-					{
-						if (    (currentGameState.canWhiteQueenCastle && whiteToMove) ||  (currentGameState.canBlackQueenCastle && !whiteToMove))
-						{
-							bool isOK = true;
-							if (!isSquareEmpty(1,j))
-							{
-								isOK = false;
-							}
-							for (int p = 2; p <= 3; ++p )
-							{
-								if (!isSquareEmpty(p, j) || controlled[j][p])
-								{
-									isOK = false;
-								}
-							}
-							if (isOK)
-							{
-								moves.push_back(genMove(currentPID, currentPID - 2, QueenCastle));
-							}
-						}
-						if (   (currentGameState.canWhiteKingCastle && whiteToMove) ||  (currentGameState.canBlackKingCastle && !whiteToMove) )
-						{
-							bool isOK = true;
-							for (int p = 5; p <= 6; ++p )
-							{
-								if (!isSquareEmpty(p, j) || controlled[j][p])
-								{
-									isOK = false;
-								}
-							}
-							if (isOK)
-							{
-								moves.push_back(genMove(currentPID, currentPID + 2, KingCastle));
-							}
-						}
-					}
-
-				}
-
-				if (pieceType(piece) == Knight)
-				{
-
-					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareFree(i+1,j-2))
-					{
-						moves.push_back(genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture));
-					}
-					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareFree(i-1,j-2))
-					{
-						moves.push_back(genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture));
-					}
-					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareFree(i+1,j+2))
-					{
-						moves.push_back(genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture));
-					}
-					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareFree(i-1,j+2))
-					{
-						moves.push_back(genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture));
-					}
-
-					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareFree(i+2,j-1))
-					{
-						moves.push_back(genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture));
-					}
-					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareFree(i+2,j+1))
-					{
-						moves.push_back(genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture));
-					}
-					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareFree(i-2,j-1))
-					{
-						moves.push_back(genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture));
-					}
-					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareFree(i-2,j+1))
-					{
-						moves.push_back(genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture));
-					}
-
-				}
-
-				if (pieceType(piece) == Rook || pieceType(piece) == Bishop || pieceType(piece) == Queen)
-				{
-
-					int startDir = (pieceType(piece) == Bishop) ? 4 : 0;
-					int endDir = (pieceType(piece) == Rook) ? 3 : 7;
-
-					for (int dirID = startDir ; dirID <= endDir ; ++dirID)
-					{
-						for (int i = 0 ; i < numSquares[currentPID][dirID]; ++i)
-						{
-							int targetPos = currentPID + directions[dirID] * (i+1);
-
-							if (isSquareFriendly(targetPos))
-							{
-								break;
-							}
+				///// Pawn ////
 
 
-							moves.push_back(genMove(currentPID, targetPos, isSquareEnemy(targetPos) * Capture));
-
-							if (isSquareEnemy(targetPos))
-							{
-								break;
-							}
-
-						}
-					}
-
-				}
-
-			}
-		}
 		}
 	}
 

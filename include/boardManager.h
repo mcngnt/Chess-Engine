@@ -60,15 +60,21 @@ public:
 	int get(int x, int y);
 	std::vector<int> generatePseudoMoves();
 	std::vector<int> generateMoves(bool onlyCaptures);
-	bool isSquareEmpty(int i, int j);
-	bool isSquareEmpty(int pid);
-	bool isSquareFree(int i, int j);
-	bool isSquareFree(int pid);
 	int isLegal(std::vector<int> moves, int move);
-	bool isSquareEnemy(int i, int j);
-	bool isSquareEnemy(int pid);
-	bool isSquareFriendly(int pid);
 	void unmakeMove(int move);
+
+	bool isSquareEnemy(int sq);
+	bool isSquareFriendly(int sq);
+	bool isSquareEmpty(int sq);
+	bool isSquareEmptyFriendly(int sq);
+	bool isSquareEmptyEnemy(int sq);
+	bool isSquareEnemy(int i, int j);
+	bool isSquareFriendly(int i, int j);
+	bool isSquareEmpty(int i, int j);
+	bool isSquareEmptyFriendly(int i, int j);
+	bool isSquareEmptyEnemy(int i, int j);
+
+
 
 	std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 	// std::string startingFen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/P7/1PP1NnPP/RNBQK2R b KQ - 1 8  ";
@@ -101,14 +107,16 @@ public:
 	void unmakeNullMove();
 
 
-	void controlledSquares();
-	void resetControl();
+	// void controlledSquares();
+	// void resetControl();
+
+	void fillBitboardData();
 
 	bool isChecked();
 
 	bool isRepetitionDraw();
 
-	void assign(int i, int j);
+	// void assign(int i, int j);
 
 
 
@@ -116,6 +124,12 @@ public:
 
 
 	int board[8][8];
+
+	uint64_t friendlyPiecesBitboard;
+	uint64_t opponentPiecesBitboard;
+	uint64_t allPiecesBitboard;
+
+	uint64_t attackMap;
 
 	
 	std::stack<GameState> gameStateHistory;
@@ -126,6 +140,6 @@ public:
 
 	GameState currentGameState;
 
-	bool controlled[8][8];
+	// bool controlled[8][8];
 
 };

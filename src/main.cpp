@@ -55,11 +55,11 @@ int main()
     // uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
     // std::cout << bitboardTest << std::endl;
 
-    std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-    engine.perft(5);
-    std::cout << "4865609 expected" << std::endl;
-    std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
+    // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+    // engine.perft(5);
+    // std::cout << "4865609 expected" << std::endl;
+    // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
+    // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 
     // std::cout << trailingZerosNB(1126724540563456) << std::endl;
 
@@ -508,6 +508,18 @@ int main()
                         }
                     }
                 }
+            }
+
+            uint64_t pMask = engine.board.attackMap;
+            while (pMask != 0)
+            {
+                // std::cout << pMask << std::endl;
+                int sq = getAndClearLSB(&pMask);
+                sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+                sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
+                rectangle.setFillColor(sf::Color(0,255,0,128));
+                rectangle.setPosition(pos);
+                window.draw(rectangle);
             }
 
 
