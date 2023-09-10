@@ -336,7 +336,7 @@ std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 
 	for (int pseudoMove : pseudoMoves)
 	{
-		if (onlyCaptures && !isCapturingTag(tag(pseudoMove)))
+		if ((onlyCaptures && !isCapturingTag(getTag(pseudoMove))))
 		{
 			continue;
 		}
@@ -367,12 +367,18 @@ std::vector<int> BoardManager::generatePseudoMoves()
 	whiteToMove = !whiteToMove;
 
 
-	for (int i = 0 ; i < 8 ; ++i)
+	for (int color = 0; color <= 1; ++color)
 	{
-		for (int j = 0 ; j < 8 ; ++j)
-		{
-			int piece = get(i,j);
-			int currentPID = pid(i,j);
+	    for (int pType = 1; pType <= 6; ++pType)
+	    {
+	    uint64_t pMask = getPieceBitboard(pType, color == 0);
+        while (pMask != 0)
+        {
+
+			int piece = ((color == 0) ? White : Black) | pType;
+			int currentPID = getAndClearLSB(&pMask);
+			int i = currentPID % 8;
+			int j = currentPID / 8;
 
 			if(piece > 0 && isPieceWhite(piece) == whiteToMove)
 			{
@@ -624,6 +630,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 				}
 
 			}
+		}
 		}
 	}
 
@@ -910,7 +917,7 @@ void BoardManager::makeMove(int move)
 
 	int startPosi = startPos(move);
 	int endPosi = endPos(move);
-	int tag = (move & tagMask) >> 12;
+	int tag = getTag(move);
 
 	int startPiece = get(startPosi);
 	int endPiece = get(endPosi);
@@ -995,8 +1002,12 @@ void BoardManager::makeMove(int move)
 		}
 		board[endPosY][endPosX] = board[startPosY][startPosX];
 		board[startPosY][startPosX] = None;
+		togglePieceBitboard(startPieceType, whiteToMove, startPosi);
 		togglePieceBitboard(startPieceType, whiteToMove, endPosi);
-		togglePieceBitboard(startPieceType, whiteToMove, endPosi);
+		if (tag == Capture)
+		{
+			togglePieceBitboard(endPieceType, !whiteToMove, endPosi);
+		}
 	}
 
 	if (tag == KnightPromCapture || tag == RookPromCapture || tag == BishopPromCapture || tag == QueenPromCapture)
@@ -1022,22 +1033,19 @@ void BoardManager::makeMove(int move)
 		if (whiteToMove)
 		{
 			board[endPosY][endPosX] = White | piecePromoType;
-			togglePieceBitboard(piecePromoType, false, endPosi);
-			togglePieceBitboard(Pawn, true, endPosi);
-			togglePieceBitboard(Pawn, true, startPosi);
 			zobristKey ^= piecesZobrist[Pawn][1][endPosi];
 			zobristKey ^= piecesZobrist[piecePromoType][1][endPosi];
 		}
 		else
 		{
 			board[endPosY][endPosX] = Black | piecePromoType;
-			togglePieceBitboard(endPieceType, true, endPosi);
-			togglePieceBitboard(Pawn, false, startPosi);
-			togglePieceBitboard(piecePromoType, false, endPosi);
 			zobristKey ^= piecesZobrist[Pawn][0][endPosi];
 			zobristKey ^= piecesZobrist[piecePromoType][0][endPosi];
 		}
 		board[startPosY][startPosX] = None;
+		togglePieceBitboard(endPieceType, !whiteToMove, endPosi);
+		togglePieceBitboard(Pawn, whiteToMove, startPosi);
+		togglePieceBitboard(piecePromoType, whiteToMove, endPosi);
 	}
 
 
@@ -1138,6 +1146,11 @@ void BoardManager::makeMove(int move)
 		togglePieceBitboard(Pawn, whiteToMove, startPosi);
 	}
 
+/*	if((piecesBitboard[getPieceBitboardIndex(Queen, true)] & piecesBitboard[getPieceBitboardIndex(Queen, false)]) != 0)
+	{
+		std::cout << tag << " " << startPieceType << " " << endPieceType << std::endl;
+	}*/
+
 	if (newGameState.canWhiteKingCastle != currentGameState.canWhiteKingCastle)
 	{
 		zobristKey ^= castlingRightZobrist[0];
@@ -1181,14 +1194,13 @@ void BoardManager::unmakeMove(int move)
 {
 	int startPosi = startPos(move);
 	int endPosi = endPos(move);
-	int tag = (move & tagMask) >> 12;
+	int tag = getTag(move);
 
 	int startPiece = get(startPosi);
 	int endPiece = get(endPosi);
 
 	int startPieceType = pieceType(startPiece);
 	int endPieceType = pieceType(endPiece);
-
 
 
 	int startPosX = startPosi % 8;
@@ -1205,8 +1217,11 @@ void BoardManager::unmakeMove(int move)
 	{
 		board[startPosY][startPosX] = board[endPosY][endPosX];
 		board[endPosY][endPosX] = None;
-		togglePieceBitboard(startPieceType, !whiteToMove, startPosi);
-		togglePieceBitboard(startPieceType, !whiteToMove, endPosi);
+/*		std::cout << pieceType(board[startPosY][startPosX]) << std::endl;
+		std::cout << endPieceType << std::endl;
+		std::cout << "------------" << std::endl;*/
+		togglePieceBitboard(endPieceType, !whiteToMove, startPosi);
+		togglePieceBitboard(endPieceType, !whiteToMove, endPosi);
 	}
 
 
@@ -1214,9 +1229,10 @@ void BoardManager::unmakeMove(int move)
 	{
 		board[startPosY][startPosX] = board[endPosY][endPosX];
 		board[endPosY][endPosX] = currentGameState.capturedPiece;
-		togglePieceBitboard(startPieceType, !whiteToMove, startPosi);
-		togglePieceBitboard(startPieceType, !whiteToMove, endPosi);
+		togglePieceBitboard(endPieceType, !whiteToMove, startPosi);
+		togglePieceBitboard(endPieceType, !whiteToMove, endPosi);
 		togglePieceBitboard(pieceType(currentGameState.capturedPiece), whiteToMove, endPosi);
+		// std::cout << pieceType(currentGameState.capturedPiece) << std::endl;
 	}
 
 
@@ -1224,8 +1240,8 @@ void BoardManager::unmakeMove(int move)
 	{
 		board[startPosY][startPosX] = board[endPosY][endPosX];
 		board[endPosY][endPosX] = None;
-		togglePieceBitboard(startPieceType, !whiteToMove, startPosi);
-		togglePieceBitboard(startPieceType, !whiteToMove, endPosi);
+		togglePieceBitboard(Pawn, !whiteToMove, startPosi);
+		togglePieceBitboard(Pawn, !whiteToMove, endPosi);
 		if (!whiteToMove)
 		{
 			board[endPosY + 1][endPosX] = Black | Pawn;
@@ -1316,11 +1332,16 @@ void BoardManager::unmakeMove(int move)
 				togglePieceBitboard(Queen, !whiteToMove, endPosi);
 				break;
 		}
-		togglePieceBitboard(currentGameState.capturedPiece, whiteToMove, endPosi);
+		togglePieceBitboard(pieceType(currentGameState.capturedPiece), whiteToMove, endPosi);
 	}
 
-	
-
+	if((piecesBitboard[getPieceBitboardIndex(Queen, true)] & piecesBitboard[getPieceBitboardIndex(Queen, false)]) != 0 && !foundBug)
+	{
+		std::cout << tag << " " << startPieceType << " " << endPieceType << " " << whiteToMove << " " << startPosi << " " << endPosi << std::endl;
+		// std::cout << "----" << std::endl;
+		foundBug = true;
+		// 0 0 5 1 3 24
+	}
 
 	whiteToMove = !whiteToMove;
 

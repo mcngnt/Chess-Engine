@@ -55,11 +55,11 @@ int main()
     // uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
     // std::cout << bitboardTest << std::endl;
 
-    // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-    // engine.perft(4);
-    // std::cout << "2103487 expected" << std::endl;
-    // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-    // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
+    std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+    engine.perft(5);
+    std::cout << "4865609 expected" << std::endl;
+    std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 
     // std::cout << trailingZerosNB(1126724540563456) << std::endl;
 
@@ -323,10 +323,15 @@ int main()
 
         bool doUpdate = true;
 
+        bool showBitboard = true;
+
+        bool pressedSpace = false;
+
 
 
         while(window.isOpen())
         {
+            pressedSpace = false;
             doUpdate = true;
             sf::Vector2f mousePos = sf::Vector2f(sf::Mouse::getPosition(window));
 
@@ -381,6 +386,11 @@ int main()
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
                 {
                     engine.reset();
+                }
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && !pressedSpace)
+                {
+                    showBitboard = !showBitboard;
+                    pressedSpace = true;
                 }
             }
 
@@ -478,26 +488,24 @@ int main()
                 }
             }
 
-            for (int color = 0; color <= 1; ++color)
+            if(showBitboard)
             {
-                for (int pType = 1; pType <= 6; ++pType)
+                for (int color = 0; color <= 1; ++color)
                 {
-/*                    if(!(color == 0 && pType == 1))
+                    for (int pType = 1; pType <= 6; ++pType)
                     {
-                        continue;
-                    }*/
-                    uint64_t pMask = engine.board.getPieceBitboard(pType, color == 0);
-                    while (pMask != 0)
-                    {
-                        // std::cout << pMask << std::endl;
-                        int sq = getAndClearLSB(&pMask);
-                        // std::cout << "Pawn " << sq << std::endl;
-                        int pnum = color == 0 ? White | pType : Black | pType;
-                        sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
-                        piecesSpr[pnum].setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
-                        piecesSpr[pnum].setColor(sf::Color(0, 255, 255, 128));
-                        window.draw(piecesSpr[pnum]);
-                        piecesSpr[pnum].setColor(sf::Color(255, 255, 255, 255));
+                        uint64_t pMask = engine.board.getPieceBitboard(pType, color == 0);
+                        while (pMask != 0)
+                        {
+                            // std::cout << pMask << std::endl;
+                            int sq = getAndClearLSB(&pMask);
+                            int pnum = color == 0 ? White | pType : Black | pType;
+                            sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+                            piecesSpr[pnum].setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
+                            piecesSpr[pnum].setColor(sf::Color(0, 255, 255, 128));
+                            window.draw(piecesSpr[pnum]);
+                            piecesSpr[pnum].setColor(sf::Color(255, 255, 255, 255));
+                        }
                     }
                 }
             }

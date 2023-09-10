@@ -50,7 +50,7 @@ int startPos(int move)
 	return move & 63;
 }
 
-int tag(int move)
+int getTag(int move)
 {
 	return (move & tagMask) >> 12;
 }
@@ -65,7 +65,7 @@ std::string standardPos(int pos)
 
 std::string standardNotation(int move)
 {
-	int t = tag(move);
+	int t = getTag(move);
 	char c = ' ';
 	switch (t)
 	{

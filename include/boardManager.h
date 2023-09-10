@@ -70,8 +70,9 @@ public:
 	bool isSquareFriendly(int pid);
 	void unmakeMove(int move);
 
-	// std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-	std::string startingFen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8  ";
+	std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	// std::string startingFen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/P7/1PP1NnPP/RNBQK2R b KQ - 1 8  ";
+	// std::string startingFen = "rnbq1k1r/pp1P1ppp/2p2b2/8/2B5/P7/1PP1NnPP/RNBQK2R w KQ - 1 8  ";
 	void loadFen(std::string fen);
 	std::string convertFen();
 
@@ -87,6 +88,8 @@ public:
 	int getPieceBitboardIndex(int pieceType, bool isPieceWhite);
 	uint64_t getPieceBitboard(int pieceType, bool isPieceWhite);
 	void togglePieceBitboard(int pieceType, bool isPieceWhite, int squareIndex);
+
+	bool foundBug = false;
 
 
 	void initZobrist();

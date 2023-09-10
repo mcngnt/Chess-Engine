@@ -39,7 +39,7 @@ int genMove(int startPosx, int startPosy, int endPosx, int endPosy, int tag);
 int discardTag(int move);
 int endPos(int move);
 int startPos(int move);
-int tag(int move);
+int getTag(int move);
 std::string standardNotation(int move);
 bool isCapturingTag(int tag);
 

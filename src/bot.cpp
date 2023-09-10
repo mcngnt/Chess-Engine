@@ -144,7 +144,7 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 
 	    	-(
 
-	    		move == ttEntry.bestMove ? 9000000 : tag(move) == Capture ? 1000000 * pieceType(board->get(endPos(move))) - pieceType(board->get(startPos(move))) : killerMoves[plyFromRoot] == move ? 900000 : 0
+	    		move == ttEntry.bestMove ? 9000000 : getTag(move) == Capture ? 1000000 * pieceType(board->get(endPos(move))) - pieceType(board->get(startPos(move))) : killerMoves[plyFromRoot] == move ? 900000 : 0
 
 	    	 )
 
@@ -162,7 +162,7 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 
 
 /*
-        if (canPrune && moveCount > 1 && tag(move) != Capture && tag(move) != QueenProm)
+        if (canPrune && moveCount > 1 && getTag(move) != Capture && getTag(move) != QueenProm)
         {
              continue;
         }*/
@@ -230,7 +230,7 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
              if (alpha >= beta)
              {
                  currentNodeType = BetaNode;
-                 if (tag(move) != Capture)
+                 if (getTag(move) != Capture)
                  {
                      killerMoves[plyFromRoot] = move;
                      //historyHeuristicTable[isWhiteMult, (int)move.MovePieceType, move.TargetSquare.Index] += depth * depth;

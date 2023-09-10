@@ -83,7 +83,7 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2, char c)
 
 	if (legalMove > 0)
 	{
-		if (  tag(legalMove) >= 8)
+		if (  getTag(legalMove) >= 8)
 		{
 			int newTag = 0;
 			int newTagPr = QueenProm;
@@ -109,7 +109,7 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2, char c)
 				newTagPrCap = RookPromCapture;
 			}
 
-			switch (tag(legalMove))
+			switch (getTag(legalMove))
 			{
 				case KnightProm:
 					newTag = newTagPr;
@@ -151,7 +151,7 @@ int Engine::tryMove(int move, char c)
 
 	if (legalMove > 0)
 	{
-		if (  tag(legalMove) >= 8)
+		if (  getTag(legalMove) >= 8)
 		{
 			int newTag = 0;
 			int newTagPr = QueenProm;
@@ -177,7 +177,7 @@ int Engine::tryMove(int move, char c)
 				newTagPrCap = RookPromCapture;
 			}
 
-			switch (tag(legalMove))
+			switch (getTag(legalMove))
 			{
 				case KnightProm:
 					newTag = newTagPr;
