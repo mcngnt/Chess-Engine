@@ -90,6 +90,7 @@ public:
 	int getPieceBitboardIndex(int pieceType, bool isPieceWhite);
 	uint64_t getPieceBitboard(int pieceType, bool isPieceWhite);
 	void togglePieceBitboard(int pieceType, bool isPieceWhite, int squareIndex);
+	bool isPieceHereBitboard(int pieceType, bool isPieceWhite, int squareIndex);
 
 	bool foundBug = false;
 
@@ -113,6 +114,9 @@ public:
 	void assign(int i, int j);
 
 	uint64_t attackMap;
+	uint64_t friendlyPiecesBitboard;
+	uint64_t enemyPiecesBitboard;
+	uint64_t allPiecesBitboard;
 
 	void fillBitboardData();
 

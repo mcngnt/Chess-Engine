@@ -20,20 +20,27 @@ void BoardManager::togglePieceBitboard(int pieceType, bool isPieceWhite, int squ
 	piecesBitboard[getPieceBitboardIndex(pieceType, isPieceWhite)] = toggleSquare(piecesBitboard[getPieceBitboardIndex(pieceType, isPieceWhite)], squareIndex);
 }
 
+bool BoardManager::isPieceHereBitboard(int pieceType, bool isPieceWhite, int squareIndex)
+{
+	return isBitToggled(getPieceBitboard(pieceType, isPieceWhite), squareIndex);
+}
+
 
 bool BoardManager::isChecked()
 {
-	whiteToMove = !whiteToMove;
-    controlledSquares();
-    whiteToMove = !whiteToMove;
-    if (whiteToMove)
-    {
-    	return controlled[currentGameState.whiteKingPos / 8][currentGameState.whiteKingPos % 8];
-    }
-    else
-    {
-    	return controlled[currentGameState.blackKingPos / 8][currentGameState.blackKingPos % 8];
-    }
+	// whiteToMove = !whiteToMove;
+    // controlledSquares();
+    // whiteToMove = !whiteToMove;
+    // if (whiteToMove)
+    // {
+    // 	return controlled[currentGameState.whiteKingPos / 8][currentGameState.whiteKingPos % 8];
+    // }
+    // else
+    // {
+    // 	return controlled[currentGameState.blackKingPos / 8][currentGameState.blackKingPos % 8];
+    // }
+    fillBitboardData();
+    return isBitToggled(attackMap, whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos);
 }
 
 bool BoardManager::isRepetitionDraw()
@@ -193,15 +200,15 @@ void BoardManager::assign(int i, int j)
 
 void BoardManager::fillBitboardData()
 {
-	// friendlyPiecesBitboard = piecesBitboard[0] | piecesBitboard[1] | piecesBitboard[2] | piecesBitboard[3] | piecesBitboard[4] | piecesBitboard[5];
-	// enemyPiecesBitboard = piecesBitboard[6] | piecesBitboard[7] | piecesBitboard[8] | piecesBitboard[9] | piecesBitboard[10] | piecesBitboard[11];
-	// if(!whiteToMove)
-	// {
-	// 	uint64_t temp = friendlyPiecesBitboard;
-	// 	friendlyPiecesBitboard = enemyPiecesBitboard;
-	// 	enemyPiecesBitboard = temp;
-	// }
-	// allPiecesBitboard = friendlyPiecesBitboard | enemyPiecesBitboard;
+	friendlyPiecesBitboard = piecesBitboard[0] | piecesBitboard[1] | piecesBitboard[2] | piecesBitboard[3] | piecesBitboard[4] | piecesBitboard[5];
+	enemyPiecesBitboard = piecesBitboard[6] | piecesBitboard[7] | piecesBitboard[8] | piecesBitboard[9] | piecesBitboard[10] | piecesBitboard[11];
+	if(!whiteToMove)
+	{
+		uint64_t temp = friendlyPiecesBitboard;
+		friendlyPiecesBitboard = enemyPiecesBitboard;
+		enemyPiecesBitboard = temp;
+	}
+	allPiecesBitboard = friendlyPiecesBitboard | enemyPiecesBitboard;
 
 	attackMap = 0;
 
@@ -511,6 +518,8 @@ std::vector<int> BoardManager::generatePseudoMoves()
 	whiteToMove = !whiteToMove;
 	controlledSquares();
 	whiteToMove = !whiteToMove;
+
+	fillBitboardData();
 
 
 	for (int color = 0; color <= 1; ++color)
