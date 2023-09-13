@@ -28,17 +28,6 @@ bool BoardManager::isPieceHereBitboard(int pieceType, bool isPieceWhite, int squ
 
 bool BoardManager::isChecked()
 {
-	// whiteToMove = !whiteToMove;
-    // controlledSquares();
-    // whiteToMove = !whiteToMove;
-    // if (whiteToMove)
-    // {
-    // 	return controlled[currentGameState.whiteKingPos / 8][currentGameState.whiteKingPos % 8];
-    // }
-    // else
-    // {
-    // 	return controlled[currentGameState.blackKingPos / 8][currentGameState.blackKingPos % 8];
-    // }
     fillBitboardData();
     return isBitToggled(attackMap, whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos);
 }
@@ -147,47 +136,55 @@ BoardManager::BoardManager()
 
 bool BoardManager::isSquareEmpty(int i, int j)
 {
-	return get(i,j) == 0;
+	// return get(i,j) == 0;
+	return !isBitToggled(allPiecesBitboard, i + 8 * j);
 }
 
 bool BoardManager::isSquareEmpty(int pid)
 {
-	return get(pid) == 0;
+	return !isBitToggled(allPiecesBitboard, pid);
 }
 
 bool BoardManager::isSquareEnemy(int i, int j)
 {
-	return isPieceWhite(get(i,j)) != whiteToMove && (get(i,j) > 0);
+	// return isPieceWhite(get(i,j)) != whiteToMove && (get(i,j) > 0);
+	return isBitToggled(enemyPiecesBitboard, i + 8 * j);
 }
 
 bool BoardManager::isSquareEnemy(int pid)
 {
-	return isPieceWhite(get(pid)) != whiteToMove && (get(pid) > 0);
+	// return isPieceWhite(get(pid)) != whiteToMove && (get(pid) > 0);
+	return isBitToggled(enemyPiecesBitboard, pid);
 }
 
 bool BoardManager::isSquareNotFriendly(int i, int j)
 {
-	return isPieceWhite(get(i,j)) != whiteToMove || (get(i,j) == 0);
+	// return isPieceWhite(get(i,j)) != whiteToMove || (get(i,j) == 0);
+	return isBitToggled(enemyPiecesBitboard, i + 8 * j) || !isBitToggled(allPiecesBitboard, i + 8 * j);
 }
 
 bool BoardManager::isSquareNotFriendly(int pid)
 {
-	return isPieceWhite(get(pid)) != whiteToMove || (get(pid) == 0);
+	// return isPieceWhite(get(pid)) != whiteToMove || (get(pid) == 0);
+	return isBitToggled(enemyPiecesBitboard, pid) || !isBitToggled(allPiecesBitboard, pid);
 }
 
 bool BoardManager::isSquareNotEnemy(int i, int j)
 {
-	return isPieceWhite(get(i,j)) == whiteToMove || (get(i,j) == 0);
+	// return isPieceWhite(get(i,j)) == whiteToMove || (get(i,j) == 0);
+	return isBitToggled(friendlyPiecesBitboard, i + 8 * j) || !isBitToggled(allPiecesBitboard, i + 8 * j);
 }
 
 bool BoardManager::isSquareNotEnemy(int pid)
 {
-	return isPieceWhite(get(pid)) == whiteToMove || (get(pid) == 0);
+	// return isPieceWhite(get(pid)) == whiteToMove || (get(pid) == 0);
+	return isBitToggled(friendlyPiecesBitboard, pid) || !isBitToggled(allPiecesBitboard, pid);
 }
 
 bool BoardManager::isSquareFriendly(int pid)
 {
-	return isPieceWhite(get(pid)) == whiteToMove && (get(pid) > 0);
+	// return isPieceWhite(get(pid)) == whiteToMove && (get(pid) > 0);
+	return isBitToggled(friendlyPiecesBitboard, pid);
 }
 
 void BoardManager::assign(int i, int j)
