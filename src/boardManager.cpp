@@ -140,9 +140,9 @@ bool BoardManager::isSquareEmpty(int i, int j)
 	return !isBitToggled(allPiecesBitboard, i + 8 * j);
 }
 
-bool BoardManager::isSquareEmpty(int pid)
+bool BoardManager::isSquareEmpty(int sq)
 {
-	return !isBitToggled(allPiecesBitboard, pid);
+	return !isBitToggled(allPiecesBitboard, sq);
 }
 
 bool BoardManager::isSquareEnemy(int i, int j)
@@ -151,10 +151,10 @@ bool BoardManager::isSquareEnemy(int i, int j)
 	return isBitToggled(enemyPiecesBitboard, i + 8 * j);
 }
 
-bool BoardManager::isSquareEnemy(int pid)
+bool BoardManager::isSquareEnemy(int sq)
 {
-	// return isPieceWhite(get(pid)) != whiteToMove && (get(pid) > 0);
-	return isBitToggled(enemyPiecesBitboard, pid);
+	// return isPieceWhite(get(sq)) != whiteToMove && (get(sq) > 0);
+	return isBitToggled(enemyPiecesBitboard, sq);
 }
 
 bool BoardManager::isSquareNotFriendly(int i, int j)
@@ -163,10 +163,10 @@ bool BoardManager::isSquareNotFriendly(int i, int j)
 	return isBitToggled(enemyPiecesBitboard, i + 8 * j) || !isBitToggled(allPiecesBitboard, i + 8 * j);
 }
 
-bool BoardManager::isSquareNotFriendly(int pid)
+bool BoardManager::isSquareNotFriendly(int sq)
 {
-	// return isPieceWhite(get(pid)) != whiteToMove || (get(pid) == 0);
-	return isBitToggled(enemyPiecesBitboard, pid) || !isBitToggled(allPiecesBitboard, pid);
+	// return isPieceWhite(get(sq)) != whiteToMove || (get(sq) == 0);
+	return isBitToggled(enemyPiecesBitboard, sq) || !isBitToggled(allPiecesBitboard, sq);
 }
 
 bool BoardManager::isSquareNotEnemy(int i, int j)
@@ -175,16 +175,16 @@ bool BoardManager::isSquareNotEnemy(int i, int j)
 	return isBitToggled(friendlyPiecesBitboard, i + 8 * j) || !isBitToggled(allPiecesBitboard, i + 8 * j);
 }
 
-bool BoardManager::isSquareNotEnemy(int pid)
+bool BoardManager::isSquareNotEnemy(int sq)
 {
-	// return isPieceWhite(get(pid)) == whiteToMove || (get(pid) == 0);
-	return isBitToggled(friendlyPiecesBitboard, pid) || !isBitToggled(allPiecesBitboard, pid);
+	// return isPieceWhite(get(sq)) == whiteToMove || (get(sq) == 0);
+	return isBitToggled(friendlyPiecesBitboard, sq) || !isBitToggled(allPiecesBitboard, sq);
 }
 
-bool BoardManager::isSquareFriendly(int pid)
+bool BoardManager::isSquareFriendly(int sq)
 {
-	// return isPieceWhite(get(pid)) == whiteToMove && (get(pid) > 0);
-	return isBitToggled(friendlyPiecesBitboard, pid);
+	// return isPieceWhite(get(sq)) == whiteToMove && (get(sq) > 0);
+	return isBitToggled(friendlyPiecesBitboard, sq);
 }
 
 // void BoardManager::assign(int i, int j)
@@ -319,7 +319,7 @@ void BoardManager::fillBitboardData()
 						}
 						// assign(targetPos / 8, targetPos % 8);
 						attackMap |= getPositionMask(targetPos);
-						if (isSquareFriendly(targetPos))
+						if (isSquareFriendly(targetPos) && targetPos != (whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos))
 						{
 							break;
 						}
@@ -342,7 +342,7 @@ void BoardManager::fillBitboardData()
 // 		for (int j = 0 ; j < 8 ; ++j)
 // 		{
 // 			int piece = get(i,j);
-// 			int currentPID = pid(i,j);
+// 			int sq = sq(i,j);
 
 // 			if(piece > 0 && isPieceWhite(piece) == whiteToMove)
 // 			{
@@ -352,11 +352,11 @@ void BoardManager::fillBitboardData()
 
 // 					if (isPieceWhite(piece))
 // 					{
-// 						if (numSquares[currentPID][NorthEastID] >= 1 && isSquareNotFriendly(i+1,j-1))
+// 						if (numSquares[sq][NorthEastID] >= 1 && isSquareNotFriendly(i+1,j-1))
 // 						{
 // 							assign(j-1,i+1);
 // 						}
-// 						if (numSquares[currentPID][NorthWestID] >= 1 && isSquareNotFriendly(i-1,j-1))
+// 						if (numSquares[sq][NorthWestID] >= 1 && isSquareNotFriendly(i-1,j-1))
 // 						{
 // 							assign(j-1,i-1);
 // 						}
@@ -364,11 +364,11 @@ void BoardManager::fillBitboardData()
 // 					}
 // 					else
 // 					{
-// 						if (numSquares[currentPID][SouthEastID] >= 1 && isSquareNotFriendly(i+1,j+1))
+// 						if (numSquares[sq][SouthEastID] >= 1 && isSquareNotFriendly(i+1,j+1))
 // 						{
 // 							assign(j+1, i+1);
 // 						}
-// 						if (numSquares[currentPID][SouthWestID] >= 1 && isSquareNotFriendly(i-1,j+1))
+// 						if (numSquares[sq][SouthWestID] >= 1 && isSquareNotFriendly(i-1,j+1))
 // 						{
 // 							assign(j+1,i-1);
 // 						}
@@ -381,9 +381,9 @@ void BoardManager::fillBitboardData()
 
 // 					for (int dirID = 0 ; dirID <= 7 ; ++dirID)
 // 					{
-// 						int targetPos = currentPID + directions[dirID];
+// 						int targetPos = sq + directions[dirID];
 
-// 						if (numSquares[currentPID][dirID] >= 1 && isSquareNotFriendly(targetPos))
+// 						if (numSquares[sq][dirID] >= 1 && isSquareNotFriendly(targetPos))
 // 						{
 // 							assign(targetPos/8, targetPos % 8);
 // 						}
@@ -394,36 +394,36 @@ void BoardManager::fillBitboardData()
 // 				if (pieceType(piece) == Knight)
 // 				{
 
-// 					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareNotFriendly(i+1,j-2))
+// 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j-2))
 // 					{
 //  						assign(j-2,i+1);
 //  					}
-// 					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareNotFriendly(i-1,j-2))
+// 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j-2))
 // 					{
 //  						assign(j-2,i-1);
 //  					}
-// 					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareNotFriendly(i+1,j+2))
+// 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j+2))
 // 					{
 //  						assign(j+2,i+1);
 //  					}
-// 					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareNotFriendly(i-1,j+2))
+// 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j+2))
 // 					{
 //  						assign(j+2,i-1);
 //  					}
 
-// 					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareNotFriendly(i+2,j-1))
+// 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i+2,j-1))
 // 					{
 //  						assign(j-1,i+2);
 //  					}
-// 					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareNotFriendly(i+2,j+1))
+// 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i+2,j+1))
 // 					{
 //  						assign(j+1,i+2);
 //  					}
-// 					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareNotFriendly(i-2,j-1))
+// 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i-2,j-1))
 // 					{
 //  						assign(j-1,i-2);
 //  					}
-// 					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareNotFriendly(i-2,j+1))
+// 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i-2,j+1))
 // 					{
 //  						assign(j+1,i - 2);
 //  					}
@@ -438,9 +438,9 @@ void BoardManager::fillBitboardData()
 
 // 					for (int dirID = startDir ; dirID <= endDir ; ++dirID)
 // 					{
-// 						for (int i = 0 ; i < numSquares[currentPID][dirID]; ++i)
+// 						for (int i = 0 ; i < numSquares[sq][dirID]; ++i)
 // 						{
-// 							int targetPos = currentPID + directions[dirID] * (i+1);
+// 							int targetPos = sq + directions[dirID] * (i+1);
 
 // 							if (isSquareFriendly(targetPos))
 // 							{
@@ -528,147 +528,26 @@ std::vector<int> BoardManager::generatePseudoMoves()
         {
 
 			int piece = ((color == 0) ? White : Black) | pType;
-			int currentPID = getAndClearLSB(&pMask);
-			int i = currentPID % 8;
-			int j = currentPID / 8;
+			int sq = getAndClearLSB(&pMask);
+			int i = sq % 8;
+			int j = sq / 8;
 
-			if(piece > 0 && isPieceWhite(piece) == whiteToMove)
+			if(piece > 0 && (color == 0) == whiteToMove)
 			{
 
-				if (pieceType(piece) == Pawn)
-				{
 
-					if (isPieceWhite(piece))
-					{
-						if (numSquares[currentPID][NorthID] >= 1 && isSquareEmpty(i,j-1))
-						{
-							if (j > 1)
-							{
-								moves.push_back(genMove(i,j,i,j-1, QuietMove));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i,j-1, KnightProm));
-								moves.push_back(genMove(i,j,i,j-1, BishopProm));
-								moves.push_back(genMove(i,j,i,j-1, RookProm));
-								moves.push_back(genMove(i,j,i,j-1, QueenProm));
-							}
-						}
-						if (j == 6 && isSquareEmpty(i,j-2) && isSquareEmpty(i, j-1))
-						{
-							moves.push_back(genMove(i,j,i,j-2, DoublePawnPush));
-						}
-						if (numSquares[currentPID][NorthEastID] >= 1 && isSquareEnemy(i+1,j-1))
-						{
-							if (j - 1 == 0)
-							{
-								moves.push_back(genMove(i,j,i+1,j-1, KnightPromCapture));
-								moves.push_back(genMove(i,j,i+1,j-1, BishopPromCapture));
-								moves.push_back(genMove(i,j,i+1,j-1, RookPromCapture));
-								moves.push_back(genMove(i,j,i+1,j-1, QueenPromCapture));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i+1,j-1, Capture));
-							}
-						}
-						if (numSquares[currentPID][NorthWestID] >= 1 && isSquareEnemy(i-1,j-1))
-						{
-							if (j - 1 == 0)
-							{
-								moves.push_back(genMove(i,j,i-1,j-1, KnightPromCapture));
-								moves.push_back(genMove(i,j,i-1,j-1, BishopPromCapture));
-								moves.push_back(genMove(i,j,i-1,j-1, RookPromCapture));
-								moves.push_back(genMove(i,j,i-1,j-1, QueenPromCapture));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i-1,j-1, Capture));
-							}
-						}
 
-						if (numSquares[currentPID][NorthEastID] >= 1 && j == 3 && isSquareEnemy(i+1,j) && pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j-1) && currentGameState.doublePushFile - 1 == i+1)
-						{
-							moves.push_back(genMove(i,j,i+1,j-1, EPCapture));
-						}
-						if (numSquares[currentPID][NorthWestID] >= 1 && j == 3 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j-1) && currentGameState.doublePushFile - 1 == i-1)
-						{
-							moves.push_back(genMove(i,j,i-1,j-1, EPCapture));
-						}
 
-					}
-					else
-					{
-						if (numSquares[currentPID][NorthID] >= 1 && isSquareEmpty(i,j+1))
-						{
-							if (j < 6)
-							{
-								moves.push_back(genMove(i,j,i,j+1, QuietMove));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i,j+1, KnightProm));
-								moves.push_back(genMove(i,j,i,j+1, BishopProm));
-								moves.push_back(genMove(i,j,i,j+1, RookProm));
-								moves.push_back(genMove(i,j,i,j+1, QueenProm));
-							}
-						}
-						if (j == 1 && isSquareEmpty(i,j+2) && isSquareEmpty(i, j+1))
-						{
-							moves.push_back(genMove(i,j,i,j+2, DoublePawnPush));
-						}
-						if (numSquares[currentPID][SouthEastID] >= 1 && isSquareEnemy(i+1,j+1))
-						{
-							if (j + 1 == 7)
-							{
-								moves.push_back(genMove(i,j,i+1,j+1, KnightPromCapture));
-								moves.push_back(genMove(i,j,i+1,j+1, BishopPromCapture));
-								moves.push_back(genMove(i,j,i+1,j+1, RookPromCapture));
-								moves.push_back(genMove(i,j,i+1,j+1, QueenPromCapture));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i+1,j+1, Capture));
-							}
-						}
-						if (numSquares[currentPID][SouthWestID] >= 1 && isSquareEnemy(i-1,j+1))
-						{
-							if (j + 1 == 7)
-							{
-								moves.push_back(genMove(i,j,i-1,j+1, KnightPromCapture));
-								moves.push_back(genMove(i,j,i-1,j+1, BishopPromCapture));
-								moves.push_back(genMove(i,j,i-1,j+1, RookPromCapture));
-								moves.push_back(genMove(i,j,i-1,j+1, QueenPromCapture));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i-1,j+1, Capture));
-							}
-						}
-
-						if (numSquares[currentPID][SouthEastID] >= 1 && j == 4 && isSquareEnemy(i+1,j)&& pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j+1) && (currentGameState.doublePushFile - 1 == i+1))
-						{
-							moves.push_back(genMove(i,j,i+1,j+1, EPCapture));
-						}
-						if (numSquares[currentPID][SouthWestID] >= 1 && j == 4 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j+1) && (currentGameState.doublePushFile - 1 == i-1))
-						{
-							moves.push_back(genMove(i,j,i-1,j+1, EPCapture));
-						}
-
-					}		
-
-				}
-
-				if (pieceType(piece) == King)
+				if (pType == King)
 				{
 
 					for (int dirID = 0 ; dirID <= 7 ; ++dirID)
 					{
-						int targetPos = currentPID + directions[dirID];
+						int targetPos = sq + directions[dirID];
 
-						if (numSquares[currentPID][dirID] >= 1 && isSquareNotFriendly(targetPos))
+						if (numSquares[sq][dirID] >= 1 && isSquareNotFriendly(targetPos))
 						{
-							moves.push_back(genMove(currentPID, targetPos, isSquareEnemy(targetPos) * Capture));
+							moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
 						}
 					}
 
@@ -690,7 +569,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 							}
 							if (isOK)
 							{
-								moves.push_back(genMove(currentPID, currentPID - 2, QueenCastle));
+								moves.push_back(genMove(sq, sq - 2, QueenCastle));
 							}
 						}
 						if (   (currentGameState.canWhiteKingCastle && whiteToMove) ||  (currentGameState.canBlackKingCastle && !whiteToMove) )
@@ -705,53 +584,16 @@ std::vector<int> BoardManager::generatePseudoMoves()
 							}
 							if (isOK)
 							{
-								moves.push_back(genMove(currentPID, currentPID + 2, KingCastle));
+								moves.push_back(genMove(sq, sq + 2, KingCastle));
 							}
 						}
 					}
 
 				}
 
-				if (pieceType(piece) == Knight)
-				{
 
-					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareNotFriendly(i+1,j-2))
-					{
-						moves.push_back(genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture));
-					}
-					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareNotFriendly(i-1,j-2))
-					{
-						moves.push_back(genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture));
-					}
-					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareNotFriendly(i+1,j+2))
-					{
-						moves.push_back(genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture));
-					}
-					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareNotFriendly(i-1,j+2))
-					{
-						moves.push_back(genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture));
-					}
 
-					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareNotFriendly(i+2,j-1))
-					{
-						moves.push_back(genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture));
-					}
-					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareNotFriendly(i+2,j+1))
-					{
-						moves.push_back(genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture));
-					}
-					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareNotFriendly(i-2,j-1))
-					{
-						moves.push_back(genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture));
-					}
-					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareNotFriendly(i-2,j+1))
-					{
-						moves.push_back(genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture));
-					}
-
-				}
-
-				if (pieceType(piece) == Rook || pieceType(piece) == Bishop || pieceType(piece) == Queen)
+				if (pType == Rook || pType == Bishop || pType == Queen)
 				{
 
 					int startDir = (pieceType(piece) == Bishop) ? 4 : 0;
@@ -759,9 +601,9 @@ std::vector<int> BoardManager::generatePseudoMoves()
 
 					for (int dirID = startDir ; dirID <= endDir ; ++dirID)
 					{
-						for (int i = 0 ; i < numSquares[currentPID][dirID]; ++i)
+						for (int i = 0 ; i < numSquares[sq][dirID]; ++i)
 						{
-							int targetPos = currentPID + directions[dirID] * (i+1);
+							int targetPos = sq + directions[dirID] * (i+1);
 
 							if (isSquareFriendly(targetPos))
 							{
@@ -769,7 +611,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 							}
 
 
-							moves.push_back(genMove(currentPID, targetPos, isSquareEnemy(targetPos) * Capture));
+							moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
 
 							if (isSquareEnemy(targetPos))
 							{
@@ -780,6 +622,176 @@ std::vector<int> BoardManager::generatePseudoMoves()
 					}
 
 				}
+
+
+
+
+				if (pType == Knight)
+				{
+
+					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j-2))
+					{
+						moves.push_back(genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture));
+					}
+					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j-2))
+					{
+						moves.push_back(genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture));
+					}
+					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j+2))
+					{
+						moves.push_back(genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture));
+					}
+					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j+2))
+					{
+						moves.push_back(genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture));
+					}
+
+					if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i+2,j-1))
+					{
+						moves.push_back(genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture));
+					}
+					if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i+2,j+1))
+					{
+						moves.push_back(genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture));
+					}
+					if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i-2,j-1))
+					{
+						moves.push_back(genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture));
+					}
+					if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i-2,j+1))
+					{
+						moves.push_back(genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture));
+					}
+
+				}
+
+
+
+
+				if (pType == Pawn)
+				{
+
+					if (color == 0)
+					{
+						if (numSquares[sq][NorthID] >= 1 && isSquareEmpty(i,j-1))
+						{
+							if (j > 1)
+							{
+								moves.push_back(genMove(i,j,i,j-1, QuietMove));
+							}
+							else
+							{
+								moves.push_back(genMove(i,j,i,j-1, KnightProm));
+								moves.push_back(genMove(i,j,i,j-1, BishopProm));
+								moves.push_back(genMove(i,j,i,j-1, RookProm));
+								moves.push_back(genMove(i,j,i,j-1, QueenProm));
+							}
+						}
+						if (j == 6 && isSquareEmpty(i,j-2) && isSquareEmpty(i, j-1))
+						{
+							moves.push_back(genMove(i,j,i,j-2, DoublePawnPush));
+						}
+						if (numSquares[sq][NorthEastID] >= 1 && isSquareEnemy(i+1,j-1))
+						{
+							if (j - 1 == 0)
+							{
+								moves.push_back(genMove(i,j,i+1,j-1, KnightPromCapture));
+								moves.push_back(genMove(i,j,i+1,j-1, BishopPromCapture));
+								moves.push_back(genMove(i,j,i+1,j-1, RookPromCapture));
+								moves.push_back(genMove(i,j,i+1,j-1, QueenPromCapture));
+							}
+							else
+							{
+								moves.push_back(genMove(i,j,i+1,j-1, Capture));
+							}
+						}
+						if (numSquares[sq][NorthWestID] >= 1 && isSquareEnemy(i-1,j-1))
+						{
+							if (j - 1 == 0)
+							{
+								moves.push_back(genMove(i,j,i-1,j-1, KnightPromCapture));
+								moves.push_back(genMove(i,j,i-1,j-1, BishopPromCapture));
+								moves.push_back(genMove(i,j,i-1,j-1, RookPromCapture));
+								moves.push_back(genMove(i,j,i-1,j-1, QueenPromCapture));
+							}
+							else
+							{
+								moves.push_back(genMove(i,j,i-1,j-1, Capture));
+							}
+						}
+
+						if (numSquares[sq][NorthEastID] >= 1 && j == 3 && isSquareEnemy(i+1,j) && pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j-1) && currentGameState.doublePushFile - 1 == i+1)
+						{
+							moves.push_back(genMove(i,j,i+1,j-1, EPCapture));
+						}
+						if (numSquares[sq][NorthWestID] >= 1 && j == 3 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j-1) && currentGameState.doublePushFile - 1 == i-1)
+						{
+							moves.push_back(genMove(i,j,i-1,j-1, EPCapture));
+						}
+
+					}
+					else
+					{
+						if (numSquares[sq][NorthID] >= 1 && isSquareEmpty(i,j+1))
+						{
+							if (j < 6)
+							{
+								moves.push_back(genMove(i,j,i,j+1, QuietMove));
+							}
+							else
+							{
+								moves.push_back(genMove(i,j,i,j+1, KnightProm));
+								moves.push_back(genMove(i,j,i,j+1, BishopProm));
+								moves.push_back(genMove(i,j,i,j+1, RookProm));
+								moves.push_back(genMove(i,j,i,j+1, QueenProm));
+							}
+						}
+						if (j == 1 && isSquareEmpty(i,j+2) && isSquareEmpty(i, j+1))
+						{
+							moves.push_back(genMove(i,j,i,j+2, DoublePawnPush));
+						}
+						if (numSquares[sq][SouthEastID] >= 1 && isSquareEnemy(i+1,j+1))
+						{
+							if (j + 1 == 7)
+							{
+								moves.push_back(genMove(i,j,i+1,j+1, KnightPromCapture));
+								moves.push_back(genMove(i,j,i+1,j+1, BishopPromCapture));
+								moves.push_back(genMove(i,j,i+1,j+1, RookPromCapture));
+								moves.push_back(genMove(i,j,i+1,j+1, QueenPromCapture));
+							}
+							else
+							{
+								moves.push_back(genMove(i,j,i+1,j+1, Capture));
+							}
+						}
+						if (numSquares[sq][SouthWestID] >= 1 && isSquareEnemy(i-1,j+1))
+						{
+							if (j + 1 == 7)
+							{
+								moves.push_back(genMove(i,j,i-1,j+1, KnightPromCapture));
+								moves.push_back(genMove(i,j,i-1,j+1, BishopPromCapture));
+								moves.push_back(genMove(i,j,i-1,j+1, RookPromCapture));
+								moves.push_back(genMove(i,j,i-1,j+1, QueenPromCapture));
+							}
+							else
+							{
+								moves.push_back(genMove(i,j,i-1,j+1, Capture));
+							}
+						}
+
+						if (numSquares[sq][SouthEastID] >= 1 && j == 4 && isSquareEnemy(i+1,j)&& pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j+1) && (currentGameState.doublePushFile - 1 == i+1))
+						{
+							moves.push_back(genMove(i,j,i+1,j+1, EPCapture));
+						}
+						if (numSquares[sq][SouthWestID] >= 1 && j == 4 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j+1) && (currentGameState.doublePushFile - 1 == i-1))
+						{
+							moves.push_back(genMove(i,j,i-1,j+1, EPCapture));
+						}
+
+					}		
+
+				}
+
 
 			}
 		}
@@ -1451,7 +1463,7 @@ void BoardManager::unmakeMove(int move)
 			case BishopProm:
 				togglePieceBitboard(Bishop, !whiteToMove, endPosi);
 				break;
-			case QueenPromCapture:
+			case QueenProm:
 				togglePieceBitboard(Queen, !whiteToMove, endPosi);
 				break;
 		}

@@ -61,20 +61,22 @@ public:
 	std::vector<int> generatePseudoMoves();
 	std::vector<int> generateMoves(bool onlyCaptures);
 	bool isSquareEmpty(int i, int j);
-	bool isSquareEmpty(int pid);
+	bool isSquareEmpty(int sq);
 	bool isSquareNotFriendly(int i, int j);
-	bool isSquareNotFriendly(int pid);
+	bool isSquareNotFriendly(int sq);
 	bool isSquareNotEnemy(int i, int j);
-	bool isSquareNotEnemy(int pid);
+	bool isSquareNotEnemy(int sq);
 	int isLegal(std::vector<int> moves, int move);
 	bool isSquareEnemy(int i, int j);
-	bool isSquareEnemy(int pid);
-	bool isSquareFriendly(int pid);
+	bool isSquareEnemy(int sq);
+	bool isSquareFriendly(int sq);
 	void unmakeMove(int move);
 
-	std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	// std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 	// std::string startingFen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/P7/1PP1NnPP/RNBQK2R b KQ - 1 8  ";
 	// std::string startingFen = "rnbq1k1r/pp1P1ppp/2p2b2/8/2B5/P7/1PP1NnPP/RNBQK2R w KQ - 1 8  ";
+	// std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
+	std::string startingFen = "r3k2r/p1ppqpb1/bn2Pnp1/4N3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq - 0 1";
 	void loadFen(std::string fen);
 	std::string convertFen();
 
@@ -126,6 +128,8 @@ public:
 
 
 	int board[8][8];
+
+	int checkNumber;
 
 	
 	std::stack<GameState> gameStateHistory;
