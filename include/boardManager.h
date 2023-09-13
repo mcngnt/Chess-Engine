@@ -62,8 +62,10 @@ public:
 	std::vector<int> generateMoves(bool onlyCaptures);
 	bool isSquareEmpty(int i, int j);
 	bool isSquareEmpty(int pid);
-	bool isSquareFree(int i, int j);
-	bool isSquareFree(int pid);
+	bool isSquareNotFriendly(int i, int j);
+	bool isSquareNotFriendly(int pid);
+	bool isSquareNotEnemy(int i, int j);
+	bool isSquareNotEnemy(int pid);
 	int isLegal(std::vector<int> moves, int move);
 	bool isSquareEnemy(int i, int j);
 	bool isSquareEnemy(int pid);
@@ -109,6 +111,10 @@ public:
 	bool isRepetitionDraw();
 
 	void assign(int i, int j);
+
+	uint64_t attackMap;
+
+	void fillBitboardData();
 
 
 
