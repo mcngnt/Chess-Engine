@@ -488,27 +488,29 @@ int main()
                 }
             }
 
-            if(showBitboard)
+            for (int color = 0; color <= 1; ++color)
             {
-                for (int color = 0; color <= 1; ++color)
+                for (int pType = 1; pType <= 6; ++pType)
                 {
-                    for (int pType = 1; pType <= 6; ++pType)
+                    uint64_t pMask = engine.board.getPieceBitboard(pType, color == 0);
+                    while (pMask != 0)
                     {
-                        uint64_t pMask = engine.board.getPieceBitboard(pType, color == 0);
-                        while (pMask != 0)
-                        {
-                            // std::cout << pMask << std::endl;
-                            int sq = getAndClearLSB(&pMask);
-                            int pnum = color == 0 ? White | pType : Black | pType;
-                            sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
-                            piecesSpr[pnum].setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
-                            piecesSpr[pnum].setColor(sf::Color(0, 255, 255, 128));
-                            window.draw(piecesSpr[pnum]);
-                            piecesSpr[pnum].setColor(sf::Color(255, 255, 255, 255));
-                        }
+                        // std::cout << pMask << std::endl;
+                        int sq = getAndClearLSB(&pMask);
+                        int pnum = color == 0 ? White | pType : Black | pType;
+                        // if(sf::Vector2i(sq % 8, sq / 8) == pieceHeld)
+                        // {
+                        //     continue;
+                        // }
+                        sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+                        piecesSpr[pnum].setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
+                        piecesSpr[pnum].setColor(sf::Color(0, 255, 255, 128));
+                        window.draw(piecesSpr[pnum]);
+                        piecesSpr[pnum].setColor(sf::Color(255, 255, 255, 255));
                     }
                 }
             }
+
 
             engine.board.fillBitboardData();
             uint64_t pMask = engine.board.attackMap;

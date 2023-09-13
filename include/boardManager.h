@@ -104,14 +104,14 @@ public:
 	void unmakeNullMove();
 
 
-	void controlledSquares();
-	void resetControl();
+	// void controlledSquares();
+	// void resetControl();
 
 	bool isChecked();
 
 	bool isRepetitionDraw();
 
-	void assign(int i, int j);
+	// void assign(int i, int j);
 
 	uint64_t attackMap;
 	uint64_t friendlyPiecesBitboard;
@@ -136,6 +136,6 @@ public:
 
 	GameState currentGameState;
 
-	bool controlled[8][8];
+	// bool controlled[8][8];
 
 };

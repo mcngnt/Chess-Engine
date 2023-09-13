@@ -187,13 +187,13 @@ bool BoardManager::isSquareFriendly(int pid)
 	return isBitToggled(friendlyPiecesBitboard, pid);
 }
 
-void BoardManager::assign(int i, int j)
-{
-	if (i >= 0 && i < 8 && j >= 0 && j < 8)
-	{
-		controlled[i][j] = true;
-	}
-}
+// void BoardManager::assign(int i, int j)
+// {
+// 	if (i >= 0 && i < 8 && j >= 0 && j < 8)
+// 	{
+// 		controlled[i][j] = true;
+// 	}
+// }
 
 void BoardManager::fillBitboardData()
 {
@@ -332,149 +332,149 @@ void BoardManager::fillBitboardData()
 }
 
 
-void BoardManager::controlledSquares()
-{
+// void BoardManager::controlledSquares()
+// {
 
-	resetControl();
+// 	resetControl();
 
-	for (int i = 0 ; i < 8 ; ++i)
-	{
-		for (int j = 0 ; j < 8 ; ++j)
-		{
-			int piece = get(i,j);
-			int currentPID = pid(i,j);
+// 	for (int i = 0 ; i < 8 ; ++i)
+// 	{
+// 		for (int j = 0 ; j < 8 ; ++j)
+// 		{
+// 			int piece = get(i,j);
+// 			int currentPID = pid(i,j);
 
-			if(piece > 0 && isPieceWhite(piece) == whiteToMove)
-			{
+// 			if(piece > 0 && isPieceWhite(piece) == whiteToMove)
+// 			{
 
-				if (pieceType(piece) == Pawn)
-				{
+// 				if (pieceType(piece) == Pawn)
+// 				{
 
-					if (isPieceWhite(piece))
-					{
-						if (numSquares[currentPID][NorthEastID] >= 1 && isSquareNotFriendly(i+1,j-1))
-						{
-							assign(j-1,i+1);
-						}
-						if (numSquares[currentPID][NorthWestID] >= 1 && isSquareNotFriendly(i-1,j-1))
-						{
-							assign(j-1,i-1);
-						}
+// 					if (isPieceWhite(piece))
+// 					{
+// 						if (numSquares[currentPID][NorthEastID] >= 1 && isSquareNotFriendly(i+1,j-1))
+// 						{
+// 							assign(j-1,i+1);
+// 						}
+// 						if (numSquares[currentPID][NorthWestID] >= 1 && isSquareNotFriendly(i-1,j-1))
+// 						{
+// 							assign(j-1,i-1);
+// 						}
 
-					}
-					else
-					{
-						if (numSquares[currentPID][SouthEastID] >= 1 && isSquareNotFriendly(i+1,j+1))
-						{
-							assign(j+1, i+1);
-						}
-						if (numSquares[currentPID][SouthWestID] >= 1 && isSquareNotFriendly(i-1,j+1))
-						{
-							assign(j+1,i-1);
-						}
-					}		
+// 					}
+// 					else
+// 					{
+// 						if (numSquares[currentPID][SouthEastID] >= 1 && isSquareNotFriendly(i+1,j+1))
+// 						{
+// 							assign(j+1, i+1);
+// 						}
+// 						if (numSquares[currentPID][SouthWestID] >= 1 && isSquareNotFriendly(i-1,j+1))
+// 						{
+// 							assign(j+1,i-1);
+// 						}
+// 					}		
 
-				}
+// 				}
 
-				if (pieceType(piece) == King)
-				{
+// 				if (pieceType(piece) == King)
+// 				{
 
-					for (int dirID = 0 ; dirID <= 7 ; ++dirID)
-					{
-						int targetPos = currentPID + directions[dirID];
+// 					for (int dirID = 0 ; dirID <= 7 ; ++dirID)
+// 					{
+// 						int targetPos = currentPID + directions[dirID];
 
-						if (numSquares[currentPID][dirID] >= 1 && isSquareNotFriendly(targetPos))
-						{
-							assign(targetPos/8, targetPos % 8);
-						}
-					}
+// 						if (numSquares[currentPID][dirID] >= 1 && isSquareNotFriendly(targetPos))
+// 						{
+// 							assign(targetPos/8, targetPos % 8);
+// 						}
+// 					}
 
-				}
+// 				}
 
-				if (pieceType(piece) == Knight)
-				{
+// 				if (pieceType(piece) == Knight)
+// 				{
 
-					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareNotFriendly(i+1,j-2))
-					{
- 						assign(j-2,i+1);
- 					}
-					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareNotFriendly(i-1,j-2))
-					{
- 						assign(j-2,i-1);
- 					}
-					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareNotFriendly(i+1,j+2))
-					{
- 						assign(j+2,i+1);
- 					}
-					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareNotFriendly(i-1,j+2))
-					{
- 						assign(j+2,i-1);
- 					}
+// 					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareNotFriendly(i+1,j-2))
+// 					{
+//  						assign(j-2,i+1);
+//  					}
+// 					if (numSquares[currentPID][NorthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareNotFriendly(i-1,j-2))
+// 					{
+//  						assign(j-2,i-1);
+//  					}
+// 					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][EastID] >= 1 && isSquareNotFriendly(i+1,j+2))
+// 					{
+//  						assign(j+2,i+1);
+//  					}
+// 					if (numSquares[currentPID][SouthID] >= 2 && numSquares[currentPID][WestID] >= 1 && isSquareNotFriendly(i-1,j+2))
+// 					{
+//  						assign(j+2,i-1);
+//  					}
 
-					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareNotFriendly(i+2,j-1))
-					{
- 						assign(j-1,i+2);
- 					}
-					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareNotFriendly(i+2,j+1))
-					{
- 						assign(j+1,i+2);
- 					}
-					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareNotFriendly(i-2,j-1))
-					{
- 						assign(j-1,i-2);
- 					}
-					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareNotFriendly(i-2,j+1))
-					{
- 						assign(j+1,i - 2);
- 					}
+// 					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareNotFriendly(i+2,j-1))
+// 					{
+//  						assign(j-1,i+2);
+//  					}
+// 					if (numSquares[currentPID][EastID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareNotFriendly(i+2,j+1))
+// 					{
+//  						assign(j+1,i+2);
+//  					}
+// 					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][NorthID] >= 1 && isSquareNotFriendly(i-2,j-1))
+// 					{
+//  						assign(j-1,i-2);
+//  					}
+// 					if (numSquares[currentPID][WestID] >= 2 && numSquares[currentPID][SouthID] >= 1 && isSquareNotFriendly(i-2,j+1))
+// 					{
+//  						assign(j+1,i - 2);
+//  					}
 
-				}
+// 				}
 
-				if (pieceType(piece) == Rook || pieceType(piece) == Bishop || pieceType(piece) == Queen)
-				{
+// 				if (pieceType(piece) == Rook || pieceType(piece) == Bishop || pieceType(piece) == Queen)
+// 				{
 
-					int startDir = (pieceType(piece) == Bishop) ? 4 : 0;
-					int endDir = (pieceType(piece) == Rook) ? 3 : 7;
+// 					int startDir = (pieceType(piece) == Bishop) ? 4 : 0;
+// 					int endDir = (pieceType(piece) == Rook) ? 3 : 7;
 
-					for (int dirID = startDir ; dirID <= endDir ; ++dirID)
-					{
-						for (int i = 0 ; i < numSquares[currentPID][dirID]; ++i)
-						{
-							int targetPos = currentPID + directions[dirID] * (i+1);
+// 					for (int dirID = startDir ; dirID <= endDir ; ++dirID)
+// 					{
+// 						for (int i = 0 ; i < numSquares[currentPID][dirID]; ++i)
+// 						{
+// 							int targetPos = currentPID + directions[dirID] * (i+1);
 
-							if (isSquareFriendly(targetPos))
-							{
-								break;
-							}
+// 							if (isSquareFriendly(targetPos))
+// 							{
+// 								break;
+// 							}
 
-							assign(targetPos / 8, targetPos % 8);
+// 							assign(targetPos / 8, targetPos % 8);
 
-							if (isSquareEnemy(targetPos))
-							{
-								break;
-							}
+// 							if (isSquareEnemy(targetPos))
+// 							{
+// 								break;
+// 							}
 
-						}
-					}
+// 						}
+// 					}
 
-				}
+// 				}
 
-			}
-		}
-	}
+// 			}
+// 		}
+// 	}
 
-}
+// }
 
-void BoardManager::resetControl()
-{
-	for (int i = 0 ; i <= 7; ++i)
-	{
-		for (int j = 0; j <= 7; ++j)
-		{
-			controlled[i][j] = false;
-		}
-	}
-}
+// void BoardManager::resetControl()
+// {
+// 	for (int i = 0 ; i <= 7; ++i)
+// 	{
+// 		for (int j = 0; j <= 7; ++j)
+// 		{
+// 			controlled[i][j] = false;
+// 		}
+// 	}
+// }
 
 
 
@@ -512,9 +512,9 @@ std::vector<int> BoardManager::generatePseudoMoves()
 {
 	std::vector<int> moves;
 
-	whiteToMove = !whiteToMove;
-	controlledSquares();
-	whiteToMove = !whiteToMove;
+	// whiteToMove = !whiteToMove;
+	// controlledSquares();
+	// whiteToMove = !whiteToMove;
 
 	fillBitboardData();
 
@@ -672,7 +672,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						}
 					}
 
-					if (!controlled[j][i])
+					if (!isBitToggled(attackMap, i + 8 * j))
 					{
 						if (    (currentGameState.canWhiteQueenCastle && whiteToMove) ||  (currentGameState.canBlackQueenCastle && !whiteToMove))
 						{
@@ -683,7 +683,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 							}
 							for (int p = 2; p <= 3; ++p )
 							{
-								if (!isSquareEmpty(p, j) || controlled[j][p])
+								if (!isSquareEmpty(p, j) || isBitToggled(attackMap, p + 8 * j))
 								{
 									isOK = false;
 								}
@@ -698,7 +698,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 							bool isOK = true;
 							for (int p = 5; p <= 6; ++p )
 							{
-								if (!isSquareEmpty(p, j) || controlled[j][p])
+								if (!isSquareEmpty(p, j) || isBitToggled(attackMap, p + 8 * j))
 								{
 									isOK = false;
 								}
