@@ -801,22 +801,15 @@ std::vector<int> BoardManager::generatePseudoMoves()
 	return moves;
 }
 
-int BoardManager::isLegal(std::vector<int> moves, int move)
-{
-	for (int movei : moves)
-	{
-		if (discardTag(movei) == move)
-		{
-			return movei;
-		}
-	}
-	return 0;
-}
-
 void BoardManager::loadFen(std::string fen)
 {
 	gameStateHistory = std::stack<GameState>();
 	historySize = 0;
+
+	for (int i = 0; i < 12; ++i)
+	{
+		piecesBitboard[i] = 0;
+	}
 
 	currentGameState.canBlackQueenCastle = false;
 	currentGameState.canWhiteQueenCastle = false;
@@ -1062,6 +1055,28 @@ std::string BoardManager::convertFen()
 		fen += 'b';
 	}
 
+	fen += ' ';
+
+	if(currentGameState.canWhiteKingCastle)
+	{
+		fen += 'K';
+	}
+	if(currentGameState.canWhiteQueenCastle)
+	{
+		fen += 'Q';
+	}
+	if(currentGameState.canBlackKingCastle)
+	{
+		fen += 'k';
+	}
+	if(currentGameState.canBlackQueenCastle)
+	{
+		fen += 'q';
+	}
+
+
+	fen += ' ';
+	fen += '-';
 	fen += ' ';
 
 	fen += '0' + currentGameState.doublePushFile;
@@ -1360,10 +1375,10 @@ void BoardManager::unmakeMove(int move)
 	int endPosi = endPos(move);
 	int tag = getTag(move);
 
-	int startPiece = get(startPosi);
+	// int startPiece = get(startPosi);
 	int endPiece = get(endPosi);
 
-	int startPieceType = pieceType(startPiece);
+	// int startPieceType = pieceType(startPiece);
 	int endPieceType = pieceType(endPiece);
 
 
@@ -1499,13 +1514,6 @@ void BoardManager::unmakeMove(int move)
 		togglePieceBitboard(pieceType(currentGameState.capturedPiece), whiteToMove, endPosi);
 	}
 
-	if((piecesBitboard[getPieceBitboardIndex(Queen, true)] & piecesBitboard[getPieceBitboardIndex(Queen, false)]) != 0 && !foundBug)
-	{
-		std::cout << tag << " " << startPieceType << " " << endPieceType << " " << whiteToMove << " " << startPosi << " " << endPosi << std::endl;
-		// std::cout << "----" << std::endl;
-		foundBug = true;
-		// 0 0 5 1 3 24
-	}
 
 	whiteToMove = !whiteToMove;
 

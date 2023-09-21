@@ -24,7 +24,7 @@ public:
 
 	void update();
 
-	int isLegal(int move);
+	int getLegal(int move);
 
 
 	void perft(int depth);

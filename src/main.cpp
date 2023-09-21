@@ -55,11 +55,11 @@ int main()
     // uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
     // std::cout << bitboardTest << std::endl;
 
-    std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-    engine.perft(3);
+    // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+    // engine.perft(3);
     // std::cout << "4085603 expected" << std::endl;
-    std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-    std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
+    // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
+    // std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 
     // std::cout << trailingZerosNB(1126724540563456) << std::endl;
 
@@ -214,6 +214,7 @@ int main()
                 {
                     engine.board.whiteToMove = true;
                     readMoves = true;
+                    // std::cout << "info : " << engine.board.convertFen() << std::endl;
                     continue;
                 }
                 if(posMode == 2 && readMoves)
@@ -228,6 +229,7 @@ int main()
                         word.pop_back();
                         engine.tryMove(standNotToMove(word), c);
                     }
+                    // std::cout << "info : " << engine.board.convertFen() << std::endl;
                     continue;
                 }
             }
@@ -266,7 +268,7 @@ int main()
     #endif
     #if !USE_UCI
         engine.whiteBotType = Human;
-        engine.blackBotType = Human;
+        engine.blackBotType = TrueBot;
         sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
         window.setVerticalSyncEnabled(true);
 
@@ -368,9 +370,9 @@ int main()
                         // std::cout << engine.board.maxHistorySize << std::endl;
 
 
-                        std::cout << "Pos NB : " << engine.board.historySize << " Draw : " << engine.board.isRepetitionDraw() << std::endl;
+                        // std::cout << "Pos NB : " << engine.board.historySize << " Draw : " << engine.board.isRepetitionDraw() << std::endl;
 
-                        std::cout << "Current Zob Key : " << engine.board.zobristKey << std::endl;
+                        // std::cout << "Current Zob Key : " << engine.board.zobristKey << std::endl;
 
                         // for (int i = 0; i < engine.board.historySize ; ++i)
                         // {
@@ -488,7 +490,7 @@ int main()
                 }
             }
 
-            for (int color = 0; color <= 1; ++color)
+/*            for (int color = 0; color <= 1; ++color)
             {
                 for (int pType = 1; pType <= 6; ++pType)
                 {
@@ -509,10 +511,10 @@ int main()
                         piecesSpr[pnum].setColor(sf::Color(255, 255, 255, 255));
                     }
                 }
-            }
+            }*/
 
 
-            engine.board.fillBitboardData();
+            /*engine.board.fillBitboardData();
             uint64_t pMask = engine.board.attackMap;
             while (pMask != 0)
             {
@@ -523,7 +525,7 @@ int main()
                 rectangle.setFillColor(sf::Color(0,255,0,128));
                 rectangle.setPosition(pos);
                 window.draw(rectangle);
-            }
+            }*/
 
 
 

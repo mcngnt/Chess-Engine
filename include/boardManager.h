@@ -66,17 +66,27 @@ public:
 	bool isSquareNotFriendly(int sq);
 	bool isSquareNotEnemy(int i, int j);
 	bool isSquareNotEnemy(int sq);
-	int isLegal(std::vector<int> moves, int move);
+	// int getLegal(std::vector<int> moves, int move);
 	bool isSquareEnemy(int i, int j);
 	bool isSquareEnemy(int sq);
 	bool isSquareFriendly(int sq);
 	void unmakeMove(int move);
 
-	// std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+	// std::string startingFen = "r1bqkb1r/ppp2pp1/5n1p/3P4/2P1p3/5N2/PPP2PPP/RNBQK2R w KQkq - 0 9";
+
 	// std::string startingFen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/P7/1PP1NnPP/RNBQK2R b KQ - 1 8  ";
 	// std::string startingFen = "rnbq1k1r/pp1P1ppp/2p2b2/8/2B5/P7/1PP1NnPP/RNBQK2R w KQ - 1 8  ";
 	// std::string startingFen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ";
-	std::string startingFen = "r3k2r/p1ppqpb1/bn2Pnp1/4N3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq - 0 1";
+	// std::string startingFen = "r3k2r/p1ppqpb1/bn2Pnp1/4N3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq - 0 1";
+
+	// std::string startingFen = "r3k2r/p1ppqNb1/bn2pnp1/3P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq - 0 1";
+	// b4b3
+	// std::string startingFen = "r3k2r/p1ppq1b1/bn2pnpN/3P4/4P3/1pN2Q1p/PPPBBPPP/R3K2R b KQkq - 1 2";
+
+	// std::string startingFen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8  ";
+
 	void loadFen(std::string fen);
 	std::string convertFen();
 
@@ -93,8 +103,6 @@ public:
 	uint64_t getPieceBitboard(int pieceType, bool isPieceWhite);
 	void togglePieceBitboard(int pieceType, bool isPieceWhite, int squareIndex);
 	bool isPieceHereBitboard(int pieceType, bool isPieceWhite, int squareIndex);
-
-	bool foundBug = false;
 
 
 	void initZobrist();

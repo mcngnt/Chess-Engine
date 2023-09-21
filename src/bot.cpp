@@ -259,6 +259,7 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 int Bot::play(BoardManager* board)
 {
 
+	std::cout << "Current fen : " << board->convertFen() << std::endl;
 
 	startTime = std::chrono::high_resolution_clock::now();
 
@@ -281,6 +282,7 @@ int Bot::play(BoardManager* board)
 	}
 
 	std::cout << "info bestmove : " << standardNotation(rootMove) << std::endl;
+
 
 	std::cout << "info --------------------------------------" << std::endl;
 
