@@ -389,150 +389,6 @@ void BoardManager::fillBitboardData()
 }
 
 
-// void BoardManager::controlledSquares()
-// {
-
-// 	resetControl();
-
-// 	for (int i = 0 ; i < 8 ; ++i)
-// 	{
-// 		for (int j = 0 ; j < 8 ; ++j)
-// 		{
-// 			int piece = get(i,j);
-// 			int sq = sq(i,j);
-
-// 			if(piece > 0 && isPieceWhite(piece) == whiteToMove)
-// 			{
-
-// 				if (pieceType(piece) == Pawn)
-// 				{
-
-// 					if (isPieceWhite(piece))
-// 					{
-// 						if (numSquares[sq][NorthEastID] >= 1 && isSquareNotFriendly(i+1,j-1))
-// 						{
-// 							assign(j-1,i+1);
-// 						}
-// 						if (numSquares[sq][NorthWestID] >= 1 && isSquareNotFriendly(i-1,j-1))
-// 						{
-// 							assign(j-1,i-1);
-// 						}
-
-// 					}
-// 					else
-// 					{
-// 						if (numSquares[sq][SouthEastID] >= 1 && isSquareNotFriendly(i+1,j+1))
-// 						{
-// 							assign(j+1, i+1);
-// 						}
-// 						if (numSquares[sq][SouthWestID] >= 1 && isSquareNotFriendly(i-1,j+1))
-// 						{
-// 							assign(j+1,i-1);
-// 						}
-// 					}		
-
-// 				}
-
-// 				if (pieceType(piece) == King)
-// 				{
-
-// 					for (int dirID = 0 ; dirID <= 7 ; ++dirID)
-// 					{
-// 						int targetPos = sq + directions[dirID];
-
-// 						if (numSquares[sq][dirID] >= 1 && isSquareNotFriendly(targetPos))
-// 						{
-// 							assign(targetPos/8, targetPos % 8);
-// 						}
-// 					}
-
-// 				}
-
-// 				if (pieceType(piece) == Knight)
-// 				{
-
-// 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j-2))
-// 					{
-//  						assign(j-2,i+1);
-//  					}
-// 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j-2))
-// 					{
-//  						assign(j-2,i-1);
-//  					}
-// 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j+2))
-// 					{
-//  						assign(j+2,i+1);
-//  					}
-// 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j+2))
-// 					{
-//  						assign(j+2,i-1);
-//  					}
-
-// 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i+2,j-1))
-// 					{
-//  						assign(j-1,i+2);
-//  					}
-// 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i+2,j+1))
-// 					{
-//  						assign(j+1,i+2);
-//  					}
-// 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i-2,j-1))
-// 					{
-//  						assign(j-1,i-2);
-//  					}
-// 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i-2,j+1))
-// 					{
-//  						assign(j+1,i - 2);
-//  					}
-
-// 				}
-
-// 				if (pieceType(piece) == Rook || pieceType(piece) == Bishop || pieceType(piece) == Queen)
-// 				{
-
-// 					int startDir = (pieceType(piece) == Bishop) ? 4 : 0;
-// 					int endDir = (pieceType(piece) == Rook) ? 3 : 7;
-
-// 					for (int dirID = startDir ; dirID <= endDir ; ++dirID)
-// 					{
-// 						for (int i = 0 ; i < numSquares[sq][dirID]; ++i)
-// 						{
-// 							int targetPos = sq + directions[dirID] * (i+1);
-
-// 							if (isSquareFriendly(targetPos))
-// 							{
-// 								break;
-// 							}
-
-// 							assign(targetPos / 8, targetPos % 8);
-
-// 							if (isSquareEnemy(targetPos))
-// 							{
-// 								break;
-// 							}
-
-// 						}
-// 					}
-
-// 				}
-
-// 			}
-// 		}
-// 	}
-
-// }
-
-// void BoardManager::resetControl()
-// {
-// 	for (int i = 0 ; i <= 7; ++i)
-// 	{
-// 		for (int j = 0; j <= 7; ++j)
-// 		{
-// 			controlled[i][j] = false;
-// 		}
-// 	}
-// }
-
 
 
 std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
@@ -569,9 +425,6 @@ std::vector<int> BoardManager::generatePseudoMoves()
 {
 	std::vector<int> moves;
 
-	// whiteToMove = !whiteToMove;
-	// controlledSquares();
-	// whiteToMove = !whiteToMove;
 
 	fillBitboardData();
 
@@ -646,6 +499,11 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						}
 					}
 
+				}
+
+				if(checkNumber >= 2)
+				{
+					return moves;
 				}
 
 
