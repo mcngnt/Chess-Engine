@@ -144,7 +144,7 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 
 	    	-(
 
-	    		move == ttEntry.bestMove ? 9000000 : getTag(move) == Capture ? 1000000 * pieceType(board->get(endPos(move))) - pieceType(board->get(startPos(move))) : killerMoves[plyFromRoot] == move ? 900000 : 0
+	    		move == ttEntry.bestMove ? 9000000 : getTag(move) == Capture ? 1000000 * pieceType(board->get(endPos(move))) - pieceType(board->get(startPos(move))) : killerMoves[plyFromRoot] == move ? 900000 : historyHeuristicTable[(board->whiteToMove ? 1 : 0)][startPos(move)][endPos(move)]
 
 	    	 )
 
@@ -202,11 +202,6 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 
 		board->unmakeMove(move);
 
-		// if(plyFromRoot == 0)
-		// {
-		// 	// std::cout << standardNotation(move) << std::endl;
-		// 	std::cout << "Eval " << standardNotation(move) << " : " << eval << std::endl;
-		// }
 
 
         if (eval > bestEval)
@@ -233,7 +228,7 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
                  if (getTag(move) != Capture)
                  {
                      killerMoves[plyFromRoot] = move;
-                     //historyHeuristicTable[isWhiteMult, (int)move.MovePieceType, move.TargetSquare.Index] += depth * depth;
+                     historyHeuristicTable[(board->whiteToMove ? 1 : 0)][startPos(move)][endPos(move)] += depth * depth;
                      //counterMoves[isWhiteMult,(int)previousMove.MovePieceType, previousMove.TargetSquare.Index] = move;
                  }
                  break;
@@ -262,6 +257,17 @@ int Bot::play(BoardManager* board)
 	std::cout << "Current fen : " << board->convertFen() << std::endl;
 
 	startTime = std::chrono::high_resolution_clock::now();
+
+	for (int i = 0; i < 2; ++i)
+	{
+		for (int j = 0; j < 64; ++j)
+		{
+			for (int k = 0; k < 64; ++k)
+			{
+				historyHeuristicTable[i][j][k] = 0;
+			}
+		}
+	}
 
 	int alpha = -999999;
 	int beta = 999999;

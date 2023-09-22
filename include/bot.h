@@ -43,6 +43,7 @@ public:
     int piecePhaseValue[6] = { 0, 1, 1, 2, 4, 0 };
 
     int killerMoves[200];
+    unsigned int historyHeuristicTable[2][64][64];
 
 	
     int pieceTable[12][64] = { 
