@@ -1,14 +1,15 @@
 #include "engine.h"
 
 
-Engine::Engine(int whiteBotType_, int blackBotType_)
+Engine::Engine(int whiteBotType_, int blackBotType_, std::string startFen)
 {
 	whiteBotType = whiteBotType_;
 	blackBotType = blackBotType_;
 
 	currentMoves = board.generateMoves(false);
 
-	bot.evaluate(&board);
+	board.startingFen = startFen;
+	board.loadFen(startFen);
 }
 
 

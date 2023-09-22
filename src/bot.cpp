@@ -20,7 +20,7 @@ int Bot::evaluate(BoardManager* board)
 	int endGame = 0;
 	int phase = 0;
 
-	for (int i = 0 ; i < 64 ; ++i)
+	/*for (int i = 0 ; i < 64 ; ++i)
 	{
 		int piece = board->get(i);
 		int pType = pieceType(piece);
@@ -44,7 +44,34 @@ int Bot::evaluate(BoardManager* board)
 		}
 		
 
-	}
+	}*/
+
+
+	for (int color = 0; color <= 1; ++color)
+    {
+        for (int pType = 1; pType <= 6; ++pType)
+        {
+            uint64_t pMask = board->getPieceBitboard(pType, color == 0);
+            while (pMask != 0)
+            {
+                int sq = getAndClearLSB(&pMask);
+
+                int pscore = pieceValues[pType - 1];
+                phase += piecePhaseValue[pType - 1];
+                if (color == 0)
+                {
+                	middleGame += pieceTable[pType - 1][sq] + pscore;
+                	endGame += pieceTable[pType - 1 + 6][sq] + pscore;
+                }
+                else
+                {
+                	middleGame -= pieceTable[pType - 1][sq ^ 56] + pscore;
+                	endGame -= pieceTable[pType - 1 + 6][sq ^ 56] + pscore;
+                }
+            }
+        }
+    }
+
 
 
 	return (middleGame * phase + endGame * (24 - phase)) / 24 * (board->whiteToMove ? 1 : -1);
@@ -97,8 +124,8 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
     }
     else if (!inCheck && beta - alpha == 1)
     {
-/*        if (depth <= 6 && Evaluate() - depth * 165 > beta)
-            return beta;*/
+        // if (depth <= 6 && Evaluate() - depth * 165 > beta)
+            // return beta;
 
         // canPrune = depth <= 6 && evaluate(board) + depth * 165 < alpha;
 

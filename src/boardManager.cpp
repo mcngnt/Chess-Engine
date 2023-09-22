@@ -29,7 +29,8 @@ bool BoardManager::isPieceHereBitboard(int pieceType, bool isPieceWhite, int squ
 bool BoardManager::isChecked()
 {
     fillBitboardData();
-    return isBitToggled(attackMap, whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos);
+    // return isBitToggled(attackMap, whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos);
+    return inCheck;
 }
 
 bool BoardManager::isRepetitionDraw()
@@ -197,6 +198,9 @@ bool BoardManager::isSquareFriendly(int sq)
 
 void BoardManager::fillBitboardData()
 {
+	checkNumber = 0;
+	inCheck = false;
+
 	friendlyPiecesBitboard = piecesBitboard[0] | piecesBitboard[1] | piecesBitboard[2] | piecesBitboard[3] | piecesBitboard[4] | piecesBitboard[5];
 	enemyPiecesBitboard = piecesBitboard[6] | piecesBitboard[7] | piecesBitboard[8] | piecesBitboard[9] | piecesBitboard[10] | piecesBitboard[11];
 	if(!whiteToMove)
@@ -209,10 +213,12 @@ void BoardManager::fillBitboardData()
 
 	attackMap = 0;
 
+	int friendlyKingPos = whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos;
+
+
 	for (int pType = 1; pType <= 6; ++pType)
 	{
 	    uint64_t pMask = getPieceBitboard(pType, !whiteToMove);
-	    // attackMap = pMask;
 	    while (pMask != 0)
 	    {
 			int sq = getAndClearLSB(&pMask);
@@ -226,26 +232,42 @@ void BoardManager::fillBitboardData()
 				{
 					if (numSquares[sq][NorthEastID] >= 1 && isSquareNotEnemy(i+1,j-1))
 					{
-						// assign(j-1,i+1);
 						attackMap |= getPositionMask(i+1, j-1);
+						if(i+1 + 8*(j-1) == friendlyKingPos)
+						{
+							checkNumber = 1;
+							inCheck = true;
+						}
 					}
 					if (numSquares[sq][NorthWestID] >= 1 && isSquareNotEnemy(i-1,j-1))
 					{
-						// assign(j-1,i-1);
 						attackMap |= getPositionMask(i-1,j-1);
+						if(i-1 + 8*(j-1) == friendlyKingPos)
+						{
+							checkNumber = 1;
+							inCheck = true;
+						}
 					}
 				}
 				else
 				{
 					if (numSquares[sq][SouthEastID] >= 1 && isSquareNotEnemy(i+1,j+1))
 					{
-						// assign(j+1, i+1);
 						attackMap |= getPositionMask(i+1,j+1);
+						if(i+1 + 8*(j+1) == friendlyKingPos)
+						{
+							checkNumber = 1;
+							inCheck = true;
+						}
 					}
 					if (numSquares[sq][SouthWestID] >= 1 && isSquareNotEnemy(i-1,j+1))
 					{
-						// assign(j+1,i-1);
 						attackMap |= getPositionMask(i-1,j+1);
+						if(i-1 + 8*(j+1) == friendlyKingPos)
+						{
+							checkNumber = 1;
+							inCheck = true;
+						}
 					}
 				}		
 			}
@@ -256,7 +278,6 @@ void BoardManager::fillBitboardData()
 					int targetPos = sq + directions[dirID];
 					if (numSquares[sq][dirID] >= 1 && isSquareNotEnemy(targetPos))
 					{
-						// assign(targetPos/8, targetPos % 8);
 						attackMap |= getPositionMask(targetPos);
 					}
 				}
@@ -265,43 +286,75 @@ void BoardManager::fillBitboardData()
 			{
 				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotEnemy(i+1,j-2))
 				{
-			 		// assign(j-2,i+1);
 			 		attackMap |= getPositionMask(i+1, j-2);
+			 		if(i+1 + 8*(j-2) == friendlyKingPos)
+					{
+						checkNumber = 1;
+						inCheck = true;
+					}
 			 	}
 				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotEnemy(i-1,j-2))
 				{
-			 		// assign(j-2,i-1);
 			 		attackMap |= getPositionMask(i-1, j-2);
+			 		if(i-1 + 8*(j-2) == friendlyKingPos)
+					{
+						checkNumber = 1;
+						inCheck = true;
+					}
 			 	}
 				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotEnemy(i+1,j+2))
 				{
-			 		// assign(j+2,i+1);
 			 		attackMap |= getPositionMask(i+1, j+2);
+			 		if(i+1 + 8*(j+2) == friendlyKingPos)
+					{
+						checkNumber = 1;
+						inCheck = true;
+					}
 			 	}
 				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotEnemy(i-1,j+2))
 				{
-			 		// assign(j+2,i-1);
 			 		attackMap |= getPositionMask(i-1, j+2);
+			 		if(i-1 + 8*(j+2) == friendlyKingPos)
+					{
+						checkNumber = 1;
+						inCheck = true;
+					}
 			 	}
 				if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotEnemy(i+2,j-1))
 				{
-			 		// assign(j-1,i+2);
 			 		attackMap |= getPositionMask(i+2, j-1);
+			 		if(i+2 + 8*(j-1) == friendlyKingPos)
+					{
+						checkNumber = 1;
+						inCheck = true;
+					}
 			 	}
 				if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotEnemy(i+2,j+1))
 				{
-					// assign(j+1,i+2);
 			 		attackMap |= getPositionMask(i+2, j+1);
+			 		if(i+2 + 8*(j+1) == friendlyKingPos)
+					{
+						checkNumber = 1;
+						inCheck = true;
+					}
 			 	}
 				if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotEnemy(i-2,j-1))
 				{
-			 		// assign(j-1,i-2);
 			 		attackMap |= getPositionMask(i-2, j-1);
+			 		if(i-2 + 8*(j-1) == friendlyKingPos)
+					{
+						checkNumber = 1;
+						inCheck = true;
+					}
 			 	}
 				if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotEnemy(i-2,j+1))
 				{
-			 		// assign(j+1,i - 2);
 			 		attackMap |= getPositionMask(i-2, j+1);
+			 		if(i-2 + 8*(j+1) == friendlyKingPos)
+					{
+						checkNumber = 1;
+						inCheck = true;
+					}
 			 	}
 			}
 			if (pType == Rook || pType == Bishop || pType == Queen)
@@ -317,9 +370,13 @@ void BoardManager::fillBitboardData()
 						{
 							break;
 						}
-						// assign(targetPos / 8, targetPos % 8);
 						attackMap |= getPositionMask(targetPos);
-						if (isSquareFriendly(targetPos) && targetPos != (whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos))
+						if(targetPos == friendlyKingPos)
+						{
+							inCheck = true;
+							checkNumber++;
+						}
+						if (isSquareFriendly(targetPos) && targetPos != (whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos) && targetPos != friendlyKingPos)
 						{
 							break;
 						}
