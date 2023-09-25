@@ -198,8 +198,10 @@ bool BoardManager::isSquareFriendly(int sq)
 
 void BoardManager::fillBitboardData()
 {
-	checkNumber = 0;
+	doubleCheck = false;
 	inCheck = false;
+	checkRays = 0;
+	pinRays = 0;
 
 	friendlyPiecesBitboard = piecesBitboard[0] | piecesBitboard[1] | piecesBitboard[2] | piecesBitboard[3] | piecesBitboard[4] | piecesBitboard[5];
 	enemyPiecesBitboard = piecesBitboard[6] | piecesBitboard[7] | piecesBitboard[8] | piecesBitboard[9] | piecesBitboard[10] | piecesBitboard[11];
@@ -235,7 +237,7 @@ void BoardManager::fillBitboardData()
 						attackMap |= getPositionMask(i+1, j-1);
 						if(i+1 + 8*(j-1) == friendlyKingPos)
 						{
-							checkNumber = 1;
+							doubleCheck = inCheck;
 							inCheck = true;
 						}
 					}
@@ -244,7 +246,7 @@ void BoardManager::fillBitboardData()
 						attackMap |= getPositionMask(i-1,j-1);
 						if(i-1 + 8*(j-1) == friendlyKingPos)
 						{
-							checkNumber = 1;
+							doubleCheck = inCheck;
 							inCheck = true;
 						}
 					}
@@ -256,7 +258,7 @@ void BoardManager::fillBitboardData()
 						attackMap |= getPositionMask(i+1,j+1);
 						if(i+1 + 8*(j+1) == friendlyKingPos)
 						{
-							checkNumber = 1;
+							doubleCheck = inCheck;
 							inCheck = true;
 						}
 					}
@@ -265,7 +267,7 @@ void BoardManager::fillBitboardData()
 						attackMap |= getPositionMask(i-1,j+1);
 						if(i-1 + 8*(j+1) == friendlyKingPos)
 						{
-							checkNumber = 1;
+							doubleCheck = inCheck;
 							inCheck = true;
 						}
 					}
@@ -289,7 +291,7 @@ void BoardManager::fillBitboardData()
 			 		attackMap |= getPositionMask(i+1, j-2);
 			 		if(i+1 + 8*(j-2) == friendlyKingPos)
 					{
-						checkNumber = 1;
+						doubleCheck = inCheck;
 						inCheck = true;
 					}
 			 	}
@@ -298,7 +300,7 @@ void BoardManager::fillBitboardData()
 			 		attackMap |= getPositionMask(i-1, j-2);
 			 		if(i-1 + 8*(j-2) == friendlyKingPos)
 					{
-						checkNumber = 1;
+						doubleCheck = inCheck;
 						inCheck = true;
 					}
 			 	}
@@ -307,7 +309,7 @@ void BoardManager::fillBitboardData()
 			 		attackMap |= getPositionMask(i+1, j+2);
 			 		if(i+1 + 8*(j+2) == friendlyKingPos)
 					{
-						checkNumber = 1;
+						doubleCheck = inCheck;
 						inCheck = true;
 					}
 			 	}
@@ -316,7 +318,7 @@ void BoardManager::fillBitboardData()
 			 		attackMap |= getPositionMask(i-1, j+2);
 			 		if(i-1 + 8*(j+2) == friendlyKingPos)
 					{
-						checkNumber = 1;
+						doubleCheck = inCheck;
 						inCheck = true;
 					}
 			 	}
@@ -325,7 +327,7 @@ void BoardManager::fillBitboardData()
 			 		attackMap |= getPositionMask(i+2, j-1);
 			 		if(i+2 + 8*(j-1) == friendlyKingPos)
 					{
-						checkNumber = 1;
+						doubleCheck = inCheck;
 						inCheck = true;
 					}
 			 	}
@@ -334,7 +336,7 @@ void BoardManager::fillBitboardData()
 			 		attackMap |= getPositionMask(i+2, j+1);
 			 		if(i+2 + 8*(j+1) == friendlyKingPos)
 					{
-						checkNumber = 1;
+						doubleCheck = inCheck;
 						inCheck = true;
 					}
 			 	}
@@ -343,7 +345,7 @@ void BoardManager::fillBitboardData()
 			 		attackMap |= getPositionMask(i-2, j-1);
 			 		if(i-2 + 8*(j-1) == friendlyKingPos)
 					{
-						checkNumber = 1;
+						doubleCheck = inCheck;
 						inCheck = true;
 					}
 			 	}
@@ -352,7 +354,7 @@ void BoardManager::fillBitboardData()
 			 		attackMap |= getPositionMask(i-2, j+1);
 			 		if(i-2 + 8*(j+1) == friendlyKingPos)
 					{
-						checkNumber = 1;
+						doubleCheck = inCheck;
 						inCheck = true;
 					}
 			 	}
@@ -363,22 +365,46 @@ void BoardManager::fillBitboardData()
 				int endDir = (pType == Rook) ? 3 : 7;
 				for (int dirID = startDir ; dirID <= endDir ; ++dirID)
 				{
+
+					uint64_t currentRay = 0;
+					bool hasSeenFriendlyPiece = false;
+
 					for (int i = 0 ; i < numSquares[sq][dirID]; ++i)
 					{
 						int targetPos = sq + directions[dirID] * (i+1);
+
+						uint64_t positionMask = getPositionMask(targetPos);
+						currentRay |= positionMask;
 						if (isSquareEnemy(targetPos))
 						{
 							break;
 						}
-						attackMap |= getPositionMask(targetPos);
+						if(!hasSeenFriendlyPiece)
+						{
+							attackMap |= positionMask;
+						}
 						if(targetPos == friendlyKingPos)
 						{
-							inCheck = true;
-							checkNumber++;
+							if(!hasSeenFriendlyPiece)
+							{
+								doubleCheck = inCheck;
+								inCheck = true;
+								checkRays |= (currentRay | getPositionMask(sq)) & (~positionMask);
+								break;
+							}
+							else
+							{
+								pinRays |= currentRay;
+								break;
+							}
 						}
-						if (isSquareFriendly(targetPos) && targetPos != (whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos) && targetPos != friendlyKingPos)
+						if (isSquareFriendly(targetPos))
 						{
-							break;
+							if(hasSeenFriendlyPiece)
+							{
+								break;
+							}
+							hasSeenFriendlyPiece = true;
 						}
 					}
 				}
@@ -461,7 +487,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						}
 					}
 
-					if (!isBitToggled(attackMap, i + 8 * j))
+					if (!inCheck && !isBitToggled(attackMap, i + 8 * j))
 					{
 						if (    (currentGameState.canWhiteQueenCastle && whiteToMove) ||  (currentGameState.canBlackQueenCastle && !whiteToMove))
 						{
@@ -501,7 +527,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 
 				}
 
-				if(checkNumber >= 2)
+				if(doubleCheck)
 				{
 					return moves;
 				}
@@ -527,6 +553,8 @@ std::vector<int> BoardManager::generatePseudoMoves()
 
 
 							moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
+
+
 
 							if (isSquareEnemy(targetPos))
 							{

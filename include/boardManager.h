@@ -115,6 +115,9 @@ public:
 	uint64_t enemyPiecesBitboard;
 	uint64_t allPiecesBitboard;
 
+	uint64_t pinRays;
+	uint64_t checkRays;
+
 	void fillBitboardData();
 
 
@@ -124,8 +127,8 @@ public:
 
 	int board[8][8];
 
-	int checkNumber;
 	bool inCheck;
+	bool doubleCheck;
 
 	
 	std::stack<GameState> gameStateHistory;
@@ -135,7 +138,5 @@ public:
 	uint64_t repetitionTable[1024];
 
 	GameState currentGameState;
-
-	// bool controlled[8][8];
 
 };

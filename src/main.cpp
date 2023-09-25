@@ -268,7 +268,7 @@ int main()
     #endif
     #if !USE_UCI
         engine.whiteBotType = Human;
-        engine.blackBotType = TrueBot;
+        engine.blackBotType = Human;
         sf::RenderWindow window(sf::VideoMode(SCREEN_W, SCREEN_H, 32), "Main", sf::Style::Default);
         window.setVerticalSyncEnabled(true);
 
@@ -461,7 +461,7 @@ int main()
 
                     if (holdPiece)
                     {
-                        if (engine.isLegal(genMove(pieceHeld.x, pieceHeld.y, j,i, 0)))
+                        if (engine.getLegal(genMove(pieceHeld.x, pieceHeld.y, j,i, 0)))
                         {
                             if ((i + j) % 2 == 0)
                             {
@@ -514,18 +514,29 @@ int main()
             }*/
 
 
-            /*engine.board.fillBitboardData();
-            uint64_t pMask = engine.board.attackMap;
+            engine.board.fillBitboardData();
+            uint64_t pMask = engine.board.checkRays;
             while (pMask != 0)
             {
-                // std::cout << pMask << std::endl;
                 int sq = getAndClearLSB(&pMask);
                 sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
                 sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
                 rectangle.setFillColor(sf::Color(0,255,0,128));
                 rectangle.setPosition(pos);
                 window.draw(rectangle);
-            }*/
+            }
+
+            engine.board.fillBitboardData();
+            uint64_t pMask2 = engine.board.pinRays;
+            while (pMask2 != 0)
+            {
+                int sq = getAndClearLSB(&pMask2);
+                sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+                sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
+                rectangle.setFillColor(sf::Color(0,0,255,128));
+                rectangle.setPosition(pos);
+                window.draw(rectangle);
+            }
 
 
 
