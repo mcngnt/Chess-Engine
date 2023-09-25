@@ -225,6 +225,9 @@ void BoardManager::fillBitboardData()
 	    {
 			int sq = getAndClearLSB(&pMask);
 
+			uint64_t positionMask;
+			uint64_t squareMask = getPositionMask(sq);
+
 			int i = sq % 8;
 			int j = sq / 8;
 
@@ -234,20 +237,24 @@ void BoardManager::fillBitboardData()
 				{
 					if (numSquares[sq][NorthEastID] >= 1 && isSquareNotEnemy(i+1,j-1))
 					{
-						attackMap |= getPositionMask(i+1, j-1);
+						positionMask = getPositionMask(i+1, j-1);
+						attackMap |= positionMask;
 						if(i+1 + 8*(j-1) == friendlyKingPos)
 						{
 							doubleCheck = inCheck;
 							inCheck = true;
+							checkRays |= squareMask;
 						}
 					}
 					if (numSquares[sq][NorthWestID] >= 1 && isSquareNotEnemy(i-1,j-1))
 					{
-						attackMap |= getPositionMask(i-1,j-1);
+						positionMask = getPositionMask(i-1, j-1);
+						attackMap |= positionMask;
 						if(i-1 + 8*(j-1) == friendlyKingPos)
 						{
 							doubleCheck = inCheck;
 							inCheck = true;
+							checkRays |= squareMask;
 						}
 					}
 				}
@@ -255,20 +262,24 @@ void BoardManager::fillBitboardData()
 				{
 					if (numSquares[sq][SouthEastID] >= 1 && isSquareNotEnemy(i+1,j+1))
 					{
-						attackMap |= getPositionMask(i+1,j+1);
+						positionMask = getPositionMask(i+1, j+1);
+						attackMap |= positionMask;
 						if(i+1 + 8*(j+1) == friendlyKingPos)
 						{
 							doubleCheck = inCheck;
 							inCheck = true;
+							checkRays |= squareMask;
 						}
 					}
 					if (numSquares[sq][SouthWestID] >= 1 && isSquareNotEnemy(i-1,j+1))
 					{
-						attackMap |= getPositionMask(i-1,j+1);
+						positionMask = getPositionMask(i-1, j+1);
+						attackMap |= positionMask;
 						if(i-1 + 8*(j+1) == friendlyKingPos)
 						{
 							doubleCheck = inCheck;
 							inCheck = true;
+							checkRays |= squareMask;
 						}
 					}
 				}		
@@ -288,74 +299,90 @@ void BoardManager::fillBitboardData()
 			{
 				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotEnemy(i+1,j-2))
 				{
-			 		attackMap |= getPositionMask(i+1, j-2);
-			 		if(i+1 + 8*(j-2) == friendlyKingPos)
+			 		positionMask = getPositionMask(i+1, j-2);
+					attackMap |= positionMask;
+					if(i+1 + 8*(j-2) == friendlyKingPos)
 					{
 						doubleCheck = inCheck;
 						inCheck = true;
+						checkRays |= squareMask;
 					}
 			 	}
 				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotEnemy(i-1,j-2))
 				{
-			 		attackMap |= getPositionMask(i-1, j-2);
-			 		if(i-1 + 8*(j-2) == friendlyKingPos)
+			 		positionMask = getPositionMask(i-1, j-2);
+					attackMap |= positionMask;
+					if(i-1 + 8*(j-2) == friendlyKingPos)
 					{
 						doubleCheck = inCheck;
 						inCheck = true;
+						checkRays |= squareMask;
 					}
 			 	}
 				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotEnemy(i+1,j+2))
 				{
-			 		attackMap |= getPositionMask(i+1, j+2);
-			 		if(i+1 + 8*(j+2) == friendlyKingPos)
+			 		positionMask = getPositionMask(i+1, j+2);
+					attackMap |= positionMask;
+					if(i+1 + 8*(j+2) == friendlyKingPos)
 					{
 						doubleCheck = inCheck;
 						inCheck = true;
+						checkRays |= squareMask;
 					}
 			 	}
 				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotEnemy(i-1,j+2))
 				{
-			 		attackMap |= getPositionMask(i-1, j+2);
-			 		if(i-1 + 8*(j+2) == friendlyKingPos)
+			 		positionMask = getPositionMask(i-1, j+2);
+					attackMap |= positionMask;
+					if(i-1 + 8*(j+2) == friendlyKingPos)
 					{
 						doubleCheck = inCheck;
 						inCheck = true;
+						checkRays |= squareMask;
 					}
 			 	}
 				if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotEnemy(i+2,j-1))
 				{
-			 		attackMap |= getPositionMask(i+2, j-1);
-			 		if(i+2 + 8*(j-1) == friendlyKingPos)
+			 		positionMask = getPositionMask(i+2, j-1);
+					attackMap |= positionMask;
+					if(i+2 + 8*(j-1) == friendlyKingPos)
 					{
 						doubleCheck = inCheck;
 						inCheck = true;
+						checkRays |= squareMask;
 					}
 			 	}
 				if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotEnemy(i+2,j+1))
 				{
-			 		attackMap |= getPositionMask(i+2, j+1);
-			 		if(i+2 + 8*(j+1) == friendlyKingPos)
+			 		positionMask = getPositionMask(i+2, j+1);
+					attackMap |= positionMask;
+					if(i+2 + 8*(j+1) == friendlyKingPos)
 					{
 						doubleCheck = inCheck;
 						inCheck = true;
+						checkRays |= squareMask;
 					}
 			 	}
 				if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotEnemy(i-2,j-1))
 				{
-			 		attackMap |= getPositionMask(i-2, j-1);
-			 		if(i-2 + 8*(j-1) == friendlyKingPos)
+			 		positionMask = getPositionMask(i-2, j-1);
+					attackMap |= positionMask;
+					if(i-2 + 8*(j-1) == friendlyKingPos)
 					{
 						doubleCheck = inCheck;
 						inCheck = true;
+						checkRays |= squareMask;
 					}
 			 	}
 				if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotEnemy(i-2,j+1))
 				{
-			 		attackMap |= getPositionMask(i-2, j+1);
-			 		if(i-2 + 8*(j+1) == friendlyKingPos)
+			 		positionMask = getPositionMask(i-2, j+1);
+					attackMap |= positionMask;
+					if(i-2 + 8*(j+1) == friendlyKingPos)
 					{
 						doubleCheck = inCheck;
 						inCheck = true;
+						checkRays |= squareMask;
 					}
 			 	}
 			}
@@ -394,7 +421,7 @@ void BoardManager::fillBitboardData()
 							}
 							else
 							{
-								pinRays |= currentRay;
+								pinRays |= (currentRay | getPositionMask(sq)) & (~positionMask);
 								break;
 							}
 						}
@@ -444,6 +471,11 @@ std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 	}
 
 	return legalMoves;
+}
+
+bool BoardManager::isPinned(int sq)
+{
+	return (getPositionMask(sq) & pinRays) > 0;
 }
 
 
@@ -552,9 +584,27 @@ std::vector<int> BoardManager::generatePseudoMoves()
 							}
 
 
-							moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
-
-
+							if(inCheck)
+							{
+								if(isBitToggled(checkRays, targetPos))
+								{
+									moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
+								}
+							}
+							else
+							{
+								if(!isPinned(sq))
+								{
+									moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
+								}
+								else
+								{
+									if(isPinned(targetPos))
+									{
+										moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
+									}
+								}
+							}
 
 							if (isSquareEnemy(targetPos))
 							{
@@ -574,36 +624,117 @@ std::vector<int> BoardManager::generatePseudoMoves()
 
 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j-2))
 					{
-						moves.push_back(genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture));
+						if(inCheck)
+						{
+							if(isBitToggled(checkRays, i+1 + 8 * (j-2)))
+							{
+								moves.push_back(genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture));
+							}
+						}
+						else
+						{
+							moves.push_back(genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture));
+						}
+						
 					}
 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j-2))
 					{
-						moves.push_back(genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture));
+						if(inCheck)
+						{
+							if(isBitToggled(checkRays, i-1 + 8 * (j-2)))
+							{
+								moves.push_back(genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture));
+							}
+						}
+						else
+						{
+							moves.push_back(genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture));
+						}
 					}
 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j+2))
 					{
-						moves.push_back(genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture));
+						if(inCheck)
+						{
+							if(isBitToggled(checkRays, i+1 + 8 * (j+2)))
+							{
+								moves.push_back(genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture));
+							}
+						}
+						else
+						{
+							moves.push_back(genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture));
+						}
 					}
 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j+2))
 					{
-						moves.push_back(genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture));
+						if(inCheck)
+						{
+							if(isBitToggled(checkRays, i-1 + 8 * (j+2)))
+							{
+								moves.push_back(genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture));
+							}
+						}
+						else
+						{
+							moves.push_back(genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture));
+						}
 					}
 
 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i+2,j-1))
 					{
-						moves.push_back(genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture));
+						if(inCheck)
+						{
+							if(isBitToggled(checkRays, i+2 + 8 * (j-1)))
+							{
+								moves.push_back(genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture));
+							}
+						}
+						else
+						{
+							moves.push_back(genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture));
+						}
 					}
 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i+2,j+1))
 					{
-						moves.push_back(genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture));
+						if(inCheck)
+						{
+							if(isBitToggled(checkRays, i+2 + 8 * (j+1)))
+							{
+								moves.push_back(genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture));
+							}
+						}
+						else
+						{
+							moves.push_back(genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture));
+						}
 					}
 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i-2,j-1))
 					{
-						moves.push_back(genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture));
+						if(inCheck)
+						{
+							if(isBitToggled(checkRays, i-2 + 8 * (j-1)))
+							{
+								moves.push_back(genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture));
+							}
+						}
+						else
+						{
+							moves.push_back(genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture));
+						}
 					}
 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i-2,j+1))
 					{
-						moves.push_back(genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture));
+						if(inCheck)
+						{
+							if(isBitToggled(checkRays, i-2 + 8 * (j+1)))
+							{
+								moves.push_back(genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture));
+							}
+						}
+						else
+						{
+							moves.push_back(genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture));
+						}
 					}
 
 				}

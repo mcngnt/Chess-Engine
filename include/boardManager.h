@@ -118,6 +118,8 @@ public:
 	uint64_t pinRays;
 	uint64_t checkRays;
 
+	bool isPinned(int sq);
+
 	void fillBitboardData();
 
 
