@@ -202,6 +202,7 @@ void BoardManager::fillBitboardData()
 	inCheck = false;
 	checkRays = 0;
 	pinRays = 0;
+	captureMask = 0;
 
 	friendlyPiecesBitboard = piecesBitboard[0] | piecesBitboard[1] | piecesBitboard[2] | piecesBitboard[3] | piecesBitboard[4] | piecesBitboard[5];
 	enemyPiecesBitboard = piecesBitboard[6] | piecesBitboard[7] | piecesBitboard[8] | piecesBitboard[9] | piecesBitboard[10] | piecesBitboard[11];
@@ -235,23 +236,25 @@ void BoardManager::fillBitboardData()
 			{
 				if (!whiteToMove)
 				{
-					if (numSquares[sq][NorthEastID] >= 1 && isSquareNotEnemy(i+1,j-1))
+					if (numSquares[sq][NorthEastID] >= 1)
 					{
 						positionMask = getPositionMask(i+1, j-1);
 						attackMap |= positionMask;
-						if(i+1 + 8*(j-1) == friendlyKingPos)
+						if(i+1 + 8*(j-1) == friendlyKingPos && isSquareNotEnemy(i+1,j-1))
 						{
+							captureMask |= squareMask;
 							doubleCheck = inCheck;
 							inCheck = true;
 							checkRays |= squareMask;
 						}
 					}
-					if (numSquares[sq][NorthWestID] >= 1 && isSquareNotEnemy(i-1,j-1))
+					if (numSquares[sq][NorthWestID] >= 1)
 					{
 						positionMask = getPositionMask(i-1, j-1);
 						attackMap |= positionMask;
-						if(i-1 + 8*(j-1) == friendlyKingPos)
+						if(i-1 + 8*(j-1) == friendlyKingPos && isSquareNotEnemy(i-1,j-1))
 						{
+							captureMask |= squareMask;
 							doubleCheck = inCheck;
 							inCheck = true;
 							checkRays |= squareMask;
@@ -260,23 +263,25 @@ void BoardManager::fillBitboardData()
 				}
 				else
 				{
-					if (numSquares[sq][SouthEastID] >= 1 && isSquareNotEnemy(i+1,j+1))
+					if (numSquares[sq][SouthEastID] >= 1)
 					{
 						positionMask = getPositionMask(i+1, j+1);
 						attackMap |= positionMask;
-						if(i+1 + 8*(j+1) == friendlyKingPos)
+						if(i+1 + 8*(j+1) == friendlyKingPos && isSquareNotEnemy(i+1,j+1))
 						{
+							captureMask |= squareMask;
 							doubleCheck = inCheck;
 							inCheck = true;
 							checkRays |= squareMask;
 						}
 					}
-					if (numSquares[sq][SouthWestID] >= 1 && isSquareNotEnemy(i-1,j+1))
+					if (numSquares[sq][SouthWestID] >= 1)
 					{
 						positionMask = getPositionMask(i-1, j+1);
 						attackMap |= positionMask;
-						if(i-1 + 8*(j+1) == friendlyKingPos)
+						if(i-1 + 8*(j+1) == friendlyKingPos && isSquareNotEnemy(i-1,j+1))
 						{
+							captureMask |= squareMask;
 							doubleCheck = inCheck;
 							inCheck = true;
 							checkRays |= squareMask;
@@ -289,7 +294,7 @@ void BoardManager::fillBitboardData()
 				for (int dirID = 0 ; dirID <= 7 ; ++dirID)
 				{
 					int targetPos = sq + directions[dirID];
-					if (numSquares[sq][dirID] >= 1 && isSquareNotEnemy(targetPos))
+					if (numSquares[sq][dirID] >= 1) // && isSquareNotEnemy(targetPos)
 					{
 						attackMap |= getPositionMask(targetPos);
 					}
@@ -297,89 +302,97 @@ void BoardManager::fillBitboardData()
 			}
 			if (pType == Knight)
 			{
-				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotEnemy(i+1,j-2))
+				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1)
 				{
 			 		positionMask = getPositionMask(i+1, j-2);
 					attackMap |= positionMask;
-					if(i+1 + 8*(j-2) == friendlyKingPos)
+					if(i+1 + 8*(j-2) == friendlyKingPos && isSquareNotEnemy(i+1,j-2))
 					{
+						captureMask |= squareMask;
 						doubleCheck = inCheck;
 						inCheck = true;
 						checkRays |= squareMask;
 					}
 			 	}
-				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotEnemy(i-1,j-2))
+				if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1)
 				{
 			 		positionMask = getPositionMask(i-1, j-2);
 					attackMap |= positionMask;
-					if(i-1 + 8*(j-2) == friendlyKingPos)
+					if(i-1 + 8*(j-2) == friendlyKingPos && isSquareNotEnemy(i-1,j-2))
 					{
+						captureMask |= squareMask;
 						doubleCheck = inCheck;
 						inCheck = true;
 						checkRays |= squareMask;
 					}
 			 	}
-				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotEnemy(i+1,j+2))
+				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1)
 				{
 			 		positionMask = getPositionMask(i+1, j+2);
 					attackMap |= positionMask;
-					if(i+1 + 8*(j+2) == friendlyKingPos)
+					if(i+1 + 8*(j+2) == friendlyKingPos && isSquareNotEnemy(i+1,j+2))
 					{
+						captureMask |= squareMask;
 						doubleCheck = inCheck;
 						inCheck = true;
 						checkRays |= squareMask;
 					}
 			 	}
-				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotEnemy(i-1,j+2))
+				if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1)
 				{
 			 		positionMask = getPositionMask(i-1, j+2);
 					attackMap |= positionMask;
-					if(i-1 + 8*(j+2) == friendlyKingPos)
+					if(i-1 + 8*(j+2) == friendlyKingPos && isSquareNotEnemy(i-1,j+2))
 					{
+						captureMask |= squareMask;
 						doubleCheck = inCheck;
 						inCheck = true;
 						checkRays |= squareMask;
 					}
 			 	}
-				if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotEnemy(i+2,j-1))
+				if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1)
 				{
 			 		positionMask = getPositionMask(i+2, j-1);
 					attackMap |= positionMask;
-					if(i+2 + 8*(j-1) == friendlyKingPos)
+					if(i+2 + 8*(j-1) == friendlyKingPos && isSquareNotEnemy(i+2,j-1))
 					{
+						captureMask |= squareMask;
 						doubleCheck = inCheck;
 						inCheck = true;
 						checkRays |= squareMask;
 					}
 			 	}
-				if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotEnemy(i+2,j+1))
+				if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1)
 				{
 			 		positionMask = getPositionMask(i+2, j+1);
 					attackMap |= positionMask;
-					if(i+2 + 8*(j+1) == friendlyKingPos)
+					if(i+2 + 8*(j+1) == friendlyKingPos && isSquareNotEnemy(i+2,j+1))
 					{
+						captureMask |= squareMask;
 						doubleCheck = inCheck;
 						inCheck = true;
 						checkRays |= squareMask;
 					}
 			 	}
-				if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotEnemy(i-2,j-1))
+				if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1)
 				{
 			 		positionMask = getPositionMask(i-2, j-1);
 					attackMap |= positionMask;
-					if(i-2 + 8*(j-1) == friendlyKingPos)
+					if(i-2 + 8*(j-1) == friendlyKingPos && isSquareNotEnemy(i-2,j-1))
 					{
+						captureMask |= squareMask;
 						doubleCheck = inCheck;
 						inCheck = true;
 						checkRays |= squareMask;
 					}
 			 	}
-				if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotEnemy(i-2,j+1))
+				if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1)
 				{
 			 		positionMask = getPositionMask(i-2, j+1);
 					attackMap |= positionMask;
-					if(i-2 + 8*(j+1) == friendlyKingPos)
+					if(i-2 + 8*(j+1) == friendlyKingPos && isSquareNotEnemy(i-2,j+1))
 					{
+						captureMask |= squareMask;
 						doubleCheck = inCheck;
 						inCheck = true;
 						checkRays |= squareMask;
@@ -402,30 +415,29 @@ void BoardManager::fillBitboardData()
 
 						uint64_t positionMask = getPositionMask(targetPos);
 						currentRay |= positionMask;
-						if (isSquareEnemy(targetPos))
-						{
-							break;
-						}
 						if(!hasSeenFriendlyPiece)
 						{
 							attackMap |= positionMask;
+						}
+						if (isSquareEnemy(targetPos))
+						{
+							break;
 						}
 						if(targetPos == friendlyKingPos)
 						{
 							if(!hasSeenFriendlyPiece)
 							{
+								captureMask |= squareMask;
 								doubleCheck = inCheck;
 								inCheck = true;
 								checkRays |= (currentRay | getPositionMask(sq)) & (~positionMask);
-								break;
 							}
 							else
 							{
 								pinRays |= (currentRay | getPositionMask(sq)) & (~positionMask);
-								break;
 							}
 						}
-						if (isSquareFriendly(targetPos))
+						if (isSquareFriendly(targetPos) && targetPos != friendlyKingPos)
 						{
 							if(hasSeenFriendlyPiece)
 							{
@@ -450,12 +462,15 @@ std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 
 	std::vector<int> legalMoves;
 
+	std::string currentFen = convertFen();
+
 	for (int pseudoMove : pseudoMoves)
 	{
 		if ((onlyCaptures && !isCapturingTag(getTag(pseudoMove))))
 		{
 			continue;
 		}
+
 		makeMove(pseudoMove);
 
 		whiteToMove = !whiteToMove;
@@ -468,6 +483,11 @@ std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 		whiteToMove = !whiteToMove;
 
 		unmakeMove(pseudoMove);
+
+		if(inCheck)
+		{
+			std::cout << currentFen << " : " << standardNotation(pseudoMove) << std::endl;
+		}
 	}
 
 	return legalMoves;
@@ -476,6 +496,32 @@ std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 bool BoardManager::isPinned(int sq)
 {
 	return (getPositionMask(sq) & pinRays) > 0;
+}
+
+bool BoardManager::isMoveLegal(int sq, int targetPos)
+{
+	if(inCheck)
+	{
+		if(isBitToggled(checkRays, targetPos))
+		{
+			return true;
+		}
+	}
+	else
+	{
+		if(!isPinned(sq))
+		{
+			return true;
+		}
+		else
+		{
+			if(isPinned(targetPos))
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 
@@ -513,7 +559,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 					{
 						int targetPos = sq + directions[dirID];
 
-						if (numSquares[sq][dirID] >= 1 && isSquareNotFriendly(targetPos))
+						if (numSquares[sq][dirID] >= 1 && isSquareNotFriendly(targetPos) && !isBitToggled(attackMap, targetPos))
 						{
 							moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
 						}
@@ -583,28 +629,11 @@ std::vector<int> BoardManager::generatePseudoMoves()
 								break;
 							}
 
-
-							if(inCheck)
+							if(isMoveLegal(sq, targetPos))
 							{
-								if(isBitToggled(checkRays, targetPos))
-								{
-									moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
-								}
+								moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
 							}
-							else
-							{
-								if(!isPinned(sq))
-								{
-									moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
-								}
-								else
-								{
-									if(isPinned(targetPos))
-									{
-										moves.push_back(genMove(sq, targetPos, isSquareEnemy(targetPos) * Capture));
-									}
-								}
-							}
+							
 
 							if (isSquareEnemy(targetPos))
 							{
@@ -624,122 +653,79 @@ std::vector<int> BoardManager::generatePseudoMoves()
 
 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j-2))
 					{
-						if(inCheck)
+						int move = genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture);
+						int targetPos = i+1 + 8 * (j-2);
+						if(isMoveLegal(sq, targetPos))
 						{
-							if(isBitToggled(checkRays, i+1 + 8 * (j-2)))
-							{
-								moves.push_back(genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture));
-							}
+							moves.push_back(move);
 						}
-						else
-						{
-							moves.push_back(genMove(i,j,i+1,j-2, isSquareEnemy(i+1,j-2) * Capture));
-						}
-						
 					}
 					if (numSquares[sq][NorthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j-2))
 					{
-						if(inCheck)
+						int move = genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture);
+						int targetPos = i-1 + 8 * (j-2);
+						if(isMoveLegal(sq, targetPos))
 						{
-							if(isBitToggled(checkRays, i-1 + 8 * (j-2)))
-							{
-								moves.push_back(genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture));
-							}
-						}
-						else
-						{
-							moves.push_back(genMove(i,j,i-1,j-2, isSquareEnemy(i-1,j-2) * Capture));
+							moves.push_back(move);
 						}
 					}
 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][EastID] >= 1 && isSquareNotFriendly(i+1,j+2))
 					{
-						if(inCheck)
+						int move = genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture);
+						int targetPos = i+1 + 8 * (j+2);
+						if(isMoveLegal(sq, targetPos))
 						{
-							if(isBitToggled(checkRays, i+1 + 8 * (j+2)))
-							{
-								moves.push_back(genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture));
-							}
-						}
-						else
-						{
-							moves.push_back(genMove(i,j,i+1,j+2, isSquareEnemy(i+1,j+2) * Capture));
+							moves.push_back(move);
 						}
 					}
 					if (numSquares[sq][SouthID] >= 2 && numSquares[sq][WestID] >= 1 && isSquareNotFriendly(i-1,j+2))
 					{
-						if(inCheck)
+						int move = genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture);
+						int targetPos =  i-1 + 8 * (j+2);
+						if(isMoveLegal(sq, targetPos))
 						{
-							if(isBitToggled(checkRays, i-1 + 8 * (j+2)))
-							{
-								moves.push_back(genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture));
-							}
-						}
-						else
-						{
-							moves.push_back(genMove(i,j,i-1,j+2, isSquareEnemy(i-1,j+2) * Capture));
+							moves.push_back(move);
 						}
 					}
 
 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i+2,j-1))
 					{
-						if(inCheck)
+						int move = genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture);
+						int targetPos = i+2 + 8 * (j-1);
+						if(isMoveLegal(sq, targetPos))
 						{
-							if(isBitToggled(checkRays, i+2 + 8 * (j-1)))
-							{
-								moves.push_back(genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture));
-							}
-						}
-						else
-						{
-							moves.push_back(genMove(i,j,i+2,j-1, isSquareEnemy(i+2,j-1) * Capture));
+							moves.push_back(move);
 						}
 					}
 					if (numSquares[sq][EastID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i+2,j+1))
 					{
-						if(inCheck)
+						int move = genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture);
+						int targetPos = i+2 + 8 * (j+1);
+						if(isMoveLegal(sq, targetPos))
 						{
-							if(isBitToggled(checkRays, i+2 + 8 * (j+1)))
-							{
-								moves.push_back(genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture));
-							}
-						}
-						else
-						{
-							moves.push_back(genMove(i,j,i+2,j+1, isSquareEnemy(i+2,j+1) * Capture));
+							moves.push_back(move);
 						}
 					}
 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][NorthID] >= 1 && isSquareNotFriendly(i-2,j-1))
 					{
-						if(inCheck)
+						int move = genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture);
+						int targetPos = i-2 + 8 * (j-1);
+						if(isMoveLegal(sq, targetPos))
 						{
-							if(isBitToggled(checkRays, i-2 + 8 * (j-1)))
-							{
-								moves.push_back(genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture));
-							}
-						}
-						else
-						{
-							moves.push_back(genMove(i,j,i-2,j-1, isSquareEnemy(i-2,j-1) * Capture));
+							moves.push_back(move);
 						}
 					}
 					if (numSquares[sq][WestID] >= 2 && numSquares[sq][SouthID] >= 1 && isSquareNotFriendly(i-2,j+1))
 					{
-						if(inCheck)
+						int move = genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture);
+						int targetPos = i-2 + 8 * (j+1);
+						if(isMoveLegal(sq, targetPos))
 						{
-							if(isBitToggled(checkRays, i-2 + 8 * (j+1)))
-							{
-								moves.push_back(genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture));
-							}
-						}
-						else
-						{
-							moves.push_back(genMove(i,j,i-2,j+1, isSquareEnemy(i-2,j+1) * Capture));
+							moves.push_back(move);
 						}
 					}
 
 				}
-
-
 
 
 				if (pType == Pawn)
@@ -749,21 +735,30 @@ std::vector<int> BoardManager::generatePseudoMoves()
 					{
 						if (numSquares[sq][NorthID] >= 1 && isSquareEmpty(i,j-1))
 						{
-							if (j > 1)
+							if(isMoveLegal(sq, i + 8*(j-1)))
 							{
-								moves.push_back(genMove(i,j,i,j-1, QuietMove));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i,j-1, KnightProm));
-								moves.push_back(genMove(i,j,i,j-1, BishopProm));
-								moves.push_back(genMove(i,j,i,j-1, RookProm));
-								moves.push_back(genMove(i,j,i,j-1, QueenProm));
+								if (j > 1)
+								{
+									moves.push_back(genMove(i,j,i,j-1, QuietMove));
+								}
+								else
+								{
+									if(isMoveLegal(sq, i + 8*(j-1)))
+									{
+										moves.push_back(genMove(i,j,i,j-1, KnightProm));
+										moves.push_back(genMove(i,j,i,j-1, BishopProm));
+										moves.push_back(genMove(i,j,i,j-1, RookProm));
+										moves.push_back(genMove(i,j,i,j-1, QueenProm));
+									}
+								}
 							}
 						}
 						if (j == 6 && isSquareEmpty(i,j-2) && isSquareEmpty(i, j-1))
 						{
-							moves.push_back(genMove(i,j,i,j-2, DoublePawnPush));
+							if(isMoveLegal(sq, i + 8 * (j-2)))
+							{
+								moves.push_back(genMove(i,j,i,j-2, DoublePawnPush));
+							}
 						}
 						if (numSquares[sq][NorthEastID] >= 1 && isSquareEnemy(i+1,j-1))
 						{
@@ -781,26 +776,35 @@ std::vector<int> BoardManager::generatePseudoMoves()
 						}
 						if (numSquares[sq][NorthWestID] >= 1 && isSquareEnemy(i-1,j-1))
 						{
-							if (j - 1 == 0)
+							if(isMoveLegal(sq, i-1 + 8*(j-1)))
 							{
-								moves.push_back(genMove(i,j,i-1,j-1, KnightPromCapture));
-								moves.push_back(genMove(i,j,i-1,j-1, BishopPromCapture));
-								moves.push_back(genMove(i,j,i-1,j-1, RookPromCapture));
-								moves.push_back(genMove(i,j,i-1,j-1, QueenPromCapture));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i-1,j-1, Capture));
+								if (j - 1 == 0)
+								{
+									moves.push_back(genMove(i,j,i-1,j-1, KnightPromCapture));
+									moves.push_back(genMove(i,j,i-1,j-1, BishopPromCapture));
+									moves.push_back(genMove(i,j,i-1,j-1, RookPromCapture));
+									moves.push_back(genMove(i,j,i-1,j-1, QueenPromCapture));
+								}
+								else
+								{
+									moves.push_back(genMove(i,j,i-1,j-1, Capture));
+								}
 							}
 						}
 
 						if (numSquares[sq][NorthEastID] >= 1 && j == 3 && isSquareEnemy(i+1,j) && pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j-1) && currentGameState.doublePushFile - 1 == i+1)
 						{
-							moves.push_back(genMove(i,j,i+1,j-1, EPCapture));
+							if(isMoveLegal(sq, i+1 + 8*(j-1)) || (inCheck && isBitToggled(captureMask, i+1 + 8*j)))
+							{
+								moves.push_back(genMove(i,j,i+1,j-1, EPCapture));
+							}
 						}
 						if (numSquares[sq][NorthWestID] >= 1 && j == 3 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j-1) && currentGameState.doublePushFile - 1 == i-1)
 						{
-							moves.push_back(genMove(i,j,i-1,j-1, EPCapture));
+							if(isMoveLegal(sq, i-1 + 8*(j-1)) || (inCheck && isBitToggled(captureMask, i-1 + 8*j)))
+							{
+								moves.push_back(genMove(i,j,i-1,j-1, EPCapture));
+							}
 						}
 
 					}
@@ -808,58 +812,76 @@ std::vector<int> BoardManager::generatePseudoMoves()
 					{
 						if (numSquares[sq][NorthID] >= 1 && isSquareEmpty(i,j+1))
 						{
-							if (j < 6)
+							if(isMoveLegal(sq, i + 8*(j+1)))
 							{
-								moves.push_back(genMove(i,j,i,j+1, QuietMove));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i,j+1, KnightProm));
-								moves.push_back(genMove(i,j,i,j+1, BishopProm));
-								moves.push_back(genMove(i,j,i,j+1, RookProm));
-								moves.push_back(genMove(i,j,i,j+1, QueenProm));
+								if (j < 6)
+								{
+									moves.push_back(genMove(i,j,i,j+1, QuietMove));
+								}
+								else
+								{
+									moves.push_back(genMove(i,j,i,j+1, KnightProm));
+									moves.push_back(genMove(i,j,i,j+1, BishopProm));
+									moves.push_back(genMove(i,j,i,j+1, RookProm));
+									moves.push_back(genMove(i,j,i,j+1, QueenProm));
+								}
 							}
 						}
 						if (j == 1 && isSquareEmpty(i,j+2) && isSquareEmpty(i, j+1))
 						{
-							moves.push_back(genMove(i,j,i,j+2, DoublePawnPush));
+							if(isMoveLegal(sq, i + 8*(j+2)))
+							{
+								moves.push_back(genMove(i,j,i,j+2, DoublePawnPush));
+							}
 						}
 						if (numSquares[sq][SouthEastID] >= 1 && isSquareEnemy(i+1,j+1))
 						{
-							if (j + 1 == 7)
+							if(isMoveLegal(sq, i+1 + 8*(j+1)))
 							{
-								moves.push_back(genMove(i,j,i+1,j+1, KnightPromCapture));
-								moves.push_back(genMove(i,j,i+1,j+1, BishopPromCapture));
-								moves.push_back(genMove(i,j,i+1,j+1, RookPromCapture));
-								moves.push_back(genMove(i,j,i+1,j+1, QueenPromCapture));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i+1,j+1, Capture));
+								if (j + 1 == 7)
+								{
+									moves.push_back(genMove(i,j,i+1,j+1, KnightPromCapture));
+									moves.push_back(genMove(i,j,i+1,j+1, BishopPromCapture));
+									moves.push_back(genMove(i,j,i+1,j+1, RookPromCapture));
+									moves.push_back(genMove(i,j,i+1,j+1, QueenPromCapture));
+								}
+								else
+								{
+									moves.push_back(genMove(i,j,i+1,j+1, Capture));
+								}
 							}
 						}
 						if (numSquares[sq][SouthWestID] >= 1 && isSquareEnemy(i-1,j+1))
 						{
-							if (j + 1 == 7)
+							if(isMoveLegal(sq, i-1 + 8 * (j+1)))
 							{
-								moves.push_back(genMove(i,j,i-1,j+1, KnightPromCapture));
-								moves.push_back(genMove(i,j,i-1,j+1, BishopPromCapture));
-								moves.push_back(genMove(i,j,i-1,j+1, RookPromCapture));
-								moves.push_back(genMove(i,j,i-1,j+1, QueenPromCapture));
-							}
-							else
-							{
-								moves.push_back(genMove(i,j,i-1,j+1, Capture));
+								if (j + 1 == 7)
+								{
+									moves.push_back(genMove(i,j,i-1,j+1, KnightPromCapture));
+									moves.push_back(genMove(i,j,i-1,j+1, BishopPromCapture));
+									moves.push_back(genMove(i,j,i-1,j+1, RookPromCapture));
+									moves.push_back(genMove(i,j,i-1,j+1, QueenPromCapture));
+								}
+								else
+								{
+									moves.push_back(genMove(i,j,i-1,j+1, Capture));
+								}
 							}
 						}
 
 						if (numSquares[sq][SouthEastID] >= 1 && j == 4 && isSquareEnemy(i+1,j)&& pieceType(get(i+1,j)) == Pawn && isSquareEmpty(i+1, j+1) && (currentGameState.doublePushFile - 1 == i+1))
 						{
-							moves.push_back(genMove(i,j,i+1,j+1, EPCapture));
+							if(isMoveLegal(sq, i+1 + 8*(j+1)) || (inCheck && isBitToggled(captureMask, i+1 + 8*j)))
+							{
+								moves.push_back(genMove(i,j,i+1,j+1, EPCapture));
+							}
 						}
 						if (numSquares[sq][SouthWestID] >= 1 && j == 4 && isSquareEnemy(i-1,j) && pieceType(get(i-1,j)) == Pawn && isSquareEmpty(i-1, j+1) && (currentGameState.doublePushFile - 1 == i-1))
 						{
-							moves.push_back(genMove(i,j,i-1,j+1, EPCapture));
+							if(isMoveLegal(sq, i-1 + 8*(j+1)) || (inCheck && isBitToggled(captureMask, i-1 + 8*j)))
+							{
+								moves.push_back(genMove(i,j,i-1,j+1, EPCapture));
+							}
 						}
 
 					}		

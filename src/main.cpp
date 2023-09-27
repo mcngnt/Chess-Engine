@@ -48,18 +48,20 @@ int timeToAlloc(int baseTime, int inc)
 
 int main()
 {
-    Engine engine(TrueBot, TrueBot, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");
+    // Engine engine(TrueBot, TrueBot, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");
+
+    Engine engine(TrueBot, TrueBot, "r4k1r/p1ppqpb1/bn2pQpB/3PN3/1p2P3/2N4p/PPP1BPPP/R3K2R b KQ - 0 1");
 
     engine.bot.maxTime = botBaseTime;
 
     // uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
     // std::cout << bitboardTest << std::endl;
 
-    std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-    engine.perft(4);
-    std::cout << "4085659 expected" << std::endl;
-    std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-    std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
+    // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+    // engine.perft(4);
+    // std::cout << "4085659 expected" << std::endl;
+    // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
+    // std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 
     // std::cout << trailingZerosNB(1126724540563456) << std::endl;
 
@@ -364,6 +366,7 @@ int main()
                     {
                         holdPiece = false;
                         engine.tryMove(pieceHeld, sf::Vector2i(gridPos.x, gridPos.y), 'q');
+                        // std::cout << standardNotation(engine.board.movesHistory.top()) << std::endl;
                         pieceHeld = sf::Vector2i(-1,-1);
                         doUpdate = false;
 
@@ -515,7 +518,7 @@ int main()
 
 
             engine.board.fillBitboardData();
-            uint64_t pMask = engine.board.checkRays;
+            uint64_t pMask = engine.board.attackMap;
             while (pMask != 0)
             {
                 int sq = getAndClearLSB(&pMask);

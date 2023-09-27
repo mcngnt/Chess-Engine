@@ -108,6 +108,8 @@ public:
 
 	bool isRepetitionDraw();
 
+	bool isMoveLegal(int sq, int targetPos);
+
 	// void assign(int i, int j);
 
 	uint64_t attackMap;
@@ -117,6 +119,8 @@ public:
 
 	uint64_t pinRays;
 	uint64_t checkRays;
+	uint64_t captureMask;
+
 
 	bool isPinned(int sq);
 
