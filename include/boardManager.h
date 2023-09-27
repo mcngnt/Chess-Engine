@@ -113,6 +113,7 @@ public:
 	// void assign(int i, int j);
 
 	uint64_t attackMap;
+	uint64_t checkRaysEP;
 	uint64_t friendlyPiecesBitboard;
 	uint64_t enemyPiecesBitboard;
 	uint64_t allPiecesBitboard;
@@ -135,6 +136,10 @@ public:
 
 	bool inCheck;
 	bool doubleCheck;
+
+	uint64_t alignMask[64][64];
+
+	int friendlyKingPos;
 
 	
 	std::stack<GameState> gameStateHistory;

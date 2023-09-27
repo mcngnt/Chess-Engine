@@ -48,9 +48,11 @@ int timeToAlloc(int baseTime, int inc)
 
 int main()
 {
-    // Engine engine(TrueBot, TrueBot, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");
+    Engine engine(TrueBot, TrueBot, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-    Engine engine(TrueBot, TrueBot, "r4k1r/p1ppqpb1/bn2pQpB/3PN3/1p2P3/2N4p/PPP1BPPP/R3K2R b KQ - 0 1");
+    // Engine engine(TrueBot, TrueBot, "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq");
+
+    // Engine engine(TrueBot, TrueBot, "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
 
     engine.bot.maxTime = botBaseTime;
 
@@ -518,7 +520,7 @@ int main()
 
 
             engine.board.fillBitboardData();
-            uint64_t pMask = engine.board.attackMap;
+            uint64_t pMask = engine.board.checkRaysEP;
             while (pMask != 0)
             {
                 int sq = getAndClearLSB(&pMask);
@@ -529,17 +531,28 @@ int main()
                 window.draw(rectangle);
             }
 
-            engine.board.fillBitboardData();
-            uint64_t pMask2 = engine.board.pinRays;
-            while (pMask2 != 0)
-            {
-                int sq = getAndClearLSB(&pMask2);
-                sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
-                sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
-                rectangle.setFillColor(sf::Color(0,0,255,128));
-                rectangle.setPosition(pos);
-                window.draw(rectangle);
-            }
+            // engine.board.fillBitboardData();
+            // uint64_t pMask2 = engine.board.pinRays;
+            // while (pMask2 != 0)
+            // {
+            //     int sq = getAndClearLSB(&pMask2);
+            //     sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+            //     sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
+            //     rectangle.setFillColor(sf::Color(0,0,255,128));
+            //     rectangle.setPosition(pos);
+            //     window.draw(rectangle);
+            // }
+
+            // uint64_t pMask2 = engine.board.alignMask[5][13];
+            // while (pMask2 != 0)
+            // {
+            //     int sq = getAndClearLSB(&pMask2);
+            //     sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+            //     sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
+            //     rectangle.setFillColor(sf::Color(0,0,255,128));
+            //     rectangle.setPosition(pos);
+            //     window.draw(rectangle);
+            // }
 
 
 
