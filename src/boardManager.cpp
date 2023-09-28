@@ -502,7 +502,7 @@ std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 
 	std::vector<int> legalMoves;
 
-	// std::string currentFen = convertFen();
+	std::string currentFen = convertFen();
 
 	for (int pseudoMove : pseudoMoves)
 	{
@@ -513,23 +513,25 @@ std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 
 		legalMoves.push_back(pseudoMove);
 
-		// makeMove(pseudoMove);
+		makeMove(pseudoMove);
 
-		// whiteToMove = !whiteToMove;
+		whiteToMove = !whiteToMove;
 
-		// if (!isChecked())
-		// {
-		// 	legalMoves.push_back(pseudoMove);
-		// }
+		if (!isChecked())
+		{
+			legalMoves.push_back(pseudoMove);
+		}
 
-		// whiteToMove = !whiteToMove;
+		whiteToMove = !whiteToMove;
 
-		// unmakeMove(pseudoMove);
+		unmakeMove(pseudoMove);
 
-		// if(inCheck)
-		// {
-		// 	std::cout << currentFen << " : " << standardNotation(pseudoMove) << std::endl;
-		// }
+		if(inCheck)
+		{
+			std::fstream file("errorFens.txt", std::ios::app);
+			file << currentFen << " : " << standardNotation(pseudoMove) << std::endl;
+			std::cout << currentFen << " : " << standardNotation(pseudoMove) << std::endl;
+		}
 	}
 
 	return legalMoves;

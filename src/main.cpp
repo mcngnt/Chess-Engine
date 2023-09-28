@@ -48,24 +48,19 @@ int timeToAlloc(int baseTime, int inc)
 
 int main()
 {
-    Engine engine(TrueBot, TrueBot, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    // Engine engine(TrueBot, TrueBot, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-    // Engine engine(TrueBot, TrueBot, "rnbqkbnr/pppppppp/8/8/8/P7/1PPPPPPP/RNBQKBNR b KQkq");
+    // Engine engine(TrueBot, TrueBot, "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ");
+    Engine engine(TrueBot, TrueBot, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
 
     // Engine engine(TrueBot, TrueBot, "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
 
     engine.bot.maxTime = botBaseTime;
 
-    // uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
-    // std::cout << bitboardTest << std::endl;
-
-    // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-    // engine.perft(4);
-    // std::cout << "4085659 expected" << std::endl;
-    // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-    // std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
-
-    // std::cout << trailingZerosNB(1126724540563456) << std::endl;
+    std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+    engine.perft(4);
+    std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
+    std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 
     #if USE_UCI
 

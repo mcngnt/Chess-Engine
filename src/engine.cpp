@@ -276,6 +276,8 @@ void Engine::update()
 			board.makeMove(move);
 		}
 		board.movesHistory.push(move);
+
+
 		currentMoves = board.generateMoves(false);
 	}
 }
