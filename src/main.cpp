@@ -48,19 +48,19 @@ int timeToAlloc(int baseTime, int inc)
 
 int main()
 {
-    // Engine engine(TrueBot, TrueBot, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    Engine engine(TrueBot, TrueBot, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-    // Engine engine(TrueBot, TrueBot, "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - ");
-    Engine engine(TrueBot, TrueBot, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -");
+    // Engine engine(TrueBot, TrueBot, "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8  ");
+    // Engine engine(TrueBot, TrueBot, "r3k2N/p1ppqpb1/1n2pn2/1b1P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQq - 0 2");
 
     // Engine engine(TrueBot, TrueBot, "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
 
-    engine.bot.maxTime = botBaseTime;
+    // engine.bot.maxTime = botBaseTime;
 
-    std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-    engine.perft(4);
-    std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-    std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
+    // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
+    // engine.perft(3);
+    // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
+    // std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 
     #if USE_UCI
 
@@ -515,7 +515,7 @@ int main()
 
 
             engine.board.fillBitboardData();
-            uint64_t pMask = engine.board.checkRaysEP;
+            uint64_t pMask = engine.board.checkRays;
             while (pMask != 0)
             {
                 int sq = getAndClearLSB(&pMask);
@@ -526,17 +526,17 @@ int main()
                 window.draw(rectangle);
             }
 
-            // engine.board.fillBitboardData();
-            // uint64_t pMask2 = engine.board.pinRays;
-            // while (pMask2 != 0)
-            // {
-            //     int sq = getAndClearLSB(&pMask2);
-            //     sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
-            //     sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
-            //     rectangle.setFillColor(sf::Color(0,0,255,128));
-            //     rectangle.setPosition(pos);
-            //     window.draw(rectangle);
-            // }
+            engine.board.fillBitboardData();
+            uint64_t pMask2 = engine.board.pinRays;
+            while (pMask2 != 0)
+            {
+                int sq = getAndClearLSB(&pMask2);
+                sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+                sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
+                rectangle.setFillColor(sf::Color(0,0,255,128));
+                rectangle.setPosition(pos);
+                window.draw(rectangle);
+            }
 
             // uint64_t pMask2 = engine.board.alignMask[5][13];
             // while (pMask2 != 0)

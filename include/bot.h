@@ -31,7 +31,7 @@ public:
 	int search(BoardManager* board,int alpha, int beta, int depth, int plyFromRoot);
 
 
-	int maxTime = 500;
+	int maxTime = 3000;
 	std::chrono::high_resolution_clock::time_point startTime;
 	int nodes;
 	int rootMove;

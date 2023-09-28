@@ -28,7 +28,7 @@ bool BoardManager::isPieceHereBitboard(int pieceType, bool isPieceWhite, int squ
 
 bool BoardManager::isChecked()
 {
-    fillBitboardData();
+    // fillBitboardData();
     // return isBitToggled(attackMap, whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos);
     return inCheck;
 }
@@ -468,7 +468,7 @@ void BoardManager::fillBitboardData()
 									pinRays |= (currentRay | getPositionMask(sq)) & (~positionMask);
 								}
 							}
-							if(hasSeenEnemyPawn && hasSeenFriendlyPawn)
+							if(hasSeenEnemyPawn && hasSeenFriendlyPawn && (dirID == 2 || dirID == 3 ))
 							{
 								checkRaysEP |= (currentRay | getPositionMask(sq)) & (~positionMask);
 							}
@@ -502,7 +502,7 @@ std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 
 	std::vector<int> legalMoves;
 
-	std::string currentFen = convertFen();
+	// std::string currentFen = convertFen();
 
 	for (int pseudoMove : pseudoMoves)
 	{
@@ -513,25 +513,25 @@ std::vector<int> BoardManager::generateMoves(bool onlyCaptures)
 
 		legalMoves.push_back(pseudoMove);
 
-		makeMove(pseudoMove);
+		// makeMove(pseudoMove);
 
-		whiteToMove = !whiteToMove;
+		// whiteToMove = !whiteToMove;
 
-		if (!isChecked())
-		{
-			legalMoves.push_back(pseudoMove);
-		}
+		// if (!isChecked())
+		// {
+		// 	legalMoves.push_back(pseudoMove);
+		// }
 
-		whiteToMove = !whiteToMove;
+		// whiteToMove = !whiteToMove;
 
-		unmakeMove(pseudoMove);
+		// unmakeMove(pseudoMove);
 
-		if(inCheck)
-		{
-			std::fstream file("errorFens.txt", std::ios::app);
-			file << currentFen << " : " << standardNotation(pseudoMove) << std::endl;
-			std::cout << currentFen << " : " << standardNotation(pseudoMove) << std::endl;
-		}
+		// if(inCheck)
+		// {
+		// 	// std::fstream file("errorFens.txt", std::ios::app);
+		// 	// file << currentFen << " : " << standardNotation(pseudoMove) << std::endl;
+		// 	std::cout << "Found a non-detected check at : " <<  currentFen << " : " << standardNotation(pseudoMove) << std::endl;
+		// }
 	}
 
 	return legalMoves;
@@ -1094,8 +1094,8 @@ void BoardManager::loadFen(std::string fen)
 		{
 			switch (c)
 			{
-				case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : case '8' :
-					currentGameState.doublePushFile = (c - '0');
+				case 'a' : case 'b' : case 'c' : case 'd' : case 'e' : case 'f' : case 'g' : case 'h' :
+					currentGameState.doublePushFile = (c - 'a') + 1;
 					break;
 			}
 		}
@@ -1232,7 +1232,11 @@ std::string BoardManager::convertFen()
 	fen += '-';
 	fen += ' ';
 
-	fen += '0' + currentGameState.doublePushFile;
+	fen += currentGameState.doublePushFile == 0 ? '-' : 'a' + (currentGameState.doublePushFile - 1);
+	if(currentGameState.doublePushFile > 0)
+	{
+		fen += whiteToMove ? '6' : '4';
+	} 
 
 	fen += ' ';
 
