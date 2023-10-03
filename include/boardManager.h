@@ -60,25 +60,20 @@ public:
 	int get(int x, int y);
 	std::vector<int> generatePseudoMoves();
 	std::vector<int> generateMoves(bool onlyCaptures);
-	int isLegal(std::vector<int> moves, int move);
-	void unmakeMove(int move);
-
+	bool isSquareEmpty(int i, int j);
+	bool isSquareEmpty(int sq);
+	bool isSquareNotFriendly(int i, int j);
+	bool isSquareNotFriendly(int sq);
+	bool isSquareNotEnemy(int i, int j);
+	bool isSquareNotEnemy(int sq);
+	// int getLegal(std::vector<int> moves, int move);
+	bool isSquareEnemy(int i, int j);
 	bool isSquareEnemy(int sq);
 	bool isSquareFriendly(int sq);
-	bool isSquareEmpty(int sq);
-	bool isSquareEmptyFriendly(int sq);
-	bool isSquareEmptyEnemy(int sq);
-	bool isSquareEnemy(int i, int j);
-	bool isSquareFriendly(int i, int j);
-	bool isSquareEmpty(int i, int j);
-	bool isSquareEmptyFriendly(int i, int j);
-	bool isSquareEmptyEnemy(int i, int j);
-
-
+	void unmakeMove(int move);
 
 	std::string startingFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-	// std::string startingFen = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/P7/1PP1NnPP/RNBQK2R b KQ - 1 8  ";
-	// std::string startingFen = "rnbq1k1r/pp1P1ppp/2p2b2/8/2B5/P7/1PP1NnPP/RNBQK2R w KQ - 1 8  ";
+
 	void loadFen(std::string fen);
 	std::string convertFen();
 
@@ -94,8 +89,7 @@ public:
 	int getPieceBitboardIndex(int pieceType, bool isPieceWhite);
 	uint64_t getPieceBitboard(int pieceType, bool isPieceWhite);
 	void togglePieceBitboard(int pieceType, bool isPieceWhite, int squareIndex);
-
-	bool foundBug = false;
+	bool isPieceHereBitboard(int pieceType, bool isPieceWhite, int squareIndex);
 
 
 	void initZobrist();
@@ -110,14 +104,28 @@ public:
 	// void controlledSquares();
 	// void resetControl();
 
-	void fillBitboardData();
-
 	bool isChecked();
 
 	bool isRepetitionDraw();
 
+	bool isMoveLegal(int sq, int targetPos);
+
 	// void assign(int i, int j);
 
+	uint64_t attackMap;
+	uint64_t checkRaysEP;
+	uint64_t friendlyPiecesBitboard;
+	uint64_t enemyPiecesBitboard;
+	uint64_t allPiecesBitboard;
+
+	uint64_t pinRays;
+	uint64_t checkRays;
+	uint64_t captureMask;
+
+
+	bool isPinned(int sq);
+
+	void fillBitboardData();
 
 
 	bool whiteToMove = true;
@@ -125,11 +133,12 @@ public:
 
 	int board[8][8];
 
-	uint64_t friendlyPiecesBitboard;
-	uint64_t opponentPiecesBitboard;
-	uint64_t allPiecesBitboard;
+	bool inCheck;
+	bool doubleCheck;
 
-	uint64_t attackMap;
+	uint64_t alignMask[64][64];
+
+	int friendlyKingPos;
 
 	
 	std::stack<GameState> gameStateHistory;
@@ -139,7 +148,5 @@ public:
 	uint64_t repetitionTable[1024];
 
 	GameState currentGameState;
-
-	// bool controlled[8][8];
 
 };

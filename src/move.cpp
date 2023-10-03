@@ -76,10 +76,10 @@ std::string standardNotation(int move)
 			c = 'q';
 			break;
 		case KnightProm:
-			c = 'k';
+			c = 'n';
 			break;
 		case KnightPromCapture:
-			c = 'k';
+			c = 'n';
 			break;
 		case RookProm:
 			c = 'r';

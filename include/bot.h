@@ -25,13 +25,16 @@ public:
 	int play(BoardManager* board);
 
 	int evaluate(BoardManager* board);
+	int pieceTableEval(BoardManager* board);
+	int closeKingEval(BoardManager * board);
+	int squareControlEval(BoardManager * board);
 
 	int getDurationFromStart();
 
 	int search(BoardManager* board,int alpha, int beta, int depth, int plyFromRoot);
 
 
-	int maxTime = 500;
+	int maxTime = 3000;
 	std::chrono::high_resolution_clock::time_point startTime;
 	int nodes;
 	int rootMove;
@@ -43,6 +46,9 @@ public:
     int piecePhaseValue[6] = { 0, 1, 1, 2, 4, 0 };
 
     int killerMoves[200];
+    unsigned int historyHeuristicTable[2][64][64];
+
+    int phase;
 
 	
     int pieceTable[12][64] = { 

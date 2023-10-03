@@ -1,14 +1,15 @@
 #include "engine.h"
 
 
-Engine::Engine(int whiteBotType_, int blackBotType_)
+Engine::Engine(int whiteBotType_, int blackBotType_, std::string startFen)
 {
 	whiteBotType = whiteBotType_;
 	blackBotType = blackBotType_;
 
 	currentMoves = board.generateMoves(false);
 
-	bot.evaluate(&board);
+	board.startingFen = startFen;
+	board.loadFen(startFen);
 }
 
 
@@ -58,9 +59,21 @@ void Engine::perft(int depth)
 
 
 
-int Engine::isLegal(int move)
+int Engine::getLegal(int move)
 {
-	return board.isLegal(currentMoves, move);
+	// return board.getLegal(currentMoves, move);
+
+	currentMoves = board.generateMoves(false);
+
+	for (int movei : currentMoves)
+	{
+		// std::cout << "legalCalc : " << standardNotation(movei) << std::endl;
+		if (discardTag(movei) == move)
+		{
+			return movei;
+		}
+	}
+	return 0;
 }
 
 
@@ -79,7 +92,7 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2, char c)
 {
 	int move = genMove(pos2DToInt(p1), pos2DToInt(p2), 0);
 
-	int legalMove = isLegal(move);
+	int legalMove = getLegal(move);
 
 	if (legalMove > 0)
 	{
@@ -143,11 +156,13 @@ int Engine::tryMove(sf::Vector2i p1, sf::Vector2i p2, char c)
 	return 0;
 }
 
+// position startpos moves e2e4 e7e5 g1f3 b8c6 f1c4 g8f6 f3g5 d7d5 e4d5 c6a5 d2d3 a5c4 d3c4 h7h6 g5f3 e5e4
+
 #endif
 
 int Engine::tryMove(int move, char c)
 {
-	int legalMove = isLegal(move);
+	int legalMove = getLegal(move);
 
 	if (legalMove > 0)
 	{
@@ -179,6 +194,9 @@ int Engine::tryMove(int move, char c)
 
 			switch (getTag(legalMove))
 			{
+				case QueenProm:
+					newTag = newTagPr;
+					break;
 				case KnightProm:
 					newTag = newTagPr;
 					break;
@@ -195,6 +213,9 @@ int Engine::tryMove(int move, char c)
 					newTag = newTagPrCap;
 					break;
 				case RookPromCapture:
+					newTag = newTagPrCap;
+					break;
+				case QueenPromCapture:
 					newTag = newTagPrCap;
 					break;
 				
@@ -251,6 +272,8 @@ void Engine::update()
 			board.makeMove(move);
 		}
 		board.movesHistory.push(move);
+
+
 		currentMoves = board.generateMoves(false);
 	}
 }

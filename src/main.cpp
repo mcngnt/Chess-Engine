@@ -48,20 +48,19 @@ int timeToAlloc(int baseTime, int inc)
 
 int main()
 {
-    Engine engine(TrueBot, TrueBot);
+    Engine engine(TrueBot, TrueBot, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-    engine.bot.maxTime = botBaseTime;
+    // Engine engine(TrueBot, TrueBot, "8/5N1p/3kpq2/3b4/pr6/P1NR2Q1/1P4PP/7K b - - 0 1");
+    // Engine engine(TrueBot, TrueBot, "8/5p1p/3kpq2/3bN3/pr6/P1NR2Q1/1P4PP/7K w - - 0 1");
 
-    // uint64_t bitboardTest = engine.board.getPieceBitboard(Pawn, false);
-    // std::cout << bitboardTest << std::endl;
+    // Engine engine(TrueBot, TrueBot, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");
+
+    // engine.bot.maxTime = botBaseTime;
 
     // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-    // engine.perft(5);
-    // std::cout << "4865609 expected" << std::endl;
+    // engine.perft(4);
     // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
-    // std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
-
-    // std::cout << trailingZerosNB(1126724540563456) << std::endl;
+    // std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 
     #if USE_UCI
 
@@ -214,6 +213,7 @@ int main()
                 {
                     engine.board.whiteToMove = true;
                     readMoves = true;
+                    // std::cout << "info : " << engine.board.convertFen() << std::endl;
                     continue;
                 }
                 if(posMode == 2 && readMoves)
@@ -228,6 +228,7 @@ int main()
                         word.pop_back();
                         engine.tryMove(standNotToMove(word), c);
                     }
+                    // std::cout << "info : " << engine.board.convertFen() << std::endl;
                     continue;
                 }
             }
@@ -365,18 +366,6 @@ int main()
                         pieceHeld = sf::Vector2i(-1,-1);
                         doUpdate = false;
 
-                        // std::cout << engine.board.maxHistorySize << std::endl;
-
-
-                        std::cout << "Pos NB : " << engine.board.historySize << " Draw : " << engine.board.isRepetitionDraw() << std::endl;
-
-                        std::cout << "Current Zob Key : " << engine.board.zobristKey << std::endl;
-
-                        // for (int i = 0; i < engine.board.historySize ; ++i)
-                        // {
-                        //     std::cout << engine.board.gameStateHistory[i].zobristKey << std::endl;
-                        // }
-                        // std::cout << "----" << std::endl;
                     }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
@@ -459,7 +448,7 @@ int main()
 
                     if (holdPiece)
                     {
-                        if (engine.isLegal(genMove(pieceHeld.x, pieceHeld.y, j,i, 0)))
+                        if (engine.getLegal(genMove(pieceHeld.x, pieceHeld.y, j,i, 0)))
                         {
                             if ((i + j) % 2 == 0)
                             {
@@ -488,32 +477,34 @@ int main()
                 }
             }
 
-            if(showBitboard)
+/*            for (int color = 0; color <= 1; ++color)
             {
-                for (int color = 0; color <= 1; ++color)
+                for (int pType = 1; pType <= 6; ++pType)
                 {
-                    for (int pType = 1; pType <= 6; ++pType)
+                    uint64_t pMask = engine.board.getPieceBitboard(pType, color == 0);
+                    while (pMask != 0)
                     {
-                        uint64_t pMask = engine.board.getPieceBitboard(pType, color == 0);
-                        while (pMask != 0)
-                        {
-                            // std::cout << pMask << std::endl;
-                            int sq = getAndClearLSB(&pMask);
-                            int pnum = color == 0 ? White | pType : Black | pType;
-                            sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
-                            piecesSpr[pnum].setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
-                            piecesSpr[pnum].setColor(sf::Color(0, 255, 255, 128));
-                            window.draw(piecesSpr[pnum]);
-                            piecesSpr[pnum].setColor(sf::Color(255, 255, 255, 255));
-                        }
+                        // std::cout << pMask << std::endl;
+                        int sq = getAndClearLSB(&pMask);
+                        int pnum = color == 0 ? White | pType : Black | pType;
+                        // if(sf::Vector2i(sq % 8, sq / 8) == pieceHeld)
+                        // {
+                        //     continue;
+                        // }
+                        sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+                        piecesSpr[pnum].setPosition(pos + sf::Vector2f(pieceSize/2, pieceSize/2));
+                        piecesSpr[pnum].setColor(sf::Color(0, 255, 255, 128));
+                        window.draw(piecesSpr[pnum]);
+                        piecesSpr[pnum].setColor(sf::Color(255, 255, 255, 255));
                     }
                 }
-            }
+            }*/
 
-            uint64_t pMask = engine.board.attackMap;
+
+            engine.board.fillBitboardData();
+            uint64_t pMask = engine.board.checkRays;
             while (pMask != 0)
             {
-                // std::cout << pMask << std::endl;
                 int sq = getAndClearLSB(&pMask);
                 sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
                 sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
@@ -521,6 +512,29 @@ int main()
                 rectangle.setPosition(pos);
                 window.draw(rectangle);
             }
+
+            engine.board.fillBitboardData();
+            uint64_t pMask2 = engine.board.attackMap;
+            while (pMask2 != 0)
+            {
+                int sq = getAndClearLSB(&pMask2);
+                sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+                sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
+                rectangle.setFillColor(sf::Color(0,0,255,128));
+                rectangle.setPosition(pos);
+                window.draw(rectangle);
+            }
+
+            // uint64_t pMask2 = engine.board.alignMask[5][13];
+            // while (pMask2 != 0)
+            // {
+            //     int sq = getAndClearLSB(&pMask2);
+            //     sf::Vector2f pos = startPosDraw + sf::Vector2f((sq % 8) * pieceSize,(sq / 8) * pieceSize);
+            //     sf::RectangleShape rectangle(sf::Vector2f(pieceSize, pieceSize));
+            //     rectangle.setFillColor(sf::Color(0,0,255,128));
+            //     rectangle.setPosition(pos);
+            //     window.draw(rectangle);
+            // }
 
 
 
@@ -531,23 +545,23 @@ int main()
             }
 
 
-            if (engine.gameFinished)
-            {
-                if (engine.board.isChecked())
-                {
-                    text.setString("Echec et mat");
-                }
-                else
-                {
-                    text.setString("Pat");
-                }
-                text.setPosition(sf::Vector2f(550, 550));
-                text.setCharacterSize(80);
-                text.setOutlineColor(sf::Color(0,0,0));
-                text.setOutlineThickness(5);
-                centerText(&text);
-                window.draw(text);
-            }
+            // if (engine.gameFinished)
+            // {
+            //     if (engine.board.isChecked())
+            //     {
+            //         text.setString("Echec et mat");
+            //     }
+            //     else
+            //     {
+            //         text.setString("Pat");
+            //     }
+            //     text.setPosition(sf::Vector2f(550, 550));
+            //     text.setCharacterSize(80);
+            //     text.setOutlineColor(sf::Color(0,0,0));
+            //     text.setOutlineThickness(5);
+            //     centerText(&text);
+            //     window.draw(text);
+            // }
 
 
             window.display();

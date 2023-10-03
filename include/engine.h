@@ -12,7 +12,7 @@ public:
 	#endif
 
 
-	Engine(int whiteBotType_, int blackBotType_);
+	Engine(int whiteBotType_, int blackBotType_, std::string startFen);
 	int get(int x, int y);
 	int tryMove(int move, char c);
 	int tryMove(int move);
@@ -24,7 +24,7 @@ public:
 
 	void update();
 
-	int isLegal(int move);
+	int getLegal(int move);
 
 
 	void perft(int depth);
