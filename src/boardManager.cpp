@@ -28,8 +28,7 @@ bool BoardManager::isPieceHereBitboard(int pieceType, bool isPieceWhite, int squ
 
 bool BoardManager::isChecked()
 {
-    // fillBitboardData();
-    // return isBitToggled(attackMap, whiteToMove ? currentGameState.whiteKingPos : currentGameState.blackKingPos);
+	fillBitboardData();
     return inCheck;
 }
 
@@ -201,14 +200,6 @@ bool BoardManager::isSquareFriendly(int sq)
 	return isBitToggled(friendlyPiecesBitboard, sq);
 }
 
-
-// void BoardManager::assign(int i, int j)
-// {
-// 	if (i >= 0 && i < 8 && j >= 0 && j < 8)
-// 	{
-// 		controlled[i][j] = true;
-// 	}
-// }
 
 void BoardManager::fillBitboardData()
 {
@@ -587,24 +578,16 @@ std::vector<int> BoardManager::generatePseudoMoves()
 	fillBitboardData();
 
 
-	for (int color = 0; color <= 1; ++color)
-	{
-	    for (int pType = 1; pType <= 6; ++pType)
+	    for (int pType = 6; pType >= 1; --pType)
 	    {
-	    uint64_t pMask = getPieceBitboard(pType, color == 0);
+	    uint64_t pMask = getPieceBitboard(pType, whiteToMove);
         while (pMask != 0)
         {
 
-			int piece = ((color == 0) ? White : Black) | pType;
+			int piece = (whiteToMove ? White : Black) | pType;
 			int sq = getAndClearLSB(&pMask);
 			int i = sq % 8;
 			int j = sq / 8;
-
-			if(piece > 0 && (color == 0) == whiteToMove)
-			{
-
-
-
 
 				if (pType == King)
 				{
@@ -785,7 +768,7 @@ std::vector<int> BoardManager::generatePseudoMoves()
 				if (pType == Pawn)
 				{
 
-					if (color == 0)
+					if (whiteToMove)
 					{
 						if (numSquares[sq][NorthID] >= 1 && isSquareEmpty(i,j-1))
 						{
@@ -944,12 +927,8 @@ std::vector<int> BoardManager::generatePseudoMoves()
 					}		
 
 				}
-
-
-			}
 		}
 		}
-	}
 
 	return moves;
 }

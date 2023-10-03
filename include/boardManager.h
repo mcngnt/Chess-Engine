@@ -128,7 +128,6 @@ public:
 	void fillBitboardData();
 
 
-
 	bool whiteToMove = true;
 
 

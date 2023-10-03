@@ -164,8 +164,6 @@ int Engine::tryMove(int move, char c)
 {
 	int legalMove = getLegal(move);
 
-	// std::cout << "legal move : " << legalMove << std::endl;
-
 	if (legalMove > 0)
 	{
 		if (  getTag(legalMove) >= 8)
@@ -226,8 +224,6 @@ int Engine::tryMove(int move, char c)
 			legalMove = discardTag(legalMove) | (newTag << 12);
 		}
 		board.makeMove(legalMove);
-
-		// std::cout <<  "info : " << standardNotation(legalMove) << std::endl;
 
 		currentMoves = board.generateMoves(false);
 		board.movesHistory.push(legalMove);

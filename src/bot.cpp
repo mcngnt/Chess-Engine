@@ -13,39 +13,11 @@ int Bot::getDurationFromStart()
 	return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 }
 
-
-int Bot::evaluate(BoardManager* board)
+int Bot::pieceTableEval(BoardManager* board)
 {
 	int middleGame = 0;
 	int endGame = 0;
-	int phase = 0;
-
-	/*for (int i = 0 ; i < 64 ; ++i)
-	{
-		int piece = board->get(i);
-		int pType = pieceType(piece);
-		
-		if (pType > None)
-		{
-			int pscore = pieceValues[pType - 1];
-			phase += piecePhaseValue[pType - 1];
-			if (isPieceWhite(piece))
-			{
-				// std::cout << "Piece type : " << pType << " Index : " << (int)(i ^ 56) << std::endl;
-				middleGame += pieceTable[pType - 1][i] + pscore;
-				endGame += pieceTable[pType - 1 + 6][i] + pscore;
-			}
-			else
-			{
-				middleGame -= pieceTable[pType - 1][i ^ 56] + pscore;
-				endGame -= pieceTable[pType - 1 + 6][i ^ 56] + pscore;
-			}
-
-		}
-		
-
-	}*/
-
+	phase = 0;
 
 	for (int color = 0; color <= 1; ++color)
     {
@@ -73,8 +45,35 @@ int Bot::evaluate(BoardManager* board)
     }
 
 
-
 	return (middleGame * phase + endGame * (24 - phase)) / 24 * (board->whiteToMove ? 1 : -1);
+}
+
+int Bot::closeKingEval(BoardManager * board)
+{
+	int whiteDist = abs((board->currentGameState.whiteKingPos / 8) - 3) + abs((board->currentGameState.whiteKingPos % 8) - 3);
+	int blackDist = abs((board->currentGameState.blackKingPos / 8) - 3) + abs((board->currentGameState.blackKingPos % 8) - 3);
+
+	return -(whiteDist - blackDist) * (24 - phase) * (board->whiteToMove ? 1 : -1);
+}
+
+int Bot::squareControlEval(BoardManager * board)
+{
+	return -setBitsNB(board->attackMap);
+}
+
+
+
+int Bot::evaluate(BoardManager* board)
+{
+
+	int pieceScore = pieceTableEval(board);
+	int checkScore = (board->inCheck ? -1 : 0);
+	// int closeKingScore = closeKing(board);
+	// int squareControlScore = squareControlEval(board);
+
+	return pieceScore + checkScore * 100;
+
+	
 }
 
 
@@ -96,7 +95,6 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
     int currentNodeType = AlphaNode;
     int bestMove = 0;
     int eval = 0;
-    // bool canPrune = false;
 
     if (depth > 2 && getDurationFromStart() > maxTime)
     {
@@ -145,11 +143,6 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
     }
 
 
-
-     // foreach (Move move in moves)
-     //     scores[scoreIter++] = -(move == entry.bestMove ? 9000000 :  move.IsCapture ? 1000000 * (int)move.CapturePieceType - (int)move.MovePieceType : killerMoves[plyFromRoot] == move ? 900000 : counterMoves[isWhiteMult, (int)previousMove.MovePieceType, previousMove.TargetSquare.Index] == move ? 800000 : historyHeuristicTable[isWhiteMult,(int)move.MovePieceType, move.TargetSquare.Index]);
-
-
     std::vector<int> moves = board->generateMoves(inQuiescence && !inCheck);
 
     if (moves.size() == 0)
@@ -188,11 +181,11 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 		int move = moveScorePair[moveCount].first;
 
 
-/*
-        if (canPrune && moveCount > 1 && getTag(move) != Capture && getTag(move) != QueenProm)
-        {
-             continue;
-        }*/
+
+        // if (canPrune && moveCount > 1 && getTag(move) != Capture && getTag(move) != QueenProm)
+        // {
+        //      continue;
+        // }
 
 
 
@@ -232,7 +225,7 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 
 
         if (eval > bestEval)
-         {
+        {
 
              bestEval = eval;
 
@@ -265,9 +258,9 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
      }
 
 
-        // entry = new(board.ZobristKey, bestEval, depth, bestMove == default ? entry.bestMove : bestMove, currentFlag);
+     // entry = new(board.ZobristKey, bestEval, depth, bestMove == default ? entry.bestMove : bestMove, currentFlag);
 
-     transpositionTable.set(board->zobristKey, depth, bestEval, currentNodeType, bestMove);
+     transpositionTable.set(board->zobristKey, depth, bestEval, currentNodeType, bestMove == 0 ? ttEntry.bestMove : bestMove);
 
      return bestEval;
 
@@ -280,8 +273,6 @@ int Bot::search(BoardManager* board, int alpha, int beta, int depth, int plyFrom
 
 int Bot::play(BoardManager* board)
 {
-
-	std::cout << "Current fen : " << board->convertFen() << std::endl;
 
 	startTime = std::chrono::high_resolution_clock::now();
 
@@ -313,6 +304,10 @@ int Bot::play(BoardManager* board)
 
 
 	}
+
+	std::fstream file("C:/Users/marti/Documents/Grenouille/errorFens.txt", std::ios::app);
+	file << board->convertFen() << " : " << standardNotation(rootMove) << std::endl;
+
 
 	std::cout << "info bestmove : " << standardNotation(rootMove) << std::endl;
 

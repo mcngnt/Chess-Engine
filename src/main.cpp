@@ -50,15 +50,15 @@ int main()
 {
     Engine engine(TrueBot, TrueBot, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-    // Engine engine(TrueBot, TrueBot, "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8  ");
-    // Engine engine(TrueBot, TrueBot, "r3k2N/p1ppqpb1/1n2pn2/1b1P4/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQq - 0 2");
+    // Engine engine(TrueBot, TrueBot, "8/5N1p/3kpq2/3b4/pr6/P1NR2Q1/1P4PP/7K b - - 0 1");
+    // Engine engine(TrueBot, TrueBot, "8/5p1p/3kpq2/3bN3/pr6/P1NR2Q1/1P4PP/7K w - - 0 1");
 
-    // Engine engine(TrueBot, TrueBot, "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1");
+    // Engine engine(TrueBot, TrueBot, "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");
 
     // engine.bot.maxTime = botBaseTime;
 
     // std::chrono::high_resolution_clock::time_point startTime = std::chrono::high_resolution_clock::now();
-    // engine.perft(3);
+    // engine.perft(4);
     // std::chrono::high_resolution_clock::time_point endTime = std::chrono::high_resolution_clock::now();
     // std::cout << "Time : " << std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count() << std::endl;
 
@@ -363,22 +363,9 @@ int main()
                     {
                         holdPiece = false;
                         engine.tryMove(pieceHeld, sf::Vector2i(gridPos.x, gridPos.y), 'q');
-                        // std::cout << standardNotation(engine.board.movesHistory.top()) << std::endl;
                         pieceHeld = sf::Vector2i(-1,-1);
                         doUpdate = false;
 
-                        // std::cout << engine.board.maxHistorySize << std::endl;
-
-
-                        // std::cout << "Pos NB : " << engine.board.historySize << " Draw : " << engine.board.isRepetitionDraw() << std::endl;
-
-                        // std::cout << "Current Zob Key : " << engine.board.zobristKey << std::endl;
-
-                        // for (int i = 0; i < engine.board.historySize ; ++i)
-                        // {
-                        //     std::cout << engine.board.gameStateHistory[i].zobristKey << std::endl;
-                        // }
-                        // std::cout << "----" << std::endl;
                     }
                 }
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
@@ -527,7 +514,7 @@ int main()
             }
 
             engine.board.fillBitboardData();
-            uint64_t pMask2 = engine.board.pinRays;
+            uint64_t pMask2 = engine.board.attackMap;
             while (pMask2 != 0)
             {
                 int sq = getAndClearLSB(&pMask2);
@@ -558,23 +545,23 @@ int main()
             }
 
 
-            if (engine.gameFinished)
-            {
-                if (engine.board.isChecked())
-                {
-                    text.setString("Echec et mat");
-                }
-                else
-                {
-                    text.setString("Pat");
-                }
-                text.setPosition(sf::Vector2f(550, 550));
-                text.setCharacterSize(80);
-                text.setOutlineColor(sf::Color(0,0,0));
-                text.setOutlineThickness(5);
-                centerText(&text);
-                window.draw(text);
-            }
+            // if (engine.gameFinished)
+            // {
+            //     if (engine.board.isChecked())
+            //     {
+            //         text.setString("Echec et mat");
+            //     }
+            //     else
+            //     {
+            //         text.setString("Pat");
+            //     }
+            //     text.setPosition(sf::Vector2f(550, 550));
+            //     text.setCharacterSize(80);
+            //     text.setOutlineColor(sf::Color(0,0,0));
+            //     text.setOutlineThickness(5);
+            //     centerText(&text);
+            //     window.draw(text);
+            // }
 
 
             window.display();

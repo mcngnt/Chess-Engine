@@ -25,6 +25,9 @@ public:
 	int play(BoardManager* board);
 
 	int evaluate(BoardManager* board);
+	int pieceTableEval(BoardManager* board);
+	int closeKingEval(BoardManager * board);
+	int squareControlEval(BoardManager * board);
 
 	int getDurationFromStart();
 
@@ -44,6 +47,8 @@ public:
 
     int killerMoves[200];
     unsigned int historyHeuristicTable[2][64][64];
+
+    int phase;
 
 	
     int pieceTable[12][64] = { 
